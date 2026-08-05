@@ -7,13 +7,17 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// Управляет документами и позволяет игроку
-/// засекречивать любое слово.
+/// засекречивать любое слово кликом или движением мыши.
 ///
 /// Правильные слова задаются внутри [[двойных скобок]].
-/// Проверка выполняется только после нажатия
+/// Проверка выполняется после нажатия
 /// кнопки «Передать документ».
 /// </summary>
-public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
+public class DocumentRedactor :
+    MonoBehaviour,
+    IPointerDownHandler,
+    IDragHandler,
+    IPointerUpHandler
 {
     [Header("Основной интерфейс")]
 
@@ -51,26 +55,21 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
     [Header("Обычный текст")]
 
-    [Tooltip("Цвет обычного текста документа.")]
+    [Tooltip("Цвет обычного текста и знаков препинания.")]
     [SerializeField]
-    private string normalTextColor = "#2B2924";
+    private string normalTextColor = "#24211C";
 
     [Header("Слабая подсказка")]
 
     [Tooltip("Цвет правильных слов до засекречивания.")]
     [SerializeField]
-    private string secretTextColor = "#49453D";
+    private string secretTextColor = "#4B4438";
 
-    [Tooltip(
-        "Цвет едва заметного фона правильных слов. " +
-        "Последние две цифры отвечают за прозрачность."
-    )]
+    [Tooltip("Едва заметный фон правильных слов.")]
     [SerializeField]
-    private string secretHighlightColor = "#AD8B4010";
+    private string secretHighlightColor = "#8E713018";
 
-    [Tooltip(
-        "Размер правильных слов относительно обычного текста."
-    )]
+    [Tooltip("Размер правильных слов относительно обычных.")]
     [Range(95, 105)]
     [SerializeField]
     private int secretTextSizePercent = 99;
@@ -84,12 +83,26 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     private readonly List<WordData> words =
         new List<WordData>();
 
-    // Последовательность слов, пробелов и знаков препинания.
+    // Последовательность слов, пробелов,
+    // переносов строк и знаков препинания.
     private readonly List<TextPart> textParts =
         new List<TextPart>();
 
+    // Слова, обработанные во время текущего
+    // движения мыши. Нужны, чтобы одно слово
+    // не переключалось несколько раз.
+    private readonly HashSet<int> processedDragWords =
+        new HashSet<int>();
+
     private int currentDocumentIndex;
     private bool documentFinished;
+
+    // true — игрок сейчас удерживает кнопку мыши.
+    private bool isDragging;
+
+    // true — текущее движение ставит плашки.
+    // false — текущее движение снимает плашки.
+    private bool dragRedactionState;
 
     private void Start()
     {
@@ -114,8 +127,16 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Проверяет обязательные ссылки,
-    /// назначаемые через Inspector.
+    /// На случай, если объект отключится
+    /// во время удержания кнопки мыши.
+    /// </summary>
+    private void OnDisable()
+    {
+        StopDragging();
+    }
+
+    /// <summary>
+    /// Проверяет обязательные ссылки из Inspector.
     /// </summary>
     private bool ValidateReferences()
     {
@@ -197,6 +218,8 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
             return;
         }
+
+        StopDragging();
 
         documentFinished = false;
 
@@ -352,10 +375,6 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
     /// <summary>
     /// Разделяет документ на слова и промежутки.
-    ///
-    /// Пробелы, переводы строк и знаки препинания
-    /// сохраняются отдельно, чтобы документ
-    /// не менял структуру.
     /// </summary>
     private void CreateWordsAndTextParts(
         string cleanText,
@@ -375,8 +394,6 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
         foreach (Match match in matches)
         {
-            // Сохраняем всё перед словом:
-            // пробелы, переносы строк и пунктуацию.
             if (match.Index > currentPosition)
             {
                 string separator =
@@ -416,7 +433,6 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
                 match.Index + match.Length;
         }
 
-        // Сохраняем остаток после последнего слова.
         if (currentPosition < cleanText.Length)
         {
             string remainingText =
@@ -456,10 +472,11 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Unity вызывает этот метод
-    /// при клике по DocumentText.
+    /// Начало клика или движения мыши.
+    /// Первое слово определяет режим:
+    /// ставить плашки или снимать их.
     /// </summary>
-    public void OnPointerClick(
+    public void OnPointerDown(
         PointerEventData eventData
     )
     {
@@ -468,18 +485,109 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             return;
         }
 
+        if (eventData.button !=
+            PointerEventData.InputButton.Left)
+        {
+            return;
+        }
+
+        int wordId = GetWordIdAtPosition(
+            eventData.position,
+            eventData.pressEventCamera
+        );
+
+        if (wordId == -1)
+        {
+            return;
+        }
+
+        isDragging = true;
+        processedDragWords.Clear();
+
+        WordData firstWord = words[wordId];
+
+        // Если слово открыто — начинаем ставить плашки.
+        // Если слово закрыто — начинаем снимать их.
+        dragRedactionState = !firstWord.isRedacted;
+
+        ApplyDragState(wordId);
+    }
+
+    /// <summary>
+    /// Обрабатывает движение мыши
+    /// при зажатой левой кнопке.
+    /// </summary>
+    public void OnDrag(
+        PointerEventData eventData
+    )
+    {
+        if (documentFinished || !isDragging)
+        {
+            return;
+        }
+
+        int wordId = GetWordIdAtPosition(
+            eventData.position,
+            eventData.pressEventCamera
+        );
+
+        if (wordId == -1)
+        {
+            return;
+        }
+
+        ApplyDragState(wordId);
+    }
+
+    /// <summary>
+    /// Завершает движение мыши.
+    /// </summary>
+    public void OnPointerUp(
+        PointerEventData eventData
+    )
+    {
+        if (eventData.button !=
+            PointerEventData.InputButton.Left)
+        {
+            return;
+        }
+
+        StopDragging();
+    }
+
+    /// <summary>
+    /// Возвращает ID слова под курсором.
+    /// </summary>
+    private int GetWordIdAtPosition(
+        Vector2 screenPosition,
+        Camera eventCamera
+    )
+    {
+        Camera cameraForText = eventCamera;
+
+        if (documentText.canvas != null &&
+            documentText.canvas.renderMode ==
+            RenderMode.ScreenSpaceOverlay)
+        {
+            cameraForText = null;
+        }
+
         int linkIndex =
             TMP_TextUtilities.FindIntersectingLink(
                 documentText,
-                eventData.position,
-                eventData.pressEventCamera
+                screenPosition,
+                cameraForText
             );
 
-        // -1 означает, что игрок нажал
-        // между словами или вне текста.
         if (linkIndex == -1)
         {
-            return;
+            return -1;
+        }
+
+        if (linkIndex >=
+            documentText.textInfo.linkCount)
+        {
+            return -1;
         }
 
         TMP_LinkInfo linkInfo =
@@ -493,31 +601,42 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
                 $"Не удалось определить ID слова: {linkId}"
             );
 
-            return;
+            return -1;
         }
 
-        ToggleWordRedaction(wordId);
+        if (wordId < 0 || wordId >= words.Count)
+        {
+            return -1;
+        }
+
+        return wordId;
     }
 
     /// <summary>
-    /// Скрывает выбранное слово.
-    /// Повторный клик возвращает его.
+    /// Применяет к слову состояние текущего движения.
     /// </summary>
-    private void ToggleWordRedaction(int wordId)
+    private void ApplyDragState(int wordId)
     {
-        if (wordId < 0 ||
-            wordId >= words.Count)
+        if (wordId < 0 || wordId >= words.Count)
         {
-            Debug.LogWarning(
-                $"Слово с ID {wordId} не существует."
-            );
-
             return;
         }
 
+        if (processedDragWords.Contains(wordId))
+        {
+            return;
+        }
+
+        processedDragWords.Add(wordId);
+
         WordData word = words[wordId];
 
-        word.isRedacted = !word.isRedacted;
+        if (word.isRedacted == dragRedactionState)
+        {
+            return;
+        }
+
+        word.isRedacted = dragRedactionState;
 
         RefreshDocument();
 
@@ -525,6 +644,15 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             "Документ изменён. " +
             "Результат ещё не проверен."
         );
+    }
+
+    /// <summary>
+    /// Завершает текущее движение мыши.
+    /// </summary>
+    private void StopDragging()
+    {
+        isDragging = false;
+        processedDragWords.Clear();
     }
 
     /// <summary>
@@ -539,6 +667,8 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
         {
             if (!part.isWord)
             {
+                // Красим пробелы и знаки препинания
+                // тем же цветом, что и основной текст.
                 result.Append(
                     $"<color={normalTextColor}>" +
                     part.separatorText +
@@ -556,19 +686,14 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
         }
 
         documentText.text = result.ToString();
-
-        // Немедленно обновляем внутренние данные TMP,
-        // чтобы ссылки корректно работали после изменения.
         documentText.ForceMeshUpdate();
 
         UpdateProgress();
     }
 
     /// <summary>
-    /// Создаёт разметку одного слова.
-    ///
-    /// Каждое слово помещается во внутренний
-    /// TMP-тег link с уникальным номером.
+    /// Создаёт TMP-разметку одного слова.
+    /// Каждое слово получает уникальную ссылку.
     /// </summary>
     private string CreateWordMarkup(WordData word)
     {
@@ -620,11 +745,8 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Создаёт чёрную плашку,
-    /// сохраняя исходную ширину слова.
-    ///
-    /// Слово остаётся внутри ссылки,
-    /// поэтому повторный клик продолжает работать.
+    /// Создаёт цензурную плашку,
+    /// сохраняя ширину исходного слова.
     /// </summary>
     private string CreateRedactedWord(
         string originalText
@@ -639,8 +761,8 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Показывает число выбранных игроком слов.
-    /// Правильность здесь не раскрывается.
+    /// Показывает количество выбранных слов,
+    /// не раскрывая их правильность.
     /// </summary>
     private void UpdateProgress()
     {
@@ -678,12 +800,14 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             return;
         }
 
+        StopDragging();
+
         int missedSecretWords = 0;
         int extraRedactedWords = 0;
 
         foreach (WordData word in words)
         {
-            // Правильное слово осталось открытым.
+            // Секретное слово осталось открытым.
             if (word.isSecret &&
                 !word.isRedacted)
             {
@@ -718,7 +842,6 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     /// <summary>
     /// Сообщает количество ошибок,
     /// но не раскрывает их расположение.
-    /// Игрок может продолжить редактирование.
     /// </summary>
     private void RejectDocument(
         int missedSecretWords,
@@ -760,6 +883,7 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     private void CompleteDocument()
     {
         documentFinished = true;
+        StopDragging();
 
         submitButton.SetActive(false);
         winPanel.SetActive(true);
@@ -808,7 +932,7 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Данные одного слова документа.
+    /// Данные одного слова.
     /// </summary>
     private class WordData
     {
@@ -820,7 +944,7 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
     /// <summary>
     /// Часть документа:
-    /// либо слово, либо разделитель.
+    /// слово или разделитель.
     /// </summary>
     private class TextPart
     {
