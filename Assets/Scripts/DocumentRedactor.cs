@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+п»їusing System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -6,12 +6,11 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Управляет документами и позволяет игроку
-/// засекречивать любое слово кликом или движением мыши.
+/// РЈРїСЂР°РІР»СЏРµС‚ РґРѕРєСѓРјРµРЅС‚Р°РјРё, Р·Р°СЃРµРєСЂРµС‡РёРІР°РЅРёРµРј СЃР»РѕРІ,
+/// РїСЂРѕРІРµСЂРєР°РјРё, РЅР°С‡РёСЃР»РµРЅРёРµРј РѕС‡РєРѕРІ Рё РїРµСЂРµС…РѕРґРѕРј
+/// РјРµР¶РґСѓ РґРѕРєСѓРјРµРЅС‚Р°РјРё.
 ///
-/// Правильные слова задаются внутри [[двойных скобок]].
-/// Проверка выполняется после нажатия
-/// кнопки «Передать документ».
+/// РџСЂР°РІРёР»СЊРЅС‹Рµ СЃР»РѕРІР° Р·Р°РґР°СЋС‚СЃСЏ РІРЅСѓС‚СЂРё [[РґРІРѕР№РЅС‹С… СЃРєРѕР±РѕРє]].
 /// </summary>
 public class DocumentRedactor :
     MonoBehaviour,
@@ -19,7 +18,7 @@ public class DocumentRedactor :
     IDragHandler,
     IPointerUpHandler
 {
-    [Header("Основной интерфейс")]
+    [Header("РћСЃРЅРѕРІРЅРѕР№ РёРЅС‚РµСЂС„РµР№СЃ")]
 
     [SerializeField]
     private TMP_Text documentTitleText;
@@ -34,9 +33,12 @@ public class DocumentRedactor :
     private TMP_Text statusText;
 
     [SerializeField]
+    private TMP_Text inspectionsText;
+
+    [SerializeField]
     private GameObject submitButton;
 
-    [Header("Панель завершения")]
+    [Header("РџР°РЅРµР»СЊ СЂРµР·СѓР»СЊС‚Р°С‚Р°")]
 
     [SerializeField]
     private GameObject winPanel;
@@ -45,63 +47,74 @@ public class DocumentRedactor :
     private TMP_Text completionText;
 
     [SerializeField]
+    private TMP_Text resultScoreText;
+
+    [SerializeField]
     private GameObject nextDocumentButton;
 
-    [Header("Документы")]
+    [Header("Р”РѕРєСѓРјРµРЅС‚С‹")]
 
     [SerializeField]
     private List<DocumentData> documents =
         new List<DocumentData>();
 
-    [Header("Обычный текст")]
+    [Header("РџСЂРѕРІРµСЂРєРё")]
 
-    [Tooltip("Цвет обычного текста и знаков препинания.")]
+    [SerializeField]
+    [Min(1)]
+    private int maximumInspections = 3;
+
+    [Header("РћС‡РєРё")]
+
+    [SerializeField]
+    [Min(0)]
+    private int firstTryScore = 100;
+
+    [SerializeField]
+    [Min(0)]
+    private int secondTryScore = 75;
+
+    [SerializeField]
+    [Min(0)]
+    private int thirdTryScore = 50;
+
+    [Header("РћР±С‹С‡РЅС‹Р№ С‚РµРєСЃС‚")]
+
     [SerializeField]
     private string normalTextColor = "#24211C";
 
-    [Header("Слабая подсказка")]
+    [Header("РЎР»Р°Р±Р°СЏ РїРѕРґСЃРєР°Р·РєР°")]
 
-    [Tooltip("Цвет правильных слов до засекречивания.")]
     [SerializeField]
     private string secretTextColor = "#4B4438";
 
-    [Tooltip("Едва заметный фон правильных слов.")]
     [SerializeField]
     private string secretHighlightColor = "#8E713018";
 
-    [Tooltip("Размер правильных слов относительно обычных.")]
     [Range(95, 105)]
     [SerializeField]
     private int secretTextSizePercent = 99;
 
-    [Header("Цензурная плашка")]
+    [Header("Р¦РµРЅР·СѓСЂРЅР°СЏ РїР»Р°С€РєР°")]
 
     [SerializeField]
     private string redactionColor = "#000000FF";
 
-    // Все слова текущего документа.
     private readonly List<WordData> words =
         new List<WordData>();
 
-    // Последовательность слов, пробелов,
-    // переносов строк и знаков препинания.
     private readonly List<TextPart> textParts =
         new List<TextPart>();
 
-    // Слова, обработанные во время текущего
-    // движения мыши. Нужны, чтобы одно слово
-    // не переключалось несколько раз.
     private readonly HashSet<int> processedDragWords =
         new HashSet<int>();
 
     private int currentDocumentIndex;
+    private int inspectionsRemaining;
+    private int totalScore;
+
     private bool documentFinished;
-
-    // true — игрок сейчас удерживает кнопку мыши.
     private bool isDragging;
-
-    // true — текущее движение ставит плашки.
-    // false — текущее движение снимает плашки.
     private bool dragRedactionState;
 
     private void Start()
@@ -115,7 +128,7 @@ public class DocumentRedactor :
         if (documents.Count == 0)
         {
             Debug.LogError(
-                "В списке Documents нет ни одного документа."
+                "Р’ СЃРїРёСЃРєРµ Documents РЅРµС‚ РЅРё РѕРґРЅРѕРіРѕ РґРѕРєСѓРјРµРЅС‚Р°."
             );
 
             enabled = false;
@@ -123,21 +136,16 @@ public class DocumentRedactor :
         }
 
         currentDocumentIndex = 0;
+        totalScore = 0;
+
         LoadCurrentDocument();
     }
 
-    /// <summary>
-    /// На случай, если объект отключится
-    /// во время удержания кнопки мыши.
-    /// </summary>
     private void OnDisable()
     {
         StopDragging();
     }
 
-    /// <summary>
-    /// Проверяет обязательные ссылки из Inspector.
-    /// </summary>
     private bool ValidateReferences()
     {
         bool referencesAreValid = true;
@@ -145,7 +153,7 @@ public class DocumentRedactor :
         if (documentText == null)
         {
             Debug.LogError(
-                "Не назначено поле Document Text."
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Document Text."
             );
 
             referencesAreValid = false;
@@ -154,7 +162,7 @@ public class DocumentRedactor :
         if (progressText == null)
         {
             Debug.LogError(
-                "Не назначено поле Progress Text."
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Progress Text."
             );
 
             referencesAreValid = false;
@@ -163,7 +171,16 @@ public class DocumentRedactor :
         if (statusText == null)
         {
             Debug.LogError(
-                "Не назначено поле Status Text."
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Status Text."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (inspectionsText == null)
+        {
+            Debug.LogError(
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Inspections Text."
             );
 
             referencesAreValid = false;
@@ -172,7 +189,7 @@ public class DocumentRedactor :
         if (submitButton == null)
         {
             Debug.LogError(
-                "Не назначено поле Submit Button."
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Submit Button."
             );
 
             referencesAreValid = false;
@@ -181,7 +198,25 @@ public class DocumentRedactor :
         if (winPanel == null)
         {
             Debug.LogError(
-                "Не назначено поле Win Panel."
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Win Panel."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (completionText == null)
+        {
+            Debug.LogError(
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Completion Text."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (resultScoreText == null)
+        {
+            Debug.LogError(
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Result Score Text."
             );
 
             referencesAreValid = false;
@@ -190,17 +225,13 @@ public class DocumentRedactor :
         return referencesAreValid;
     }
 
-    /// <summary>
-    /// Загружает текущий документ
-    /// и очищает предыдущий выбор игрока.
-    /// </summary>
     private void LoadCurrentDocument()
     {
         if (currentDocumentIndex < 0 ||
             currentDocumentIndex >= documents.Count)
         {
             Debug.LogError(
-                "Некорректный индекс документа."
+                "РќРµРєРѕСЂСЂРµРєС‚РЅС‹Р№ РёРЅРґРµРєСЃ РґРѕРєСѓРјРµРЅС‚Р°."
             );
 
             return;
@@ -212,8 +243,8 @@ public class DocumentRedactor :
         if (currentDocument == null)
         {
             Debug.LogError(
-                $"Документ под индексом " +
-                $"{currentDocumentIndex} не назначен."
+                $"Р”РѕРєСѓРјРµРЅС‚ РїРѕРґ РёРЅРґРµРєСЃРѕРј " +
+                $"{currentDocumentIndex} РЅРµ РЅР°Р·РЅР°С‡РµРЅ."
             );
 
             return;
@@ -222,6 +253,7 @@ public class DocumentRedactor :
         StopDragging();
 
         documentFinished = false;
+        inspectionsRemaining = maximumInspections;
 
         winPanel.SetActive(false);
         submitButton.SetActive(true);
@@ -229,15 +261,13 @@ public class DocumentRedactor :
         UpdateDocumentTitle(currentDocument);
         ParseDocument(currentDocument.DocumentText);
         RefreshDocument();
+        UpdateInspectionsDisplay();
 
         SetStatus(
-            "Выберите сведения для засекречивания."
+            "Р’С‹Р±РµСЂРёС‚Рµ СЃРІРµРґРµРЅРёСЏ РґР»СЏ Р·Р°СЃРµРєСЂРµС‡РёРІР°РЅРёСЏ."
         );
     }
 
-    /// <summary>
-    /// Показывает номер и название документа.
-    /// </summary>
     private void UpdateDocumentTitle(
         DocumentData document
     )
@@ -252,9 +282,6 @@ public class DocumentRedactor :
             $"{document.DocumentTitle}";
     }
 
-    /// <summary>
-    /// Подготавливает текст документа.
-    /// </summary>
     private void ParseDocument(string sourceText)
     {
         words.Clear();
@@ -263,7 +290,7 @@ public class DocumentRedactor :
         if (string.IsNullOrWhiteSpace(sourceText))
         {
             Debug.LogWarning(
-                "Текст текущего документа пуст."
+                "РўРµРєСЃС‚ С‚РµРєСѓС‰РµРіРѕ РґРѕРєСѓРјРµРЅС‚Р° РїСѓСЃС‚."
             );
 
             return;
@@ -290,15 +317,11 @@ public class DocumentRedactor :
         if (secretWordCount == 0)
         {
             Debug.LogWarning(
-                "В документе нет секретных слов [[...]]."
+                "Р’ РґРѕРєСѓРјРµРЅС‚Рµ РЅРµС‚ СЃРµРєСЂРµС‚РЅС‹С… СЃР»РѕРІ [[...]]."
             );
         }
     }
 
-    /// <summary>
-    /// Удаляет [[служебные скобки]],
-    /// но запоминает положение секретных символов.
-    /// </summary>
     private ParsedSource RemoveSecretMarkers(
         string sourceText
     )
@@ -326,13 +349,6 @@ public class DocumentRedactor :
 
             if (startsSecretFragment)
             {
-                if (insideSecretFragment)
-                {
-                    Debug.LogWarning(
-                        "Обнаружены вложенные скобки [[...]]."
-                    );
-                }
-
                 insideSecretFragment = true;
                 position += 2;
                 continue;
@@ -340,14 +356,6 @@ public class DocumentRedactor :
 
             if (endsSecretFragment)
             {
-                if (!insideSecretFragment)
-                {
-                    Debug.LogWarning(
-                        "Обнаружены закрывающие скобки " +
-                        "без открывающих."
-                    );
-                }
-
                 insideSecretFragment = false;
                 position += 2;
                 continue;
@@ -362,7 +370,7 @@ public class DocumentRedactor :
         if (insideSecretFragment)
         {
             Debug.LogWarning(
-                "В документе не закрыта пара скобок [[...]]."
+                "Р’ РґРѕРєСѓРјРµРЅС‚Рµ РЅРµ Р·Р°РєСЂС‹С‚Р° РїР°СЂР° СЃРєРѕР±РѕРє [[...]]."
             );
         }
 
@@ -373,9 +381,6 @@ public class DocumentRedactor :
         };
     }
 
-    /// <summary>
-    /// Разделяет документ на слова и промежутки.
-    /// </summary>
     private void CreateWordsAndTextParts(
         string cleanText,
         List<bool> secretCharacters
@@ -383,7 +388,7 @@ public class DocumentRedactor :
     {
         Regex wordPattern = new Regex(
             @"[\p{L}\p{N}]+" +
-            @"(?:[-–—'][\p{L}\p{N}]+)*"
+            @"(?:[-вЂ“вЂ”'][\p{L}\p{N}]+)*"
         );
 
         MatchCollection matches =
@@ -422,13 +427,9 @@ public class DocumentRedactor :
             };
 
             words.Add(word);
-
-            textParts.Add(
-                TextPart.CreateWord(wordId)
-            );
+            textParts.Add(TextPart.CreateWord(wordId));
 
             wordId++;
-
             currentPosition =
                 match.Index + match.Length;
         }
@@ -444,11 +445,6 @@ public class DocumentRedactor :
         }
     }
 
-    /// <summary>
-    /// Слово считается секретным,
-    /// если хотя бы один его символ
-    /// находился внутри [[...]].
-    /// </summary>
     private bool IsWordSecret(
         int startIndex,
         int length,
@@ -471,11 +467,6 @@ public class DocumentRedactor :
         return false;
     }
 
-    /// <summary>
-    /// Начало клика или движения мыши.
-    /// Первое слово определяет режим:
-    /// ставить плашки или снимать их.
-    /// </summary>
     public void OnPointerDown(
         PointerEventData eventData
     )
@@ -506,17 +497,12 @@ public class DocumentRedactor :
 
         WordData firstWord = words[wordId];
 
-        // Если слово открыто — начинаем ставить плашки.
-        // Если слово закрыто — начинаем снимать их.
-        dragRedactionState = !firstWord.isRedacted;
+        dragRedactionState =
+            !firstWord.isRedacted;
 
         ApplyDragState(wordId);
     }
 
-    /// <summary>
-    /// Обрабатывает движение мыши
-    /// при зажатой левой кнопке.
-    /// </summary>
     public void OnDrag(
         PointerEventData eventData
     )
@@ -539,9 +525,6 @@ public class DocumentRedactor :
         ApplyDragState(wordId);
     }
 
-    /// <summary>
-    /// Завершает движение мыши.
-    /// </summary>
     public void OnPointerUp(
         PointerEventData eventData
     )
@@ -555,9 +538,6 @@ public class DocumentRedactor :
         StopDragging();
     }
 
-    /// <summary>
-    /// Возвращает ID слова под курсором.
-    /// </summary>
     private int GetWordIdAtPosition(
         Vector2 screenPosition,
         Camera eventCamera
@@ -597,10 +577,6 @@ public class DocumentRedactor :
 
         if (!int.TryParse(linkId, out int wordId))
         {
-            Debug.LogWarning(
-                $"Не удалось определить ID слова: {linkId}"
-            );
-
             return -1;
         }
 
@@ -612,9 +588,6 @@ public class DocumentRedactor :
         return wordId;
     }
 
-    /// <summary>
-    /// Применяет к слову состояние текущего движения.
-    /// </summary>
     private void ApplyDragState(int wordId)
     {
         if (wordId < 0 || wordId >= words.Count)
@@ -641,23 +614,17 @@ public class DocumentRedactor :
         RefreshDocument();
 
         SetStatus(
-            "Документ изменён. " +
-            "Результат ещё не проверен."
+            "Р”РѕРєСѓРјРµРЅС‚ РёР·РјРµРЅС‘РЅ. " +
+            "Р РµР·СѓР»СЊС‚Р°С‚ РµС‰С‘ РЅРµ РїСЂРѕРІРµСЂРµРЅ."
         );
     }
 
-    /// <summary>
-    /// Завершает текущее движение мыши.
-    /// </summary>
     private void StopDragging()
     {
         isDragging = false;
         processedDragWords.Clear();
     }
 
-    /// <summary>
-    /// Полностью перестраивает отображаемый текст.
-    /// </summary>
     private void RefreshDocument()
     {
         StringBuilder result =
@@ -667,8 +634,6 @@ public class DocumentRedactor :
         {
             if (!part.isWord)
             {
-                // Красим пробелы и знаки препинания
-                // тем же цветом, что и основной текст.
                 result.Append(
                     $"<color={normalTextColor}>" +
                     part.separatorText +
@@ -691,10 +656,6 @@ public class DocumentRedactor :
         UpdateProgress();
     }
 
-    /// <summary>
-    /// Создаёт TMP-разметку одного слова.
-    /// Каждое слово получает уникальную ссылку.
-    /// </summary>
     private string CreateWordMarkup(WordData word)
     {
         string visibleWord;
@@ -727,9 +688,6 @@ public class DocumentRedactor :
             "</link>";
     }
 
-    /// <summary>
-    /// Слабо выделяет правильное слово.
-    /// </summary>
     private string CreateSubtlyHighlightedWord(
         string originalText
     )
@@ -744,10 +702,6 @@ public class DocumentRedactor :
             "</mark>";
     }
 
-    /// <summary>
-    /// Создаёт цензурную плашку,
-    /// сохраняя ширину исходного слова.
-    /// </summary>
     private string CreateRedactedWord(
         string originalText
     )
@@ -760,10 +714,6 @@ public class DocumentRedactor :
             "</mark>";
     }
 
-    /// <summary>
-    /// Показывает количество выбранных слов,
-    /// не раскрывая их правильность.
-    /// </summary>
     private void UpdateProgress()
     {
         int redactedWordCount = 0;
@@ -777,9 +727,31 @@ public class DocumentRedactor :
         }
 
         progressText.text =
-            $"Документ: {currentDocumentIndex + 1}" +
+            $"Р”РѕРєСѓРјРµРЅС‚: {currentDocumentIndex + 1}" +
             $" / {documents.Count}\n" +
-            $"Засекречено слов: {redactedWordCount}";
+            $"Р—Р°СЃРµРєСЂРµС‡РµРЅРѕ СЃР»РѕРІ: {redactedWordCount}";
+    }
+
+    private void UpdateInspectionsDisplay()
+    {
+        StringBuilder result =
+            new StringBuilder("РџР РћР’Р•Р РљР: ");
+
+        for (int i = 0;
+             i < maximumInspections;
+             i++)
+        {
+            if (i < inspectionsRemaining)
+            {
+                result.Append("в—Џ ");
+            }
+            else
+            {
+                result.Append("в—‹ ");
+            }
+        }
+
+        inspectionsText.text = result.ToString();
     }
 
     private void SetStatus(string message)
@@ -790,9 +762,6 @@ public class DocumentRedactor :
         }
     }
 
-    /// <summary>
-    /// Вызывается кнопкой «Передать документ».
-    /// </summary>
     public void SubmitDocument()
     {
         if (documentFinished)
@@ -807,14 +776,12 @@ public class DocumentRedactor :
 
         foreach (WordData word in words)
         {
-            // Секретное слово осталось открытым.
             if (word.isSecret &&
                 !word.isRedacted)
             {
                 missedSecretWords++;
             }
 
-            // Обычное слово было скрыто.
             if (!word.isSecret &&
                 word.isRedacted)
             {
@@ -828,7 +795,16 @@ public class DocumentRedactor :
 
         if (documentIsCorrect)
         {
-            CompleteDocument();
+            CompleteDocumentSuccessfully();
+            return;
+        }
+
+        inspectionsRemaining--;
+        UpdateInspectionsDisplay();
+
+        if (inspectionsRemaining <= 0)
+        {
+            FailDocument();
         }
         else
         {
@@ -839,10 +815,6 @@ public class DocumentRedactor :
         }
     }
 
-    /// <summary>
-    /// Сообщает количество ошибок,
-    /// но не раскрывает их расположение.
-    /// </summary>
     private void RejectDocument(
         int missedSecretWords,
         int extraRedactedWords
@@ -852,35 +824,75 @@ public class DocumentRedactor :
             new StringBuilder();
 
         message.AppendLine(
-            "ДОКУМЕНТ ОТКЛОНЁН"
+            "Р”РћРљРЈРњР•РќРў РћРўРљР›РћРќРЃРќ"
         );
 
         if (missedSecretWords > 0)
         {
             message.AppendLine(
-                $"Пропущено слов: {missedSecretWords}"
+                $"РџСЂРѕРїСѓС‰РµРЅРѕ СЃР»РѕРІ: {missedSecretWords}"
             );
         }
 
         if (extraRedactedWords > 0)
         {
             message.AppendLine(
-                $"Лишних засекречиваний: " +
+                $"Р›РёС€РЅРёС… Р·Р°СЃРµРєСЂРµС‡РёРІР°РЅРёР№: " +
                 $"{extraRedactedWords}"
             );
         }
 
         message.Append(
-            "Исправьте документ и отправьте снова."
+            "РСЃРїСЂР°РІСЊС‚Рµ РґРѕРєСѓРјРµРЅС‚ Рё РѕС‚РїСЂР°РІСЊС‚Рµ СЃРЅРѕРІР°."
         );
 
         SetStatus(message.ToString());
     }
 
-    /// <summary>
-    /// Завершает текущий документ.
-    /// </summary>
-    private void CompleteDocument()
+    private void CompleteDocumentSuccessfully()
+    {
+        int documentScore =
+            CalculateDocumentScore();
+
+        totalScore += documentScore;
+
+        ShowResultPanel(
+            documentPassed: true,
+            documentScore: documentScore
+        );
+    }
+
+    private int CalculateDocumentScore()
+    {
+        int failedInspections =
+            maximumInspections -
+            inspectionsRemaining;
+
+        if (failedInspections <= 0)
+        {
+            return firstTryScore;
+        }
+
+        if (failedInspections == 1)
+        {
+            return secondTryScore;
+        }
+
+        return thirdTryScore;
+    }
+
+    private void FailDocument()
+    {
+        ShowResultPanel(
+            documentPassed: false,
+            documentScore: 0
+        );
+    }
+
+    private void ShowResultPanel(
+        bool documentPassed,
+        int documentScore
+    )
     {
         documentFinished = true;
         StopDragging();
@@ -892,12 +904,39 @@ public class DocumentRedactor :
             currentDocumentIndex <
             documents.Count - 1;
 
-        if (completionText != null)
+        bool isLastDocument =
+            currentDocumentIndex ==
+            documents.Count - 1;
+
+        if (documentPassed)
         {
-            completionText.text = hasNextDocument
-                ? "ДОКУМЕНТ ПРИНЯТ"
-                : "ВСЕ ДОКУМЕНТЫ ОБРАБОТАНЫ";
+            if (isLastDocument)
+            {
+                completionText.text =
+                    "Р’РЎР• Р”РћРљРЈРњР•РќРўР« РћР‘Р РђР‘РћРўРђРќР«";
+            }
+            else
+            {
+                completionText.text =
+                    "Р”РћРљРЈРњР•РќРў РџР РРќРЇРў";
+            }
         }
+        else
+        {
+            completionText.text =
+                isLastDocument
+                    ? "РћР‘Р РђР‘РћРўРљРђ Р—РђР’Р•Р РЁР•РќРђ"
+                    : "РЈРўР•Р§РљРђ РРќР¤РћР РњРђР¦РР";
+        }
+
+        string scoreTitle =
+            isLastDocument
+                ? "РРўРћР“РћР’Р«Р™ РЎР§РЃРў"
+                : "РћР‘Р©РР™ РЎР§РЃРў";
+
+        resultScoreText.text =
+            $"РќРђР“Р РђР”Рђ: {documentScore}\n" +
+            $"{scoreTitle}: {totalScore}";
 
         if (nextDocumentButton != null)
         {
@@ -906,14 +945,9 @@ public class DocumentRedactor :
             );
         }
 
-        SetStatus(
-            "Проверка завершена. Документ принят."
-        );
+        SetStatus(string.Empty);
     }
 
-    /// <summary>
-    /// Вызывается кнопкой следующего документа.
-    /// </summary>
     public void NextDocument()
     {
         if (!documentFinished)
@@ -931,9 +965,6 @@ public class DocumentRedactor :
         LoadCurrentDocument();
     }
 
-    /// <summary>
-    /// Данные одного слова.
-    /// </summary>
     private class WordData
     {
         public int id;
@@ -942,10 +973,6 @@ public class DocumentRedactor :
         public bool isRedacted;
     }
 
-    /// <summary>
-    /// Часть документа:
-    /// слово или разделитель.
-    /// </summary>
     private class TextPart
     {
         public bool isWord;
@@ -975,9 +1002,6 @@ public class DocumentRedactor :
         }
     }
 
-    /// <summary>
-    /// Результат удаления служебных скобок.
-    /// </summary>
     private class ParsedSource
     {
         public string cleanText;
