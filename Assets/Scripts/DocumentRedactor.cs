@@ -6,12 +6,16 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Показывает документы, обрабатывает засекречивание
-/// и переключает игрока между документами.
+/// Управляет документами и позволяет игроку
+/// засекречивать любое слово.
+///
+/// Правильные слова задаются внутри [[двойных скобок]].
+/// Проверка выполняется только после нажатия
+/// кнопки «Передать документ».
 /// </summary>
 public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 {
-    [Header("Объекты интерфейса")]
+    [Header("Основной интерфейс")]
 
     [SerializeField]
     private TMP_Text documentTitleText;
@@ -23,10 +27,18 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     private TMP_Text progressText;
 
     [SerializeField]
-    private TMP_Text completionText;
+    private TMP_Text statusText;
+
+    [SerializeField]
+    private GameObject submitButton;
+
+    [Header("Панель завершения")]
 
     [SerializeField]
     private GameObject winPanel;
+
+    [SerializeField]
+    private TMP_Text completionText;
 
     [SerializeField]
     private GameObject nextDocumentButton;
@@ -37,23 +49,47 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     private List<DocumentData> documents =
         new List<DocumentData>();
 
-    [Header("Внешний вид")]
+    [Header("Обычный текст")]
+
+    [Tooltip("Цвет обычного текста документа.")]
+    [SerializeField]
+    private string normalTextColor = "#2B2924";
+
+    [Header("Слабая подсказка")]
+
+    [Tooltip("Цвет правильных слов до засекречивания.")]
+    [SerializeField]
+    private string secretTextColor = "#49453D";
+
+    [Tooltip(
+        "Цвет едва заметного фона правильных слов. " +
+        "Последние две цифры отвечают за прозрачность."
+    )]
+    [SerializeField]
+    private string secretHighlightColor = "#AD8B4010";
+
+    [Tooltip(
+        "Размер правильных слов относительно обычного текста."
+    )]
+    [Range(95, 105)]
+    [SerializeField]
+    private int secretTextSizePercent = 99;
+
+    [Header("Цензурная плашка")]
 
     [SerializeField]
-    private string secretTextColor = "#FF5656";
+    private string redactionColor = "#000000FF";
 
-    [SerializeField]
-    private string secretHighlightColor = "#67292966";
+    // Все слова текущего документа.
+    private readonly List<WordData> words =
+        new List<WordData>();
 
-    private readonly List<SecretFragment> secretFragments =
-        new List<SecretFragment>();
-
-    private readonly List<DocumentPart> documentParts =
-        new List<DocumentPart>();
+    // Последовательность слов, пробелов и знаков препинания.
+    private readonly List<TextPart> textParts =
+        new List<TextPart>();
 
     private int currentDocumentIndex;
-    private int redactedCount;
-    private bool documentCompleted;
+    private bool documentFinished;
 
     private void Start()
     {
@@ -78,17 +114,20 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Проверяет обязательные ссылки из Inspector.
+    /// Проверяет обязательные ссылки,
+    /// назначаемые через Inspector.
     /// </summary>
     private bool ValidateReferences()
     {
+        bool referencesAreValid = true;
+
         if (documentText == null)
         {
             Debug.LogError(
                 "Не назначено поле Document Text."
             );
 
-            return false;
+            referencesAreValid = false;
         }
 
         if (progressText == null)
@@ -97,7 +136,25 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
                 "Не назначено поле Progress Text."
             );
 
-            return false;
+            referencesAreValid = false;
+        }
+
+        if (statusText == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Status Text."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (submitButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Submit Button."
+            );
+
+            referencesAreValid = false;
         }
 
         if (winPanel == null)
@@ -106,14 +163,15 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
                 "Не назначено поле Win Panel."
             );
 
-            return false;
+            referencesAreValid = false;
         }
 
-        return true;
+        return referencesAreValid;
     }
 
     /// <summary>
-    /// Загружает документ, соответствующий текущему индексу.
+    /// Загружает текущий документ
+    /// и очищает предыдущий выбор игрока.
     /// </summary>
     private void LoadCurrentDocument()
     {
@@ -121,7 +179,7 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             currentDocumentIndex >= documents.Count)
         {
             Debug.LogError(
-                "Индекс документа находится за пределами списка."
+                "Некорректный индекс документа."
             );
 
             return;
@@ -133,26 +191,33 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
         if (currentDocument == null)
         {
             Debug.LogError(
-                $"Документ под индексом {currentDocumentIndex} не назначен."
+                $"Документ под индексом " +
+                $"{currentDocumentIndex} не назначен."
             );
 
             return;
         }
 
-        documentCompleted = false;
-        redactedCount = 0;
+        documentFinished = false;
 
         winPanel.SetActive(false);
+        submitButton.SetActive(true);
 
         UpdateDocumentTitle(currentDocument);
         ParseDocument(currentDocument.DocumentText);
         RefreshDocument();
+
+        SetStatus(
+            "Выберите сведения для засекречивания."
+        );
     }
 
     /// <summary>
-    /// Обновляет название и номер дела.
+    /// Показывает номер и название документа.
     /// </summary>
-    private void UpdateDocumentTitle(DocumentData document)
+    private void UpdateDocumentTitle(
+        DocumentData document
+    )
     {
         if (documentTitleText == null)
         {
@@ -165,14 +230,14 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Разделяет документ на обычные и секретные части.
+    /// Подготавливает текст документа.
     /// </summary>
-    private void ParseDocument(string sourceDocument)
+    private void ParseDocument(string sourceText)
     {
-        documentParts.Clear();
-        secretFragments.Clear();
+        words.Clear();
+        textParts.Clear();
 
-        if (string.IsNullOrWhiteSpace(sourceDocument))
+        if (string.IsNullOrWhiteSpace(sourceText))
         {
             Debug.LogWarning(
                 "Текст текущего документа пуст."
@@ -181,86 +246,237 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             return;
         }
 
-        Regex secretPattern = new Regex(
-            @"\[\[(.*?)\]\]",
-            RegexOptions.Singleline
+        ParsedSource parsedSource =
+            RemoveSecretMarkers(sourceText);
+
+        CreateWordsAndTextParts(
+            parsedSource.cleanText,
+            parsedSource.secretCharacters
         );
 
-        MatchCollection matches =
-            secretPattern.Matches(sourceDocument);
+        int secretWordCount = 0;
 
-        int currentPosition = 0;
-        int secretIndex = 0;
-
-        foreach (Match match in matches)
+        foreach (WordData word in words)
         {
-            if (match.Index > currentPosition)
+            if (word.isSecret)
             {
-                string normalText = sourceDocument.Substring(
-                    currentPosition,
-                    match.Index - currentPosition
-                );
-
-                documentParts.Add(
-                    DocumentPart.CreateNormal(normalText)
-                );
+                secretWordCount++;
             }
-
-            string secretText = match.Groups[1].Value;
-
-            SecretFragment fragment = new SecretFragment
-            {
-                id = secretIndex,
-                originalText = secretText,
-                isRedacted = false
-            };
-
-            secretFragments.Add(fragment);
-
-            documentParts.Add(
-                DocumentPart.CreateSecret(secretIndex)
-            );
-
-            secretIndex++;
-            currentPosition = match.Index + match.Length;
         }
 
-        if (currentPosition < sourceDocument.Length)
-        {
-            string remainingText =
-                sourceDocument.Substring(currentPosition);
-
-            documentParts.Add(
-                DocumentPart.CreateNormal(remainingText)
-            );
-        }
-
-        if (secretFragments.Count == 0)
+        if (secretWordCount == 0)
         {
             Debug.LogWarning(
-                "В документе нет секретных фрагментов [[...]]."
+                "В документе нет секретных слов [[...]]."
             );
         }
     }
 
     /// <summary>
-    /// Обрабатывает клик по секретному фрагменту.
+    /// Удаляет [[служебные скобки]],
+    /// но запоминает положение секретных символов.
     /// </summary>
-    public void OnPointerClick(PointerEventData eventData)
+    private ParsedSource RemoveSecretMarkers(
+        string sourceText
+    )
     {
-        if (documentCompleted)
+        StringBuilder cleanText =
+            new StringBuilder();
+
+        List<bool> secretCharacters =
+            new List<bool>();
+
+        bool insideSecretFragment = false;
+        int position = 0;
+
+        while (position < sourceText.Length)
+        {
+            bool startsSecretFragment =
+                position + 1 < sourceText.Length &&
+                sourceText[position] == '[' &&
+                sourceText[position + 1] == '[';
+
+            bool endsSecretFragment =
+                position + 1 < sourceText.Length &&
+                sourceText[position] == ']' &&
+                sourceText[position + 1] == ']';
+
+            if (startsSecretFragment)
+            {
+                if (insideSecretFragment)
+                {
+                    Debug.LogWarning(
+                        "Обнаружены вложенные скобки [[...]]."
+                    );
+                }
+
+                insideSecretFragment = true;
+                position += 2;
+                continue;
+            }
+
+            if (endsSecretFragment)
+            {
+                if (!insideSecretFragment)
+                {
+                    Debug.LogWarning(
+                        "Обнаружены закрывающие скобки " +
+                        "без открывающих."
+                    );
+                }
+
+                insideSecretFragment = false;
+                position += 2;
+                continue;
+            }
+
+            cleanText.Append(sourceText[position]);
+            secretCharacters.Add(insideSecretFragment);
+
+            position++;
+        }
+
+        if (insideSecretFragment)
+        {
+            Debug.LogWarning(
+                "В документе не закрыта пара скобок [[...]]."
+            );
+        }
+
+        return new ParsedSource
+        {
+            cleanText = cleanText.ToString(),
+            secretCharacters = secretCharacters
+        };
+    }
+
+    /// <summary>
+    /// Разделяет документ на слова и промежутки.
+    ///
+    /// Пробелы, переводы строк и знаки препинания
+    /// сохраняются отдельно, чтобы документ
+    /// не менял структуру.
+    /// </summary>
+    private void CreateWordsAndTextParts(
+        string cleanText,
+        List<bool> secretCharacters
+    )
+    {
+        Regex wordPattern = new Regex(
+            @"[\p{L}\p{N}]+" +
+            @"(?:[-–—'][\p{L}\p{N}]+)*"
+        );
+
+        MatchCollection matches =
+            wordPattern.Matches(cleanText);
+
+        int currentPosition = 0;
+        int wordId = 0;
+
+        foreach (Match match in matches)
+        {
+            // Сохраняем всё перед словом:
+            // пробелы, переносы строк и пунктуацию.
+            if (match.Index > currentPosition)
+            {
+                string separator =
+                    cleanText.Substring(
+                        currentPosition,
+                        match.Index - currentPosition
+                    );
+
+                textParts.Add(
+                    TextPart.CreateSeparator(separator)
+                );
+            }
+
+            bool isSecret = IsWordSecret(
+                match.Index,
+                match.Length,
+                secretCharacters
+            );
+
+            WordData word = new WordData
+            {
+                id = wordId,
+                originalText = match.Value,
+                isSecret = isSecret,
+                isRedacted = false
+            };
+
+            words.Add(word);
+
+            textParts.Add(
+                TextPart.CreateWord(wordId)
+            );
+
+            wordId++;
+
+            currentPosition =
+                match.Index + match.Length;
+        }
+
+        // Сохраняем остаток после последнего слова.
+        if (currentPosition < cleanText.Length)
+        {
+            string remainingText =
+                cleanText.Substring(currentPosition);
+
+            textParts.Add(
+                TextPart.CreateSeparator(remainingText)
+            );
+        }
+    }
+
+    /// <summary>
+    /// Слово считается секретным,
+    /// если хотя бы один его символ
+    /// находился внутри [[...]].
+    /// </summary>
+    private bool IsWordSecret(
+        int startIndex,
+        int length,
+        List<bool> secretCharacters
+    )
+    {
+        int endIndex = startIndex + length;
+
+        for (int i = startIndex;
+             i < endIndex &&
+             i < secretCharacters.Count;
+             i++)
+        {
+            if (secretCharacters[i])
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Unity вызывает этот метод
+    /// при клике по DocumentText.
+    /// </summary>
+    public void OnPointerClick(
+        PointerEventData eventData
+    )
+    {
+        if (documentFinished)
         {
             return;
         }
 
-        Camera eventCamera = eventData.pressEventCamera;
+        int linkIndex =
+            TMP_TextUtilities.FindIntersectingLink(
+                documentText,
+                eventData.position,
+                eventData.pressEventCamera
+            );
 
-        int linkIndex = TMP_TextUtilities.FindIntersectingLink(
-            documentText,
-            eventData.position,
-            eventCamera
-        );
-
+        // -1 означает, что игрок нажал
+        // между словами или вне текста.
         if (linkIndex == -1)
         {
             return;
@@ -271,128 +487,271 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
         string linkId = linkInfo.GetLinkID();
 
-        if (!int.TryParse(linkId, out int secretId))
+        if (!int.TryParse(linkId, out int wordId))
         {
             Debug.LogWarning(
-                $"Некорректный ID секретного фрагмента: {linkId}"
+                $"Не удалось определить ID слова: {linkId}"
             );
 
             return;
         }
 
-        RedactFragment(secretId);
+        ToggleWordRedaction(wordId);
     }
 
     /// <summary>
-    /// Засекречивает выбранный фрагмент.
+    /// Скрывает выбранное слово.
+    /// Повторный клик возвращает его.
     /// </summary>
-    private void RedactFragment(int secretId)
+    private void ToggleWordRedaction(int wordId)
     {
-        if (secretId < 0 ||
-            secretId >= secretFragments.Count)
+        if (wordId < 0 ||
+            wordId >= words.Count)
         {
             Debug.LogWarning(
-                $"Фрагмент с ID {secretId} не найден."
+                $"Слово с ID {wordId} не существует."
             );
 
             return;
         }
 
-        SecretFragment fragment =
-            secretFragments[secretId];
+        WordData word = words[wordId];
 
-        if (fragment.isRedacted)
-        {
-            return;
-        }
-
-        fragment.isRedacted = true;
-        redactedCount++;
+        word.isRedacted = !word.isRedacted;
 
         RefreshDocument();
 
-        if (redactedCount >= secretFragments.Count)
-        {
-            CompleteDocument();
-        }
+        SetStatus(
+            "Документ изменён. " +
+            "Результат ещё не проверен."
+        );
     }
 
     /// <summary>
-    /// Заново создаёт отображаемый текст.
+    /// Полностью перестраивает отображаемый текст.
     /// </summary>
     private void RefreshDocument()
     {
-        StringBuilder result = new StringBuilder();
+        StringBuilder result =
+            new StringBuilder();
 
-        foreach (DocumentPart part in documentParts)
+        foreach (TextPart part in textParts)
         {
-            if (!part.isSecret)
+            if (!part.isWord)
             {
-                result.Append(part.normalText);
+                result.Append(
+                    $"<color={normalTextColor}>" +
+                    part.separatorText +
+                    "</color>"
+                );
+
                 continue;
             }
 
-            SecretFragment fragment =
-                secretFragments[part.secretId];
+            WordData word = words[part.wordId];
 
-            if (fragment.isRedacted)
-            {
-                result.Append(
-                    CreateRedactedText(fragment.originalText)
-                );
-            }
-            else
-            {
-                result.Append(
-                    CreateClickableSecretText(fragment)
-                );
-            }
+            result.Append(
+                CreateWordMarkup(word)
+            );
         }
 
         documentText.text = result.ToString();
 
+        // Немедленно обновляем внутренние данные TMP,
+        // чтобы ссылки корректно работали после изменения.
         documentText.ForceMeshUpdate();
 
         UpdateProgress();
     }
 
     /// <summary>
-    /// Создаёт выделенный кликабельный фрагмент.
+    /// Создаёт разметку одного слова.
+    ///
+    /// Каждое слово помещается во внутренний
+    /// TMP-тег link с уникальным номером.
     /// </summary>
-    private string CreateClickableSecretText(
-        SecretFragment fragment
-    )
+    private string CreateWordMarkup(WordData word)
     {
+        string visibleWord;
+
+        if (word.isRedacted)
+        {
+            visibleWord =
+                CreateRedactedWord(
+                    word.originalText
+                );
+        }
+        else if (word.isSecret)
+        {
+            visibleWord =
+                CreateSubtlyHighlightedWord(
+                    word.originalText
+                );
+        }
+        else
+        {
+            visibleWord =
+                $"<color={normalTextColor}>" +
+                word.originalText +
+                "</color>";
+        }
+
         return
-            $"<link=\"{fragment.id}\">" +
-            $"<mark={secretHighlightColor}>" +
-            $"<color={secretTextColor}>" +
-            fragment.originalText +
-            "</color>" +
-            "</mark>" +
+            $"<link=\"{word.id}\">" +
+            visibleWord +
             "</link>";
     }
 
     /// <summary>
-    /// Создаёт чёрную цензурную полосу.
+    /// Слабо выделяет правильное слово.
     /// </summary>
-    private string CreateRedactedText(string originalText)
+    private string CreateSubtlyHighlightedWord(
+        string originalText
+    )
     {
         return
-            "<mark=#000000FF>" +
+            $"<mark={secretHighlightColor}>" +
+            $"<size={secretTextSizePercent}%>" +
+            $"<color={secretTextColor}>" +
+            originalText +
+            "</color>" +
+            "</size>" +
+            "</mark>";
+    }
+
+    /// <summary>
+    /// Создаёт чёрную плашку,
+    /// сохраняя исходную ширину слова.
+    ///
+    /// Слово остаётся внутри ссылки,
+    /// поэтому повторный клик продолжает работать.
+    /// </summary>
+    private string CreateRedactedWord(
+        string originalText
+    )
+    {
+        return
+            $"<mark={redactionColor}>" +
             "<color=#00000000>" +
             originalText +
             "</color>" +
             "</mark>";
     }
 
+    /// <summary>
+    /// Показывает число выбранных игроком слов.
+    /// Правильность здесь не раскрывается.
+    /// </summary>
     private void UpdateProgress()
     {
-        int documentNumber = currentDocumentIndex + 1;
+        int redactedWordCount = 0;
+
+        foreach (WordData word in words)
+        {
+            if (word.isRedacted)
+            {
+                redactedWordCount++;
+            }
+        }
 
         progressText.text =
-            $"Документ: {documentNumber} / {documents.Count}\n" +
-            $"Засекречено: {redactedCount} / {secretFragments.Count}";
+            $"Документ: {currentDocumentIndex + 1}" +
+            $" / {documents.Count}\n" +
+            $"Засекречено слов: {redactedWordCount}";
+    }
+
+    private void SetStatus(string message)
+    {
+        if (statusText != null)
+        {
+            statusText.text = message;
+        }
+    }
+
+    /// <summary>
+    /// Вызывается кнопкой «Передать документ».
+    /// </summary>
+    public void SubmitDocument()
+    {
+        if (documentFinished)
+        {
+            return;
+        }
+
+        int missedSecretWords = 0;
+        int extraRedactedWords = 0;
+
+        foreach (WordData word in words)
+        {
+            // Правильное слово осталось открытым.
+            if (word.isSecret &&
+                !word.isRedacted)
+            {
+                missedSecretWords++;
+            }
+
+            // Обычное слово было скрыто.
+            if (!word.isSecret &&
+                word.isRedacted)
+            {
+                extraRedactedWords++;
+            }
+        }
+
+        bool documentIsCorrect =
+            missedSecretWords == 0 &&
+            extraRedactedWords == 0;
+
+        if (documentIsCorrect)
+        {
+            CompleteDocument();
+        }
+        else
+        {
+            RejectDocument(
+                missedSecretWords,
+                extraRedactedWords
+            );
+        }
+    }
+
+    /// <summary>
+    /// Сообщает количество ошибок,
+    /// но не раскрывает их расположение.
+    /// Игрок может продолжить редактирование.
+    /// </summary>
+    private void RejectDocument(
+        int missedSecretWords,
+        int extraRedactedWords
+    )
+    {
+        StringBuilder message =
+            new StringBuilder();
+
+        message.AppendLine(
+            "ДОКУМЕНТ ОТКЛОНЁН"
+        );
+
+        if (missedSecretWords > 0)
+        {
+            message.AppendLine(
+                $"Пропущено слов: {missedSecretWords}"
+            );
+        }
+
+        if (extraRedactedWords > 0)
+        {
+            message.AppendLine(
+                $"Лишних засекречиваний: " +
+                $"{extraRedactedWords}"
+            );
+        }
+
+        message.Append(
+            "Исправьте документ и отправьте снова."
+        );
+
+        SetStatus(message.ToString());
     }
 
     /// <summary>
@@ -400,45 +759,47 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     /// </summary>
     private void CompleteDocument()
     {
-        documentCompleted = true;
+        documentFinished = true;
+
+        submitButton.SetActive(false);
         winPanel.SetActive(true);
 
         bool hasNextDocument =
-            currentDocumentIndex < documents.Count - 1;
+            currentDocumentIndex <
+            documents.Count - 1;
 
         if (completionText != null)
         {
             completionText.text = hasNextDocument
-                ? "ДОКУМЕНТ ЗАСЕКРЕЧЕН"
+                ? "ДОКУМЕНТ ПРИНЯТ"
                 : "ВСЕ ДОКУМЕНТЫ ОБРАБОТАНЫ";
         }
 
         if (nextDocumentButton != null)
         {
-            nextDocumentButton.SetActive(hasNextDocument);
+            nextDocumentButton.SetActive(
+                hasNextDocument
+            );
         }
 
-        Debug.Log(
-            $"Документ {currentDocumentIndex + 1} завершён."
+        SetStatus(
+            "Проверка завершена. Документ принят."
         );
     }
 
     /// <summary>
-    /// Вызывается кнопкой «Следующий документ».
+    /// Вызывается кнопкой следующего документа.
     /// </summary>
     public void NextDocument()
     {
-        if (!documentCompleted)
+        if (!documentFinished)
         {
             return;
         }
 
-        if (currentDocumentIndex >= documents.Count - 1)
+        if (currentDocumentIndex >=
+            documents.Count - 1)
         {
-            Debug.Log(
-                "Следующего документа нет."
-            );
-
             return;
         }
 
@@ -446,37 +807,56 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
         LoadCurrentDocument();
     }
 
-    private class SecretFragment
+    /// <summary>
+    /// Данные одного слова документа.
+    /// </summary>
+    private class WordData
     {
         public int id;
         public string originalText;
+        public bool isSecret;
         public bool isRedacted;
     }
 
-    private class DocumentPart
+    /// <summary>
+    /// Часть документа:
+    /// либо слово, либо разделитель.
+    /// </summary>
+    private class TextPart
     {
-        public bool isSecret;
-        public string normalText;
-        public int secretId;
+        public bool isWord;
+        public int wordId;
+        public string separatorText;
 
-        public static DocumentPart CreateNormal(string text)
+        public static TextPart CreateWord(int id)
         {
-            return new DocumentPart
+            return new TextPart
             {
-                isSecret = false,
-                normalText = text,
-                secretId = -1
+                isWord = true,
+                wordId = id,
+                separatorText = string.Empty
             };
         }
 
-        public static DocumentPart CreateSecret(int id)
+        public static TextPart CreateSeparator(
+            string text
+        )
         {
-            return new DocumentPart
+            return new TextPart
             {
-                isSecret = true,
-                normalText = string.Empty,
-                secretId = id
+                isWord = false,
+                wordId = -1,
+                separatorText = text
             };
         }
+    }
+
+    /// <summary>
+    /// Результат удаления служебных скобок.
+    /// </summary>
+    private class ParsedSource
+    {
+        public string cleanText;
+        public List<bool> secretCharacters;
     }
 }
