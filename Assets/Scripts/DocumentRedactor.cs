@@ -52,6 +52,9 @@ public class DocumentRedactor :
     [SerializeField]
     private GameObject nextDocumentButton;
 
+    [SerializeField]
+    private GameObject restartButton;
+
     [Header("Документы")]
 
     [SerializeField]
@@ -222,6 +225,15 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (restartButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Restart Button."
+            );
+
+            referencesAreValid = false;
+        }
+
         return referencesAreValid;
     }
 
@@ -257,6 +269,7 @@ public class DocumentRedactor :
 
         winPanel.SetActive(false);
         submitButton.SetActive(true);
+        restartButton.SetActive(false);
 
         UpdateDocumentTitle(currentDocument);
         ParseDocument(currentDocument.DocumentText);
@@ -929,14 +942,19 @@ public class DocumentRedactor :
                     : "УТЕЧКА ИНФОРМАЦИИ";
         }
 
-        string scoreTitle =
-            isLastDocument
-                ? "ИТОГОВЫЙ СЧЁТ"
-                : "ОБЩИЙ СЧЁТ";
-
-        resultScoreText.text =
-            $"НАГРАДА: {documentScore}\n" +
-            $"{scoreTitle}: {totalScore}";
+        if (isLastDocument)
+        {
+            resultScoreText.text =
+                $"НАГРАДА: {documentScore}\n" +
+                $"ИТОГОВЫЙ СЧЁТ: {totalScore}" +
+                $" / {GetMaximumTotalScore()}";
+        }
+        else
+        {
+            resultScoreText.text =
+                $"НАГРАДА: {documentScore}\n" +
+                $"ОБЩИЙ СЧЁТ: {totalScore}";
+        }
 
         if (nextDocumentButton != null)
         {
@@ -945,9 +963,22 @@ public class DocumentRedactor :
             );
         }
 
+        if (restartButton != null)
+        {
+            restartButton.SetActive(
+                isLastDocument
+            );
+        }
+
+        SetStatus(string.Empty);
+
         SetStatus(string.Empty);
     }
 
+    private int GetMaximumTotalScore()
+    {
+        return documents.Count * firstTryScore;
+    }
     public void NextDocument()
     {
         if (!documentFinished)
@@ -962,6 +993,17 @@ public class DocumentRedactor :
         }
 
         currentDocumentIndex++;
+        LoadCurrentDocument();
+    }
+
+    public void RestartGame()
+    {
+        StopDragging();
+
+        currentDocumentIndex = 0;
+        totalScore = 0;
+        documentFinished = false;
+
         LoadCurrentDocument();
     }
 
