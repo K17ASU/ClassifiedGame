@@ -6,12 +6,15 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// Управляет документом и обработкой кликов по секретным фрагментам.
-/// Секретный текст в исходном документе записывается внутри [[двойных скобок]].
+/// Показывает документы, обрабатывает засекречивание
+/// и переключает игрока между документами.
 /// </summary>
 public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 {
     [Header("Объекты интерфейса")]
+
+    [SerializeField]
+    private TMP_Text documentTitleText;
 
     [SerializeField]
     private TMP_Text documentText;
@@ -20,20 +23,19 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     private TMP_Text progressText;
 
     [SerializeField]
+    private TMP_Text completionText;
+
+    [SerializeField]
     private GameObject winPanel;
 
-    [Header("Содержимое документа")]
-
-    [TextArea(15, 35)]
     [SerializeField]
-    private string sourceDocument =
-        "ДОКЛАД № 17-Б\n\n" +
-        "Объект был замечен в районе [[озера Лох-Несс]] " +
-        "в 03:42 по местному времени.\n\n" +
-        "Свидетель утверждает, что существо достигало " +
-        "[[примерно двенадцати метров в длину]].\n\n" +
-        "Материалы были переданы сотруднику [[агенту Харперу]].\n\n" +
-        "Официальная версия: ошибка наблюдения.";
+    private GameObject nextDocumentButton;
+
+    [Header("Документы")]
+
+    [SerializeField]
+    private List<DocumentData> documents =
+        new List<DocumentData>();
 
     [Header("Внешний вид")]
 
@@ -43,45 +45,139 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     [SerializeField]
     private string secretHighlightColor = "#67292966";
 
-    // Список всех секретных фрагментов документа.
     private readonly List<SecretFragment> secretFragments =
         new List<SecretFragment>();
 
-    // Части документа: обычный текст и секретные фрагменты.
     private readonly List<DocumentPart> documentParts =
         new List<DocumentPart>();
 
+    private int currentDocumentIndex;
     private int redactedCount;
+    private bool documentCompleted;
 
     private void Start()
     {
-        if (documentText == null)
+        if (!ValidateReferences())
+        {
+            enabled = false;
+            return;
+        }
+
+        if (documents.Count == 0)
         {
             Debug.LogError(
-                "В DocumentRedactor не назначен объект Document Text."
+                "В списке Documents нет ни одного документа."
             );
 
             enabled = false;
             return;
         }
 
-        ParseDocument();
+        currentDocumentIndex = 0;
+        LoadCurrentDocument();
+    }
+
+    /// <summary>
+    /// Проверяет обязательные ссылки из Inspector.
+    /// </summary>
+    private bool ValidateReferences()
+    {
+        if (documentText == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Document Text."
+            );
+
+            return false;
+        }
+
+        if (progressText == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Progress Text."
+            );
+
+            return false;
+        }
+
+        if (winPanel == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Win Panel."
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Загружает документ, соответствующий текущему индексу.
+    /// </summary>
+    private void LoadCurrentDocument()
+    {
+        if (currentDocumentIndex < 0 ||
+            currentDocumentIndex >= documents.Count)
+        {
+            Debug.LogError(
+                "Индекс документа находится за пределами списка."
+            );
+
+            return;
+        }
+
+        DocumentData currentDocument =
+            documents[currentDocumentIndex];
+
+        if (currentDocument == null)
+        {
+            Debug.LogError(
+                $"Документ под индексом {currentDocumentIndex} не назначен."
+            );
+
+            return;
+        }
+
+        documentCompleted = false;
+        redactedCount = 0;
+
+        winPanel.SetActive(false);
+
+        UpdateDocumentTitle(currentDocument);
+        ParseDocument(currentDocument.DocumentText);
         RefreshDocument();
     }
 
     /// <summary>
-    /// Ищет текст внутри [[двойных скобок]] и превращает его
-    /// в отдельные секретные фрагменты.
+    /// Обновляет название и номер дела.
     /// </summary>
-    private void ParseDocument()
+    private void UpdateDocumentTitle(DocumentData document)
+    {
+        if (documentTitleText == null)
+        {
+            return;
+        }
+
+        documentTitleText.text =
+            $"{document.DocumentNumber}\n" +
+            $"{document.DocumentTitle}";
+    }
+
+    /// <summary>
+    /// Разделяет документ на обычные и секретные части.
+    /// </summary>
+    private void ParseDocument(string sourceDocument)
     {
         documentParts.Clear();
         secretFragments.Clear();
-        redactedCount = 0;
 
         if (string.IsNullOrWhiteSpace(sourceDocument))
         {
-            Debug.LogWarning("Исходный документ пуст.");
+            Debug.LogWarning(
+                "Текст текущего документа пуст."
+            );
+
             return;
         }
 
@@ -90,14 +186,14 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             RegexOptions.Singleline
         );
 
-        MatchCollection matches = secretPattern.Matches(sourceDocument);
+        MatchCollection matches =
+            secretPattern.Matches(sourceDocument);
 
         int currentPosition = 0;
         int secretIndex = 0;
 
         foreach (Match match in matches)
         {
-            // Добавляем обычный текст перед секретным фрагментом.
             if (match.Index > currentPosition)
             {
                 string normalText = sourceDocument.Substring(
@@ -120,6 +216,7 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             };
 
             secretFragments.Add(fragment);
+
             documentParts.Add(
                 DocumentPart.CreateSecret(secretIndex)
             );
@@ -128,7 +225,6 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             currentPosition = match.Index + match.Length;
         }
 
-        // Добавляем оставшийся обычный текст после последнего секрета.
         if (currentPosition < sourceDocument.Length)
         {
             string remainingText =
@@ -138,13 +234,25 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
                 DocumentPart.CreateNormal(remainingText)
             );
         }
+
+        if (secretFragments.Count == 0)
+        {
+            Debug.LogWarning(
+                "В документе нет секретных фрагментов [[...]]."
+            );
+        }
     }
 
     /// <summary>
-    /// Вызывается Unity при клике по объекту с текстом.
+    /// Обрабатывает клик по секретному фрагменту.
     /// </summary>
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (documentCompleted)
+        {
+            return;
+        }
+
         Camera eventCamera = eventData.pressEventCamera;
 
         int linkIndex = TMP_TextUtilities.FindIntersectingLink(
@@ -153,7 +261,6 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             eventCamera
         );
 
-        // Значение -1 означает, что игрок нажал не на ссылку.
         if (linkIndex == -1)
         {
             return;
@@ -167,7 +274,7 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
         if (!int.TryParse(linkId, out int secretId))
         {
             Debug.LogWarning(
-                $"Не удалось определить ID секретного фрагмента: {linkId}"
+                $"Некорректный ID секретного фрагмента: {linkId}"
             );
 
             return;
@@ -181,18 +288,19 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     /// </summary>
     private void RedactFragment(int secretId)
     {
-        if (secretId < 0 || secretId >= secretFragments.Count)
+        if (secretId < 0 ||
+            secretId >= secretFragments.Count)
         {
             Debug.LogWarning(
-                $"Секретный фрагмент с ID {secretId} не найден."
+                $"Фрагмент с ID {secretId} не найден."
             );
 
             return;
         }
 
-        SecretFragment fragment = secretFragments[secretId];
+        SecretFragment fragment =
+            secretFragments[secretId];
 
-        // Не засчитываем повторное нажатие.
         if (fragment.isRedacted)
         {
             return;
@@ -210,7 +318,7 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
     }
 
     /// <summary>
-    /// Заново формирует отображаемый текст документа.
+    /// Заново создаёт отображаемый текст.
     /// </summary>
     private void RefreshDocument()
     {
@@ -229,21 +337,27 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
             if (fragment.isRedacted)
             {
-                result.Append(CreateRedactedText(fragment.originalText));
+                result.Append(
+                    CreateRedactedText(fragment.originalText)
+                );
             }
             else
             {
-                result.Append(CreateClickableSecretText(fragment));
+                result.Append(
+                    CreateClickableSecretText(fragment)
+                );
             }
         }
 
         documentText.text = result.ToString();
 
+        documentText.ForceMeshUpdate();
+
         UpdateProgress();
     }
 
     /// <summary>
-    /// Создаёт кликабельный выделенный текст.
+    /// Создаёт выделенный кликабельный фрагмент.
     /// </summary>
     private string CreateClickableSecretText(
         SecretFragment fragment
@@ -253,15 +367,14 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
             $"<link=\"{fragment.id}\">" +
             $"<mark={secretHighlightColor}>" +
             $"<color={secretTextColor}>" +
-            $"{fragment.originalText}" +
-            $"</color>" +
-            $"</mark>" +
-            $"</link>";
+            fragment.originalText +
+            "</color>" +
+            "</mark>" +
+            "</link>";
     }
 
     /// <summary>
-    /// Создаёт чёрную полосу вместо обработанного текста.
-    /// Сам текст становится прозрачным, но сохраняет свою длину.
+    /// Создаёт чёрную цензурную полосу.
     /// </summary>
     private string CreateRedactedText(string originalText)
     {
@@ -275,28 +388,64 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
 
     private void UpdateProgress()
     {
-        if (progressText == null)
+        int documentNumber = currentDocumentIndex + 1;
+
+        progressText.text =
+            $"Документ: {documentNumber} / {documents.Count}\n" +
+            $"Засекречено: {redactedCount} / {secretFragments.Count}";
+    }
+
+    /// <summary>
+    /// Завершает текущий документ.
+    /// </summary>
+    private void CompleteDocument()
+    {
+        documentCompleted = true;
+        winPanel.SetActive(true);
+
+        bool hasNextDocument =
+            currentDocumentIndex < documents.Count - 1;
+
+        if (completionText != null)
+        {
+            completionText.text = hasNextDocument
+                ? "ДОКУМЕНТ ЗАСЕКРЕЧЕН"
+                : "ВСЕ ДОКУМЕНТЫ ОБРАБОТАНЫ";
+        }
+
+        if (nextDocumentButton != null)
+        {
+            nextDocumentButton.SetActive(hasNextDocument);
+        }
+
+        Debug.Log(
+            $"Документ {currentDocumentIndex + 1} завершён."
+        );
+    }
+
+    /// <summary>
+    /// Вызывается кнопкой «Следующий документ».
+    /// </summary>
+    public void NextDocument()
+    {
+        if (!documentCompleted)
         {
             return;
         }
 
-        progressText.text =
-            $"Засекречено: {redactedCount} / {secretFragments.Count}";
-    }
-
-    private void CompleteDocument()
-    {
-        if (winPanel != null)
+        if (currentDocumentIndex >= documents.Count - 1)
         {
-            winPanel.SetActive(true);
+            Debug.Log(
+                "Следующего документа нет."
+            );
+
+            return;
         }
 
-        Debug.Log("Документ полностью засекречен.");
+        currentDocumentIndex++;
+        LoadCurrentDocument();
     }
 
-    /// <summary>
-    /// Информация об одном секретном фрагменте.
-    /// </summary>
     private class SecretFragment
     {
         public int id;
@@ -304,9 +453,6 @@ public class DocumentRedactor : MonoBehaviour, IPointerClickHandler
         public bool isRedacted;
     }
 
-    /// <summary>
-    /// Часть документа: обычный текст или ссылка на секретный фрагмент.
-    /// </summary>
     private class DocumentPart
     {
         public bool isSecret;
