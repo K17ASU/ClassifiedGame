@@ -1276,9 +1276,24 @@ MonoBehaviour:
   ultravioletButton: {fileID: 919276781}
   ultravioletButtonText: {fileID: 2051226595}
   ultravioletCursor: {fileID: 1034410594}
-  ultravioletInactiveText: "\u0423\u0424-\u041B\u0410\u041C\u041F\u0410"
-  ultravioletActiveText: "\u0412\u042B\u041A\u041B\u042E\u0427\u0418\u0422\u042C
-    \u041B\u0410\u041C\u041F\u0423"
+  ultravioletInactiveText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 472035934213
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  ultravioletActiveText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 472035934214
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   ultravioletSecretTextColor: '#6B35A8'
   ultravioletSecretHighlightColor: '#8A4DFF35'
   ultravioletRevealRadius: 110
@@ -1287,6 +1302,24 @@ MonoBehaviour:
   resultScoreText: {fileID: 1080550773}
   nextDocumentButton: {fileID: 869437955}
   nextDocumentButtonText: {fileID: 1682854136}
+  nextDocumentText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 83280863477760
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  startWorkText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 83517137010688
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
   restartButton: {fileID: 1171561494}
   documents:
   - {fileID: 11400000, guid: 1360114f1983ede419b662f3fe1b9ca4, type: 2}
@@ -1302,6 +1335,9 @@ MonoBehaviour:
   secretHighlightColor: '#AD8B4030'
   secretTextSizePercent: 99
   redactionColor: '#000000FF'
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &773629096
 GameObject:
   m_ObjectHideFlags: 0
@@ -3696,7 +3732,7 @@ MonoBehaviour:
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 15
+  m_fontSizeMin: 14
   m_fontSizeMax: 22
   m_fontStyle: 1
   m_HorizontalAlignment: 2
@@ -3731,7 +3767,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 10, y: 0, z: 10, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -4739,9 +4775,9 @@ MonoBehaviour:
   m_fontSize: 20
   m_fontSizeBase: 20
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 14
+  m_fontSizeMax: 20
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512

@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 
 /// <summary>
@@ -52,12 +54,10 @@ public class DocumentRedactor :
     private RectTransform ultravioletCursor;
 
     [SerializeField]
-    private string ultravioletInactiveText =
-        "УФ-ЛАМПА";
+    private LocalizedString ultravioletInactiveText;
 
     [SerializeField]
-    private string ultravioletActiveText =
-        "ВЫКЛЮЧИТЬ ЛАМПУ";
+    private LocalizedString ultravioletActiveText;
 
     [SerializeField]
     private string ultravioletSecretTextColor =
@@ -87,6 +87,12 @@ public class DocumentRedactor :
 
     [SerializeField]
     private TMP_Text nextDocumentButtonText;
+
+    [SerializeField]
+    private LocalizedString nextDocumentText;
+
+    [SerializeField]
+    private LocalizedString startWorkText;
 
     [SerializeField]
     private GameObject restartButton;
@@ -181,8 +187,16 @@ public class DocumentRedactor :
         LoadCurrentDocument();
     }
 
+    private void OnEnable()
+    {
+        LocalizationSettings.SelectedLocaleChanged +=
+            OnSelectedLocaleChanged;
+    }
     private void OnDisable()
     {
+        LocalizationSettings.SelectedLocaleChanged -=
+            OnSelectedLocaleChanged;
+
         StopDragging();
     }
 
@@ -380,6 +394,8 @@ public class DocumentRedactor :
                 "Выберите сведения для засекречивания."
             );
         }
+
+        UpdateDynamicButtonTexts();
     }
 
     private void UpdateDocumentTitle(
@@ -1124,13 +1140,7 @@ public class DocumentRedactor :
                 $"ОБЩИЙ СЧЁТ: {totalScore}";
         }
 
-        if (nextDocumentButtonText != null)
-        {
-            nextDocumentButtonText.text =
-                isTutorial
-                    ? "ПРИСТУПИТЬ К РАБОТЕ"
-                    : "СЛЕДУЮЩИЙ ДОКУМЕНТ";
-        }
+        UpdateNextDocumentButtonText();
 
         if (nextDocumentButton != null)
         {
@@ -1402,13 +1412,7 @@ public class DocumentRedactor :
             ClearUltravioletReveal();
         }
 
-        if (ultravioletButtonText != null)
-        {
-            ultravioletButtonText.text =
-                ultravioletModeActive
-                    ? ultravioletActiveText
-                    : ultravioletInactiveText;
-        }
+        UpdateUltravioletButtonText();
 
         if (ultravioletModeActive)
         {
@@ -1660,10 +1664,61 @@ public class DocumentRedactor :
             ultravioletCursor.gameObject.SetActive(false);
         }
 
-        if (ultravioletButtonText != null)
+        UpdateUltravioletButtonText();
+    }
+
+    private void OnSelectedLocaleChanged(
+    Locale locale
+)
+    {
+        UpdateDynamicButtonTexts();
+    }
+
+    private void UpdateDynamicButtonTexts()
+    {
+        UpdateUltravioletButtonText();
+        UpdateNextDocumentButtonText();
+    }
+    private void UpdateUltravioletButtonText()
+    {
+        if (ultravioletButtonText == null)
         {
-            ultravioletButtonText.text =
-                ultravioletInactiveText;
+            return;
         }
+
+        LocalizedString selectedText =
+            ultravioletModeActive
+                ? ultravioletActiveText
+                : ultravioletInactiveText;
+
+        if (selectedText == null ||
+            selectedText.IsEmpty)
+        {
+            return;
+        }
+
+        ultravioletButtonText.text =
+            selectedText.GetLocalizedString();
+    }
+    private void UpdateNextDocumentButtonText()
+    {
+        if (nextDocumentButtonText == null)
+        {
+            return;
+        }
+
+        LocalizedString selectedText =
+            IsCurrentDocumentTutorial()
+                ? startWorkText
+                : nextDocumentText;
+
+        if (selectedText == null ||
+            selectedText.IsEmpty)
+        {
+            return;
+        }
+
+        nextDocumentButtonText.text =
+            selectedText.GetLocalizedString();
     }
 }
