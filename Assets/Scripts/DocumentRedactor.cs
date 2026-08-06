@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 /// <summary>
 /// Управляет документами, засекречиванием слов,
@@ -37,6 +39,25 @@ public class DocumentRedactor :
 
     [SerializeField]
     private GameObject submitButton;
+
+    [Header("Ультрафиолетовая лампа")]
+
+    [SerializeField]
+    private Button ultravioletButton;
+
+    [SerializeField]
+    private TMP_Text ultravioletButtonText;
+
+    [SerializeField]
+    private RectTransform ultravioletCursor;
+
+    [SerializeField]
+    private string ultravioletInactiveText =
+        "УФ-ЛАМПА";
+
+    [SerializeField]
+    private string ultravioletActiveText =
+        "ВЫКЛЮЧИТЬ ЛАМПУ";
 
     [Header("Панель результата")]
 
@@ -122,6 +143,7 @@ public class DocumentRedactor :
     private bool documentFinished;
     private bool isDragging;
     private bool dragRedactionState;
+    private bool ultravioletModeActive;
 
     private void Start()
     {
@@ -246,6 +268,33 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (ultravioletButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Ultraviolet Button."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (ultravioletButtonText == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Ultraviolet Button Text."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (ultravioletCursor == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Ultraviolet Cursor."
+            );
+
+            referencesAreValid = false;
+        }
+
         return referencesAreValid;
     }
     private bool IsCurrentDocumentTutorial()
@@ -288,6 +337,7 @@ public class DocumentRedactor :
         }
 
         StopDragging();
+        SetUltravioletMode(false);
 
         documentFinished = false;
         inspectionsRemaining = maximumInspections;
@@ -523,7 +573,8 @@ public class DocumentRedactor :
         PointerEventData eventData
     )
     {
-        if (documentFinished)
+        if (documentFinished ||
+     ultravioletModeActive)
         {
             return;
         }
@@ -559,7 +610,9 @@ public class DocumentRedactor :
         PointerEventData eventData
     )
     {
-        if (documentFinished || !isDragging)
+        if (documentFinished ||
+            ultravioletModeActive ||
+            !isDragging)
         {
             return;
         }
@@ -998,6 +1051,7 @@ public class DocumentRedactor :
     {
         documentFinished = true;
         StopDragging();
+        SetUltravioletMode(false);
 
         submitButton.SetActive(false);
         winPanel.SetActive(true);
@@ -1279,5 +1333,78 @@ public class DocumentRedactor :
         );
 
         SetStatus(message.ToString());
+    }
+
+    private void Update()
+    {
+        if (!ultravioletModeActive)
+        {
+            return;
+        }
+
+        if (ultravioletCursor == null)
+        {
+            return;
+        }
+
+        if (Mouse.current == null)
+        {
+            return;
+        }
+
+        Vector2 mousePosition =
+            Mouse.current.position.ReadValue();
+
+        ultravioletCursor.position =
+            mousePosition;
+    }
+
+    public void ToggleUltravioletMode()
+    {
+        if (documentFinished)
+        {
+            return;
+        }
+
+        SetUltravioletMode(
+            !ultravioletModeActive
+        );
+    }
+
+    private void SetUltravioletMode(bool isActive)
+    {
+        ultravioletModeActive = isActive;
+
+        StopDragging();
+
+        if (ultravioletCursor != null)
+        {
+            ultravioletCursor.gameObject.SetActive(
+                ultravioletModeActive
+            );
+        }
+
+        if (ultravioletButtonText != null)
+        {
+            ultravioletButtonText.text =
+                ultravioletModeActive
+                    ? ultravioletActiveText
+                    : ultravioletInactiveText;
+        }
+
+        if (ultravioletModeActive)
+        {
+            SetStatus(
+                "Ультрафиолетовая лампа включена. " +
+                "Исследуйте текст документа."
+            );
+        }
+        else
+        {
+            SetStatus(
+                "Лампа выключена. " +
+                "Теперь можно устанавливать плашки."
+            );
+        }
     }
 }
