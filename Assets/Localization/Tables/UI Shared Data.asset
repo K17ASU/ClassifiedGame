@@ -47,6 +47,26 @@ MonoBehaviour:
     m_Key: button_uv_disable
     m_Metadata:
       m_Items: []
+  - m_Id: 14569246867456
+    m_Key: button_yes
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14593347338240
+    m_Key: button_no
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14625563787264
+    m_Key: button_restart
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14760414855168
+    m_Key: exit_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14856661549056
+    m_Key: exit_message
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

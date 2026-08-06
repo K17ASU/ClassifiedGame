@@ -50,6 +50,26 @@ MonoBehaviour:
     m_Localized: TURN OFF UV LAMP
     m_Metadata:
       m_Items: []
+  - m_Id: 14569246867456
+    m_Localized: YES
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14593347338240
+    m_Localized: NO
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14625563787264
+    m_Localized: RESTART
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14760414855168
+    m_Localized: INTERRUPT PROCESSING?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 14856661549056
+    m_Localized: Current progress will be lost.\nReturn to the main menu?
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
