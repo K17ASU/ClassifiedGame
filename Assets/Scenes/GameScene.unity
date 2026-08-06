@@ -423,7 +423,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0.010620117, y: -0.0045776367}
+  m_AnchoredPosition: {x: -0.010498047, y: -0.004638672}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &252442767
@@ -1277,8 +1277,10 @@ MonoBehaviour:
   completionText: {fileID: 162912340}
   resultScoreText: {fileID: 1080550773}
   nextDocumentButton: {fileID: 869437955}
+  nextDocumentButtonText: {fileID: 1682854136}
   restartButton: {fileID: 1171561494}
   documents:
+  - {fileID: 11400000, guid: 1360114f1983ede419b662f3fe1b9ca4, type: 2}
   - {fileID: 11400000, guid: 02bc9fcf05578c046a7fc9dfb3593fb1, type: 2}
   - {fileID: 11400000, guid: c938d2e2a87765e499756c1842e1904a, type: 2}
   - {fileID: 11400000, guid: 53e634afe3bdf26428495e53c878a4ea, type: 2}
@@ -3393,8 +3395,8 @@ MonoBehaviour:
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_fontSizeMin: 15
+  m_fontSizeMax: 22
   m_fontStyle: 1
   m_HorizontalAlignment: 2
   m_VerticalAlignment: 512

@@ -53,6 +53,9 @@ public class DocumentRedactor :
     private GameObject nextDocumentButton;
 
     [SerializeField]
+    private TMP_Text nextDocumentButtonText;
+
+    [SerializeField]
     private GameObject restartButton;
 
     [Header("Документы")]
@@ -234,9 +237,31 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (nextDocumentButtonText == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Next Document Button Text."
+            );
+
+            referencesAreValid = false;
+        }
+
         return referencesAreValid;
     }
+    private bool IsCurrentDocumentTutorial()
+    {
+        if (currentDocumentIndex < 0 ||
+            currentDocumentIndex >= documents.Count)
+        {
+            return false;
+        }
 
+        DocumentData currentDocument =
+            documents[currentDocumentIndex];
+
+        return currentDocument != null &&
+               currentDocument.IsTutorial;
+    }
     private void LoadCurrentDocument()
     {
         if (currentDocumentIndex < 0 ||
@@ -276,9 +301,23 @@ public class DocumentRedactor :
         RefreshDocument();
         UpdateInspectionsDisplay();
 
-        SetStatus(
-            "Выберите сведения для засекречивания."
-        );
+        if (currentDocument.IsTutorial)
+        {
+            string tutorialInstruction =
+                string.IsNullOrWhiteSpace(
+                    currentDocument.InstructionText
+                )
+                    ? "Засекретьте выделенные сведения."
+                    : currentDocument.InstructionText;
+
+            SetStatus(tutorialInstruction);
+        }
+        else
+        {
+            SetStatus(
+                "Выберите сведения для засекречивания."
+            );
+        }
     }
 
     private void UpdateDocumentTitle(
@@ -626,10 +665,17 @@ public class DocumentRedactor :
 
         RefreshDocument();
 
-        SetStatus(
-            "Документ изменён. " +
-            "Результат ещё не проверен."
-        );
+        if (IsCurrentDocumentTutorial())
+        {
+            UpdateTutorialStatus();
+        }
+        else
+        {
+            SetStatus(
+                "Документ изменён. " +
+                "Результат ещё не проверен."
+            );
+        }
     }
 
     private void StopDragging()
@@ -739,14 +785,37 @@ public class DocumentRedactor :
             }
         }
 
+        if (IsCurrentDocumentTutorial())
+        {
+            progressText.text =
+                "ОБУЧЕНИЕ\n" +
+                $"Засекречено слов: {redactedWordCount}";
+
+            return;
+        }
+
+        int currentPlayableDocument =
+            GetCurrentPlayableDocumentNumber();
+
+        int playableDocumentCount =
+            GetPlayableDocumentCount();
+
         progressText.text =
-            $"Документ: {currentDocumentIndex + 1}" +
-            $" / {documents.Count}\n" +
+            $"Документ: {currentPlayableDocument}" +
+            $" / {playableDocumentCount}\n" +
             $"Засекречено слов: {redactedWordCount}";
     }
 
     private void UpdateInspectionsDisplay()
     {
+        if (IsCurrentDocumentTutorial())
+        {
+            inspectionsText.text =
+                "УЧЕБНЫЙ РЕЖИМ";
+
+            return;
+        }
+
         StringBuilder result =
             new StringBuilder("ПРОВЕРКИ: ");
 
@@ -812,6 +881,16 @@ public class DocumentRedactor :
             return;
         }
 
+        if (IsCurrentDocumentTutorial())
+        {
+            RejectTutorialDocument(
+                missedSecretWords,
+                extraRedactedWords
+            );
+
+            return;
+        }
+
         inspectionsRemaining--;
         UpdateInspectionsDisplay();
 
@@ -864,6 +943,16 @@ public class DocumentRedactor :
 
     private void CompleteDocumentSuccessfully()
     {
+        if (IsCurrentDocumentTutorial())
+        {
+            ShowResultPanel(
+                documentPassed: true,
+                documentScore: 0
+            );
+
+            return;
+        }
+
         int documentScore =
             CalculateDocumentScore();
 
@@ -920,13 +1009,20 @@ public class DocumentRedactor :
         bool isLastDocument =
             currentDocumentIndex ==
             documents.Count - 1;
+        bool isTutorial =
+            IsCurrentDocumentTutorial();
 
         if (documentPassed)
         {
-            if (isLastDocument)
+            if (isTutorial)
             {
                 completionText.text =
-                    "ВСЕ ДОКУМЕНТЫ ОБРАБОТАНЫ";
+                    "ОБУЧЕНИЕ\nЗАВЕРШЕНО";
+            }
+            else if (isLastDocument)
+            {
+                completionText.text =
+                    "ВСЕ ДОКУМЕНТЫ\nОБРАБОТАНЫ";
             }
             else
             {
@@ -942,7 +1038,13 @@ public class DocumentRedactor :
                     : "УТЕЧКА ИНФОРМАЦИИ";
         }
 
-        if (isLastDocument)
+        if (isTutorial)
+        {
+            resultScoreText.text =
+                "Учебный документ обработан.\n" +
+                "Вы готовы приступить к работе.";
+        }
+        else if (isLastDocument)
         {
             resultScoreText.text =
                 $"НАГРАДА: {documentScore}\n" +
@@ -954,6 +1056,14 @@ public class DocumentRedactor :
             resultScoreText.text =
                 $"НАГРАДА: {documentScore}\n" +
                 $"ОБЩИЙ СЧЁТ: {totalScore}";
+        }
+
+        if (nextDocumentButtonText != null)
+        {
+            nextDocumentButtonText.text =
+                isTutorial
+                    ? "ПРИСТУПИТЬ К РАБОТЕ"
+                    : "СЛЕДУЮЩИЙ ДОКУМЕНТ";
         }
 
         if (nextDocumentButton != null)
@@ -977,7 +1087,8 @@ public class DocumentRedactor :
 
     private int GetMaximumTotalScore()
     {
-        return documents.Count * firstTryScore;
+        return GetPlayableDocumentCount() *
+               firstTryScore;
     }
     public void NextDocument()
     {
@@ -1048,5 +1159,125 @@ public class DocumentRedactor :
     {
         public string cleanText;
         public List<bool> secretCharacters;
+    }
+
+    private int GetPlayableDocumentCount()
+    {
+        int count = 0;
+
+        foreach (DocumentData document in documents)
+        {
+            if (document != null &&
+                !document.IsTutorial)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int GetCurrentPlayableDocumentNumber()
+    {
+        int number = 0;
+
+        for (int i = 0;
+             i <= currentDocumentIndex &&
+             i < documents.Count;
+             i++)
+        {
+            DocumentData document = documents[i];
+
+            if (document != null &&
+                !document.IsTutorial)
+            {
+                number++;
+            }
+        }
+
+        return number;
+    }
+
+    private void UpdateTutorialStatus()
+    {
+        int missedSecretWords = 0;
+        int extraRedactedWords = 0;
+
+        foreach (WordData word in words)
+        {
+            if (word.isSecret &&
+                !word.isRedacted)
+            {
+                missedSecretWords++;
+            }
+
+            if (!word.isSecret &&
+                word.isRedacted)
+            {
+                extraRedactedWords++;
+            }
+        }
+
+        if (missedSecretWords == 0 &&
+            extraRedactedWords == 0)
+        {
+            SetStatus(
+                "Отлично. Документ подготовлен. " +
+                "Нажмите «ПЕРЕДАТЬ ДОКУМЕНТ»."
+            );
+
+            return;
+        }
+
+        if (extraRedactedWords > 0)
+        {
+            SetStatus(
+                "Вы закрыли лишнее слово. " +
+                "Нажмите на плашку ещё раз, " +
+                "чтобы убрать её."
+            );
+
+            return;
+        }
+
+        SetStatus(
+            "Продолжайте засекречивание. " +
+            "Можно нажимать на слова или " +
+            "проводить по ним мышью."
+        );
+    }
+
+    private void RejectTutorialDocument(
+    int missedSecretWords,
+    int extraRedactedWords
+)
+    {
+        StringBuilder message =
+            new StringBuilder();
+
+        message.AppendLine(
+            "УЧЕБНЫЙ ДОКУМЕНТ НЕ ГОТОВ"
+        );
+
+        if (missedSecretWords > 0)
+        {
+            message.AppendLine(
+                $"Пропущено слов: {missedSecretWords}"
+            );
+        }
+
+        if (extraRedactedWords > 0)
+        {
+            message.AppendLine(
+                $"Лишних плашек: {extraRedactedWords}"
+            );
+        }
+
+        message.Append(
+            "Исправьте выделение и попробуйте снова. " +
+            "Проверка не была потрачена."
+        );
+
+        SetStatus(message.ToString());
     }
 }

@@ -1,35 +1,43 @@
 using UnityEngine;
 
 /// <summary>
-/// Хранит данные одного игрового документа.
-/// Это не компонент сцены, а отдельный asset-файл.
+/// Хранит содержимое и настройки одного документа.
 /// </summary>
 [CreateAssetMenu(
     fileName = "NewDocument",
-    menuName = "Classified Documents/Document",
-    order = 1
+    menuName = "Document Redactor/Document"
 )]
 public class DocumentData : ScriptableObject
 {
-    [Header("Информация о документе")]
+    [Header("Основная информация")]
 
     [SerializeField]
-    private string documentTitle = "Неизвестное дело";
+    private string documentNumber = "ДОКУМЕНТ № 001";
 
     [SerializeField]
-    private string documentNumber = "ДОКЛАД № 001";
+    private string documentTitle = "Название документа";
 
-    [Header("Содержимое документа")]
-
-    [TextArea(15, 40)]
     [SerializeField]
-    private string documentText =
-        "Введите сюда текст документа.\n\n" +
-        "Секретные фрагменты заключайте в [[двойные скобки]].";
+    [TextArea(8, 25)]
+    private string documentText;
 
-    public string DocumentTitle => documentTitle;
+    [Header("Обучение")]
+
+    [SerializeField]
+    private bool isTutorial;
+
+    [SerializeField]
+    [TextArea(2, 5)]
+    private string instructionText =
+        "Найдите и засекретьте служебные сведения.";
 
     public string DocumentNumber => documentNumber;
 
+    public string DocumentTitle => documentTitle;
+
     public string DocumentText => documentText;
+
+    public bool IsTutorial => isTutorial;
+
+    public string InstructionText => instructionText;
 }
