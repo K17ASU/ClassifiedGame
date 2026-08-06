@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: UI Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: UI
+  m_TableCollectionNameGuidString: 2c2b578ca7617c94fb50efa1bab2db63
+  m_Entries:
+  - m_Id: 472019156992
+    m_Key: menu_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 472035934208
+    m_Key: menu_subtitle
+    m_Metadata:
+      m_Items: []
+  - m_Id: 472035934209
+    m_Key: button_new_game
+    m_Metadata:
+      m_Items: []
+  - m_Id: 472035934210
+    m_Key: button_quit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 472035934211
+    m_Key: button_menu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 472035934212
+    m_Key: button_submit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 472035934213
+    m_Key: button_uv_lamp
+    m_Metadata:
+      m_Items: []
+  - m_Id: 472035934214
+    m_Key: button_uv_disable
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 6265692501840232715
+  references:
+    version: 2
+    RefIds:
+    - rid: 6265692501840232715
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1786029609216
