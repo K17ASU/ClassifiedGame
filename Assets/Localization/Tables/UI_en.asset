@@ -16,7 +16,8 @@ MonoBehaviour:
     m_Code: en
   m_SharedData: {fileID: 11400000, guid: 2c2b578ca7617c94fb50efa1bab2db63, type: 2}
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - rid: 6265692501840232725
   m_TableData:
   - m_Id: 472019156992
     m_Localized: CLASSIFIED INFORMATION DIVISION
@@ -78,6 +79,118 @@ MonoBehaviour:
     m_Localized: START ASSIGNMENT
     m_Metadata:
       m_Items: []
+  - m_Id: 110460536406016
+    m_Localized: Select information to redact.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320576
+    m_Localized: Document modified. The result has not been verified yet.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320577
+    m_Localized: UV lamp enabled. Examine the document.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320578
+    m_Localized: UV lamp disabled. You can now redact information.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320579
+    m_Localized: TRAINING MODE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320580
+    m_Localized: "Good. The document is ready. Press \u201CSUBMIT DOCUMENT\u201D."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320581
+    m_Localized: You redacted an unnecessary word. Click the redaction again to remove
+      it.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320582
+    m_Localized: Continue searching for classified information.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320583
+    m_Localized: TRAINING\nCOMPLETE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320584
+    m_Localized: ALL DOCUMENTS\nPROCESSED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320585
+    m_Localized: DOCUMENT ACCEPTED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320586
+    m_Localized: PROCESSING\nCOMPLETE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320587
+    m_Localized: DOCUMENT FAILED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320588
+    m_Localized: Training document processed.\nYou are ready to begin.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320589
+    m_Localized: 'TRAINING\nRedacted words: {0}'
+    m_Metadata:
+      m_Items:
+      - rid: 6265692501840232725
+  - m_Id: 110460599320590
+    m_Localized: 'Document: {0} / {1}\nRedacted words: {2}'
+    m_Metadata:
+      m_Items:
+      - rid: 6265692501840232725
+  - m_Id: 110460599320591
+    m_Localized: 'REWARD: {0}\nTOTAL SCORE: {1}'
+    m_Metadata:
+      m_Items:
+      - rid: 6265692501840232725
+  - m_Id: 110460599320592
+    m_Localized: 'REWARD: {0}\nFINAL SCORE: {1} / {2}'
+    m_Metadata:
+      m_Items:
+      - rid: 6265692501840232725
+  - m_Id: 110460599320593
+    m_Localized: 'Missed words: {0}'
+    m_Metadata:
+      m_Items:
+      - rid: 6265692501840232725
+  - m_Id: 110460599320594
+    m_Localized: 'Extra redactions: {0}'
+    m_Metadata:
+      m_Items:
+      - rid: 6265692501840232725
+  - m_Id: 111346075615232
+    m_Localized: 'CHECKS: {0}'
+    m_Metadata:
+      m_Items:
+      - rid: 6265692501840232725
+  - m_Id: 111550027841536
+    m_Localized: DOCUMENT REJECTED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 111562388455424
+    m_Localized: Correct the document and submit it again.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
-    RefIds: []
+    RefIds:
+    - rid: 6265692501840232725
+      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries: 
+        m_SharedEntries:
+        - id: 110460599320589
+        - id: 110460599320590
+        - id: 110460599320591
+        - id: 110460599320592
+        - id: 110460599320593
+        - id: 110460599320594
+        - id: 111346075615232

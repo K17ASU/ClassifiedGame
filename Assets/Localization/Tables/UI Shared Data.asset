@@ -47,6 +47,86 @@ MonoBehaviour:
     m_Key: button_uv_disable
     m_Metadata:
       m_Items: []
+  - m_Id: 110460536406016
+    m_Key: status_select_info
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320576
+    m_Key: status_document_changed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320577
+    m_Key: status_uv_on
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320578
+    m_Key: status_uv_off
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320579
+    m_Key: tutorial_mode
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320580
+    m_Key: tutorial_ready
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320581
+    m_Key: tutorial_extra
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320582
+    m_Key: tutorial_continue
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320583
+    m_Key: result_tutorial_complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320584
+    m_Key: result_all_complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320585
+    m_Key: result_document_accepted
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320586
+    m_Key: result_processing_complete
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320587
+    m_Key: result_document_failed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320588
+    m_Key: result_tutorial_score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320589
+    m_Key: progress_tutorial
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320590
+    m_Key: progress_document
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320591
+    m_Key: result_score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320592
+    m_Key: result_final_score
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320593
+    m_Key: error_missed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 110460599320594
+    m_Key: error_extra
+    m_Metadata:
+      m_Items: []
   - m_Id: 14569246867456
     m_Key: button_yes
     m_Metadata:
@@ -73,6 +153,18 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 83517137010688
     m_Key: button_start_work
+    m_Metadata:
+      m_Items: []
+  - m_Id: 111346075615232
+    m_Key: inspections
+    m_Metadata:
+      m_Items: []
+  - m_Id: 111550027841536
+    m_Key: document_rejected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 111562388455424
+    m_Key: document_fix_retry
     m_Metadata:
       m_Items: []
   m_Metadata:

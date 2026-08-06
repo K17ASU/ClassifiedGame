@@ -391,7 +391,7 @@ public class DocumentRedactor :
         else
         {
             SetStatus(
-                "Выберите сведения для засекречивания."
+                Localize(statusSelectInfo)
             );
         }
 
@@ -754,8 +754,7 @@ public class DocumentRedactor :
         else
         {
             SetStatus(
-                "Документ изменён. " +
-                "Результат ещё не проверен."
+               Localize(statusDocumentChanged)
             );
         }
     }
@@ -869,8 +868,10 @@ public class DocumentRedactor :
         if (IsCurrentDocumentTutorial())
         {
             progressText.text =
-                "ОБУЧЕНИЕ\n" +
-                $"Засекречено слов: {redactedWordCount}";
+                Localize(
+                    progressTutorialText,
+                    redactedWordCount
+                );
 
             return;
         }
@@ -882,39 +883,45 @@ public class DocumentRedactor :
             GetPlayableDocumentCount();
 
         progressText.text =
-            $"Документ: {currentPlayableDocument}" +
-            $" / {playableDocumentCount}\n" +
-            $"Засекречено слов: {redactedWordCount}";
+            Localize(
+                progressDocumentText,
+                currentPlayableDocument,
+                playableDocumentCount,
+                redactedWordCount
+            );
     }
 
+    [SerializeField]
+    private LocalizedString inspectionsLocalizedText;
     private void UpdateInspectionsDisplay()
     {
         if (IsCurrentDocumentTutorial())
         {
             inspectionsText.text =
-                "УЧЕБНЫЙ РЕЖИМ";
+                Localize(tutorialModeText);
 
             return;
         }
 
-        StringBuilder result =
-            new StringBuilder("ПРОВЕРКИ: ");
+        StringBuilder marks =
+            new StringBuilder();
 
         for (int i = 0;
              i < maximumInspections;
              i++)
         {
-            if (i < inspectionsRemaining)
-            {
-                result.Append("● ");
-            }
-            else
-            {
-                result.Append("○ ");
-            }
+            marks.Append(
+                i < inspectionsRemaining
+                    ? "● "
+                    : "○ "
+            );
         }
 
-        inspectionsText.text = result.ToString();
+        inspectionsText.text =
+            Localize(
+                inspectionsLocalizedText,
+                marks.ToString()
+            );
     }
 
     private void SetStatus(string message)
@@ -988,35 +995,45 @@ public class DocumentRedactor :
         }
     }
 
+    [SerializeField]
+    private LocalizedString documentRejectedText;
+
+    [SerializeField]
+    private LocalizedString documentFixRetryText;
     private void RejectDocument(
-        int missedSecretWords,
-        int extraRedactedWords
-    )
+    int missedSecretWords,
+    int extraRedactedWords
+)
     {
         StringBuilder message =
             new StringBuilder();
 
         message.AppendLine(
-            "ДОКУМЕНТ ОТКЛОНЁН"
+            Localize(documentRejectedText)
         );
 
         if (missedSecretWords > 0)
         {
             message.AppendLine(
-                $"Пропущено слов: {missedSecretWords}"
+                Localize(
+                    errorMissedText,
+                    missedSecretWords
+                )
             );
         }
 
         if (extraRedactedWords > 0)
         {
             message.AppendLine(
-                $"Лишних засекречиваний: " +
-                $"{extraRedactedWords}"
+                Localize(
+                    errorExtraText,
+                    extraRedactedWords
+                )
             );
         }
 
         message.Append(
-            "Исправьте документ и отправьте снова."
+            Localize(documentFixRetryText)
         );
 
         SetStatus(message.ToString());
@@ -1099,45 +1116,62 @@ public class DocumentRedactor :
             if (isTutorial)
             {
                 completionText.text =
-                    "ОБУЧЕНИЕ\nЗАВЕРШЕНО";
+                    Localize(
+                        resultTutorialCompleteText
+                    );
             }
             else if (isLastDocument)
             {
                 completionText.text =
-                    "ВСЕ ДОКУМЕНТЫ\nОБРАБОТАНЫ";
+                    Localize(
+                        resultAllCompleteText
+                    );
             }
             else
             {
                 completionText.text =
-                    "ДОКУМЕНТ ПРИНЯТ";
+                    Localize(
+                        resultDocumentAcceptedText
+                    );
             }
         }
         else
         {
             completionText.text =
                 isLastDocument
-                    ? "ОБРАБОТКА ЗАВЕРШЕНА"
-                    : "УТЕЧКА ИНФОРМАЦИИ";
+                    ? Localize(
+                        resultProcessingCompleteText
+                    )
+                    : Localize(
+                        resultDocumentFailedText
+                    );
         }
 
         if (isTutorial)
         {
             resultScoreText.text =
-                "Учебный документ обработан.\n" +
-                "Вы готовы приступить к работе.";
+                Localize(
+                    resultTutorialScoreText
+                );
         }
         else if (isLastDocument)
         {
             resultScoreText.text =
-                $"НАГРАДА: {documentScore}\n" +
-                $"ИТОГОВЫЙ СЧЁТ: {totalScore}" +
-                $" / {GetMaximumTotalScore()}";
+                Localize(
+                    resultFinalScoreLocalizedText,
+                    documentScore,
+                    totalScore,
+                    GetMaximumTotalScore()
+                );
         }
         else
         {
             resultScoreText.text =
-                $"НАГРАДА: {documentScore}\n" +
-                $"ОБЩИЙ СЧЁТ: {totalScore}";
+                Localize(
+                    resultScoreLocalizedText,
+                    documentScore,
+                    totalScore
+                );
         }
 
         UpdateNextDocumentButtonText();
@@ -1292,11 +1326,10 @@ public class DocumentRedactor :
         }
 
         if (missedSecretWords == 0 &&
-            extraRedactedWords == 0)
+     extraRedactedWords == 0)
         {
             SetStatus(
-                "Отлично. Документ подготовлен. " +
-                "Нажмите «ПЕРЕДАТЬ ДОКУМЕНТ»."
+                Localize(tutorialReadyText)
             );
 
             return;
@@ -1305,18 +1338,14 @@ public class DocumentRedactor :
         if (extraRedactedWords > 0)
         {
             SetStatus(
-                "Вы закрыли лишнее слово. " +
-                "Нажмите на плашку ещё раз, " +
-                "чтобы убрать её."
+                Localize(tutorialExtraText)
             );
 
             return;
         }
 
         SetStatus(
-            "Продолжайте засекречивание. " +
-            "Можно нажимать на слова или " +
-            "проводить по ним мышью."
+            Localize(tutorialContinueText)
         );
     }
 
@@ -1417,15 +1446,13 @@ public class DocumentRedactor :
         if (ultravioletModeActive)
         {
             SetStatus(
-                "Ультрафиолетовая лампа включена. " +
-                "Исследуйте документ."
+                Localize(statusUvOn)
             );
         }
         else
         {
             SetStatus(
-                "Лампа выключена. " +
-                "Можно устанавливать плашки."
+                Localize(statusUvOff)
             );
         }
     }
@@ -1668,10 +1695,12 @@ public class DocumentRedactor :
     }
 
     private void OnSelectedLocaleChanged(
-    Locale locale
-)
+     Locale locale
+ )
     {
         UpdateDynamicButtonTexts();
+        UpdateProgress();
+        UpdateInspectionsDisplay();
     }
 
     private void UpdateDynamicButtonTexts()
@@ -1720,5 +1749,84 @@ public class DocumentRedactor :
 
         nextDocumentButtonText.text =
             selectedText.GetLocalizedString();
+    }
+
+    [Header("Локализация интерфейса")]
+
+    [SerializeField]
+    private LocalizedString statusSelectInfo;
+
+    [SerializeField]
+    private LocalizedString statusDocumentChanged;
+
+    [SerializeField]
+    private LocalizedString statusUvOn;
+
+    [SerializeField]
+    private LocalizedString statusUvOff;
+
+    [SerializeField]
+    private LocalizedString tutorialModeText;
+
+    [SerializeField]
+    private LocalizedString tutorialReadyText;
+
+    [SerializeField]
+    private LocalizedString tutorialExtraText;
+
+    [SerializeField]
+    private LocalizedString tutorialContinueText;
+
+    [SerializeField]
+    private LocalizedString progressTutorialText;
+
+    [SerializeField]
+    private LocalizedString progressDocumentText;
+
+    [SerializeField]
+    private LocalizedString resultTutorialCompleteText;
+
+    [SerializeField]
+    private LocalizedString resultAllCompleteText;
+
+    [SerializeField]
+    private LocalizedString resultDocumentAcceptedText;
+
+    [SerializeField]
+    private LocalizedString resultProcessingCompleteText;
+
+    [SerializeField]
+    private LocalizedString resultDocumentFailedText;
+
+    [SerializeField]
+    private LocalizedString resultTutorialScoreText;
+
+    [SerializeField]
+    private LocalizedString resultScoreLocalizedText;
+
+    [SerializeField]
+    private LocalizedString resultFinalScoreLocalizedText;
+
+    [SerializeField]
+    private LocalizedString errorMissedText;
+
+    [SerializeField]
+    private LocalizedString errorExtraText;
+
+    private string Localize(
+    LocalizedString localizedString,
+    params object[] arguments
+)
+    {
+        if (localizedString == null ||
+            localizedString.IsEmpty)
+        {
+            return string.Empty;
+        }
+
+        return arguments != null &&
+               arguments.Length > 0
+            ? localizedString.GetLocalizedString(arguments)
+            : localizedString.GetLocalizedString();
     }
 }
