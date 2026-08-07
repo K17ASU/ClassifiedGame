@@ -373,20 +373,39 @@ public class DocumentRedactor :
         restartButton.SetActive(false);
 
         UpdateDocumentTitle(currentDocument);
-        ParseDocument(currentDocument.DocumentText);
+        string localizedDocumentText =
+            GetLocalizedDocumentString(
+                currentDocument.LocalizedDocumentText,
+                currentDocument.DocumentText
+         );
+
+        ParseDocument(
+            localizedDocumentText
+        );
         RefreshDocument();
         UpdateInspectionsDisplay();
 
         if (currentDocument.IsTutorial)
         {
             string tutorialInstruction =
-                string.IsNullOrWhiteSpace(
+                GetLocalizedDocumentString(
+                    currentDocument.LocalizedInstructionText,
                     currentDocument.InstructionText
-                )
-                    ? "Засекретьте выделенные сведения."
-                    : currentDocument.InstructionText;
+                );
 
-            SetStatus(tutorialInstruction);
+            if (string.IsNullOrWhiteSpace(
+                    tutorialInstruction))
+            {
+                SetStatus(
+                    Localize(statusSelectInfo)
+                );
+            }
+            else
+            {
+                SetStatus(
+                    tutorialInstruction
+                );
+            }
         }
         else
         {
@@ -407,9 +426,21 @@ public class DocumentRedactor :
             return;
         }
 
+        string documentNumber =
+            GetLocalizedDocumentString(
+                document.LocalizedDocumentNumber,
+                document.DocumentNumber
+            );
+
+        string documentTitle =
+            GetLocalizedDocumentString(
+                document.LocalizedDocumentTitle,
+                document.DocumentTitle
+            );
+
         documentTitleText.text =
-            $"{document.DocumentNumber}\n" +
-            $"{document.DocumentTitle}";
+            $"{documentNumber}\n" +
+            $"{documentTitle}";
     }
 
     private void ParseDocument(string sourceText)
@@ -1828,5 +1859,24 @@ public class DocumentRedactor :
                arguments.Length > 0
             ? localizedString.GetLocalizedString(arguments)
             : localizedString.GetLocalizedString();
+    }
+
+    private string GetLocalizedDocumentString(
+    LocalizedString localizedString,
+    string fallback
+)
+    {
+        if (localizedString == null ||
+            localizedString.IsEmpty)
+        {
+            return fallback;
+        }
+
+        string result =
+            localizedString.GetLocalizedString();
+
+        return string.IsNullOrWhiteSpace(result)
+            ? fallback
+            : result;
     }
 }

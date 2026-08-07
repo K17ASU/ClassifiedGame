@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
+  m_Name: Documents_en
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.StringTable
+  m_LocaleId:
+    m_Code: en
+  m_SharedData: {fileID: 11400000, guid: 76eedf465d0e3db4981b0591533a57cd, type: 2}
+  m_Metadata:
+    m_Items: []
+  m_TableData:
+  - m_Id: 2300068806656
+    m_Localized: TRAINING DOCUMENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2300131721216
+    m_Localized: REDACTION PROCEDURE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2300135915520
+    m_Localized: Use the UV lamp to detect hidden information.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2300135915521
+    m_Localized: 'OFFICIAL MEMORANDUM
+
+
+      Agent [[Username]] has been assigned
+
+      to
+      [[Organisation Training Facility]].
+
+
+      Use the ultraviolet lamp
+
+      to
+      detect hidden information.
+
+
+      After locating it, turn off the lamp
+
+      and
+      redact the discovered data.'
+    m_Metadata:
+      m_Items: []
+  references:
+    version: 2
+    RefIds: []

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Localization;
 
 /// <summary>
 /// Хранит содержимое и настройки одного документа.
@@ -40,4 +41,30 @@ public class DocumentData : ScriptableObject
     public bool IsTutorial => isTutorial;
 
     public string InstructionText => instructionText;
+
+    [Header("Локализация")]
+
+    [SerializeField]
+    private LocalizedString localizedDocumentNumber;
+
+    [SerializeField]
+    private LocalizedString localizedDocumentTitle;
+
+    [SerializeField]
+    private LocalizedString localizedDocumentText;
+
+    [SerializeField]
+    private LocalizedString localizedInstructionText;
+
+    public LocalizedString LocalizedDocumentNumber =>
+    localizedDocumentNumber;
+
+    public LocalizedString LocalizedDocumentTitle =>
+        localizedDocumentTitle;
+
+    public LocalizedString LocalizedDocumentText =>
+        localizedDocumentText;
+
+    public LocalizedString LocalizedInstructionText =>
+        localizedInstructionText;
 }
