@@ -29,11 +29,10 @@ MonoBehaviour:
   - m_Id: 2300135915520
     m_Localized: 'Turn on the UV lamp and examine the document.
 
-      Find the
-      hidden information, then turn off the lamp
+      Find the hidden
+      information, then turn off the lamp
 
-      and redact the discovered
-      data.'
+      and redact the discovered data.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915521
@@ -80,6 +79,10 @@ MonoBehaviour:
 
       and facility code
       names.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2300135915522
+    m_Localized: 001
     m_Metadata:
       m_Items: []
   references:

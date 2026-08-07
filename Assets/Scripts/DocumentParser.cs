@@ -9,6 +9,14 @@ public sealed class DocumentParser
         RegexOptions.Compiled
     );
 
+    private enum MarkerType
+    {
+        None,
+        RedactAndUltraviolet,
+        RedactOnly,
+        UltravioletOnly
+    }
+
     public DocumentParseResult Parse(string sourceText)
     {
         DocumentParseResult result = new DocumentParseResult();
@@ -18,14 +26,15 @@ public sealed class DocumentParser
             return result;
         }
 
-        ParsedSource parsedSource = RemoveSecretMarkers(sourceText);
+        ParsedSource parsedSource = RemoveMarkers(sourceText);
 
         result.hasUnclosedSecretMarker =
-            parsedSource.hasUnclosedSecretMarker;
+            parsedSource.hasUnclosedMarker;
 
         CreateWordsAndTextParts(
             parsedSource.cleanText,
-            parsedSource.secretCharacters,
+            parsedSource.redactionCharacters,
+            parsedSource.ultravioletCharacters,
             result
         );
 
@@ -40,60 +49,103 @@ public sealed class DocumentParser
         return result;
     }
 
-    private ParsedSource RemoveSecretMarkers(string sourceText)
+    private ParsedSource RemoveMarkers(string sourceText)
     {
         StringBuilder cleanText = new StringBuilder();
-        List<bool> secretCharacters = new List<bool>();
 
-        bool insideSecretFragment = false;
+        List<bool> redactionCharacters =
+            new List<bool>();
+
+        List<bool> ultravioletCharacters =
+            new List<bool>();
+
+        MarkerType currentMarker = MarkerType.None;
         int position = 0;
 
         while (position < sourceText.Length)
         {
-            bool startsSecretFragment =
-                position + 1 < sourceText.Length &&
-                sourceText[position] == '[' &&
-                sourceText[position + 1] == '[';
-
-            bool endsSecretFragment =
-                position + 1 < sourceText.Length &&
-                sourceText[position] == ']' &&
-                sourceText[position + 1] == ']';
-
-            if (startsSecretFragment)
+            if (currentMarker == MarkerType.None)
             {
-                insideSecretFragment = true;
-                position += 2;
-                continue;
+                if (StartsWith(sourceText, position, "[["))
+                {
+                    currentMarker =
+                        MarkerType.RedactAndUltraviolet;
+
+                    position += 2;
+                    continue;
+                }
+
+                if (StartsWith(sourceText, position, "{{"))
+                {
+                    currentMarker =
+                        MarkerType.RedactOnly;
+
+                    position += 2;
+                    continue;
+                }
+
+                if (StartsWith(sourceText, position, "(("))
+                {
+                    currentMarker =
+                        MarkerType.UltravioletOnly;
+
+                    position += 2;
+                    continue;
+                }
             }
-
-            if (endsSecretFragment)
+            else if (IsClosingMarker(
+                         sourceText,
+                         position,
+                         currentMarker))
             {
-                insideSecretFragment = false;
+                currentMarker = MarkerType.None;
                 position += 2;
                 continue;
             }
 
             cleanText.Append(sourceText[position]);
-            secretCharacters.Add(insideSecretFragment);
+
+            redactionCharacters.Add(
+                currentMarker ==
+                    MarkerType.RedactAndUltraviolet ||
+                currentMarker ==
+                    MarkerType.RedactOnly
+            );
+
+            ultravioletCharacters.Add(
+                currentMarker ==
+                    MarkerType.RedactAndUltraviolet ||
+                currentMarker ==
+                    MarkerType.UltravioletOnly
+            );
+
             position++;
         }
 
         return new ParsedSource
         {
             cleanText = cleanText.ToString(),
-            secretCharacters = secretCharacters,
-            hasUnclosedSecretMarker = insideSecretFragment
+
+            redactionCharacters =
+                redactionCharacters,
+
+            ultravioletCharacters =
+                ultravioletCharacters,
+
+            hasUnclosedMarker =
+                currentMarker != MarkerType.None
         };
     }
 
     private void CreateWordsAndTextParts(
         string cleanText,
-        List<bool> secretCharacters,
+        List<bool> redactionCharacters,
+        List<bool> ultravioletCharacters,
         DocumentParseResult result
     )
     {
-        MatchCollection matches = WordPattern.Matches(cleanText);
+        MatchCollection matches =
+            WordPattern.Matches(cleanText);
 
         int currentPosition = 0;
         int wordId = 0;
@@ -102,33 +154,52 @@ public sealed class DocumentParser
         {
             if (match.Index > currentPosition)
             {
-                string separator = cleanText.Substring(
-                    currentPosition,
-                    match.Index - currentPosition
-                );
+                string separator =
+                    cleanText.Substring(
+                        currentPosition,
+                        match.Index - currentPosition
+                    );
 
                 result.textParts.Add(
-                    DocumentTextPart.CreateSeparator(separator)
+                    DocumentTextPart.CreateSeparator(
+                        separator
+                    )
                 );
             }
 
             bool requiresRedaction =
-                IsWordSecret(
+                IsWordMarked(
                     match.Index,
                     match.Length,
-                    secretCharacters
+                    redactionCharacters
                 );
+
+            bool ultravioletVisible =
+                IsWordMarked(
+                    match.Index,
+                    match.Length,
+                    ultravioletCharacters
+                );
+
+            RevealMethod revealMethods =
+                ultravioletVisible
+                    ? RevealMethod.Ultraviolet
+                    : RevealMethod.None;
 
             DocumentWord word =
                 new DocumentWord
                 {
                     id = wordId,
                     originalText = match.Value,
-                    requiresRedaction = requiresRedaction,
-                    revealMethods = requiresRedaction
-                        ? RevealMethod.Ultraviolet
-                        : RevealMethod.None,
+
+                    requiresRedaction =
+                        requiresRedaction,
+
+                    revealMethods =
+                        revealMethods,
+
                     isRedacted = false,
+
                     isUltravioletRevealed = false
                 };
 
@@ -150,25 +221,27 @@ public sealed class DocumentParser
                 cleanText.Substring(currentPosition);
 
             result.textParts.Add(
-                DocumentTextPart.CreateSeparator(remainingText)
+                DocumentTextPart.CreateSeparator(
+                    remainingText
+                )
             );
         }
     }
 
-    private bool IsWordSecret(
+    private bool IsWordMarked(
         int startIndex,
         int length,
-        List<bool> secretCharacters
+        List<bool> markedCharacters
     )
     {
         int endIndex = startIndex + length;
 
         for (int i = startIndex;
              i < endIndex &&
-             i < secretCharacters.Count;
+             i < markedCharacters.Count;
              i++)
         {
-            if (secretCharacters[i])
+            if (markedCharacters[i])
             {
                 return true;
             }
@@ -177,10 +250,62 @@ public sealed class DocumentParser
         return false;
     }
 
+    private bool IsClosingMarker(
+        string sourceText,
+        int position,
+        MarkerType markerType
+    )
+    {
+        switch (markerType)
+        {
+            case MarkerType.RedactAndUltraviolet:
+                return StartsWith(
+                    sourceText,
+                    position,
+                    "]]"
+                );
+
+            case MarkerType.RedactOnly:
+                return StartsWith(
+                    sourceText,
+                    position,
+                    "}}"
+                );
+
+            case MarkerType.UltravioletOnly:
+                return StartsWith(
+                    sourceText,
+                    position,
+                    "))"
+                );
+
+            default:
+                return false;
+        }
+    }
+
+    private bool StartsWith(
+        string sourceText,
+        int position,
+        string marker
+    )
+    {
+        return position + marker.Length <=
+               sourceText.Length &&
+               sourceText.Substring(
+                   position,
+                   marker.Length
+               ) == marker;
+    }
+
     private sealed class ParsedSource
     {
         public string cleanText;
-        public List<bool> secretCharacters;
-        public bool hasUnclosedSecretMarker;
+
+        public List<bool> redactionCharacters;
+
+        public List<bool> ultravioletCharacters;
+
+        public bool hasUnclosedMarker;
     }
 }

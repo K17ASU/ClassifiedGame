@@ -1323,6 +1323,7 @@ MonoBehaviour:
     m_LocalVariables: []
   restartButton: {fileID: 1171561494}
   documents:
+  - {fileID: 11400000, guid: b12d23c0cc0fe5c46ab2b69f602225c3, type: 2}
   - {fileID: 11400000, guid: 1360114f1983ede419b662f3fe1b9ca4, type: 2}
   - {fileID: 11400000, guid: 02bc9fcf05578c046a7fc9dfb3593fb1, type: 2}
   - {fileID: 11400000, guid: c938d2e2a87765e499756c1842e1904a, type: 2}
@@ -1332,37 +1333,7 @@ MonoBehaviour:
   secondTryScore: 75
   thirdTryScore: 50
   normalTextColor: '#24211C'
-  secretTextColor: '#49453D'
-  secretHighlightColor: '#AD8B4030'
-  secretTextSizePercent: 99
   redactionColor: '#000000FF'
-  inspectionsLocalizedText:
-    m_TableReference:
-      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
-    m_TableEntryReference:
-      m_KeyId: 111346075615232
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  documentRejectedText:
-    m_TableReference:
-      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
-    m_TableEntryReference:
-      m_KeyId: 111550027841536
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  documentFixRetryText:
-    m_TableReference:
-      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
-    m_TableEntryReference:
-      m_KeyId: 111562388455424
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
   statusSelectInfo:
     m_TableReference:
       m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
@@ -1539,6 +1510,33 @@ MonoBehaviour:
       m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
     m_TableEntryReference:
       m_KeyId: 110460599320594
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  inspectionsLocalizedText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 111346075615232
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  documentRejectedText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 111550027841536
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  documentFixRetryText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 111562388455424
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
