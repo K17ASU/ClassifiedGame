@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -131,22 +131,96 @@ public class DocumentRedactor :
     [SerializeField]
     private string normalTextColor = "#24211C";
 
-    [Header("Слабая подсказка")]
-
-    [SerializeField]
-    private string secretTextColor = "#4B4438";
-
-    [SerializeField]
-    private string secretHighlightColor = "#8E713018";
-
-    [Range(95, 105)]
-    [SerializeField]
-    private int secretTextSizePercent = 99;
-
     [Header("Цензурная плашка")]
 
     [SerializeField]
     private string redactionColor = "#000000FF";
+
+    [Header("Локализация интерфейса")]
+
+    [SerializeField]
+    private LocalizedString statusSelectInfo;
+
+    [SerializeField]
+    private LocalizedString statusDocumentChanged;
+
+    [SerializeField]
+    private LocalizedString statusUvOn;
+
+    [SerializeField]
+    private LocalizedString statusUvOff;
+
+    [SerializeField]
+    private LocalizedString tutorialModeText;
+
+    [SerializeField]
+    private LocalizedString tutorialReadyText;
+
+    [SerializeField]
+    private LocalizedString tutorialExtraText;
+
+    [SerializeField]
+    private LocalizedString tutorialContinueText;
+
+    [SerializeField]
+    private LocalizedString progressTutorialText;
+
+    [SerializeField]
+    private LocalizedString progressDocumentText;
+
+    [SerializeField]
+    private LocalizedString resultTutorialCompleteText;
+
+    [SerializeField]
+    private LocalizedString resultAllCompleteText;
+
+    [SerializeField]
+    private LocalizedString resultDocumentAcceptedText;
+
+    [SerializeField]
+    private LocalizedString resultProcessingCompleteText;
+
+    [SerializeField]
+    private LocalizedString resultDocumentFailedText;
+
+    [SerializeField]
+    private LocalizedString resultTutorialScoreText;
+
+    [SerializeField]
+    private LocalizedString resultScoreLocalizedText;
+
+    [SerializeField]
+    private LocalizedString resultFinalScoreLocalizedText;
+
+    [SerializeField]
+    private LocalizedString errorMissedText;
+
+    [SerializeField]
+    private LocalizedString errorExtraText;
+
+    [SerializeField]
+    private LocalizedString inspectionsLocalizedText;
+
+    [SerializeField]
+    private LocalizedString documentRejectedText;
+
+    [SerializeField]
+    private LocalizedString documentFixRetryText;
+
+    private static readonly Regex WordPattern = new Regex(
+        @"[\p{L}\p{N}]+(?:[-–—'][\p{L}\p{N}]+)*",
+        RegexOptions.Compiled
+    );
+
+    private DocumentData CurrentDocument
+    {
+        get
+        {
+            return IsValidDocumentIndex(currentDocumentIndex)
+                ? documents[currentDocumentIndex]
+                : null;
+        }
+    }
 
     private readonly List<WordData> words =
         new List<WordData>();
@@ -165,6 +239,7 @@ public class DocumentRedactor :
     private bool isDragging;
     private bool dragRedactionState;
     private bool ultravioletModeActive;
+    private bool isInitialized;
 
     private void Start()
     {
@@ -188,6 +263,7 @@ public class DocumentRedactor :
         totalScore = 0;
 
         LoadCurrentDocument();
+        isInitialized = true;
     }
 
     private void OnEnable()
@@ -206,6 +282,15 @@ public class DocumentRedactor :
     private bool ValidateReferences()
     {
         bool referencesAreValid = true;
+
+        if (documentTitleText == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Document Title Text."
+            );
+
+            referencesAreValid = false;
+        }
 
         if (documentText == null)
         {
@@ -288,6 +373,15 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (nextDocumentButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Next Document Button."
+            );
+
+            referencesAreValid = false;
+        }
+
         if (nextDocumentButtonText == null)
         {
             Debug.LogError(
@@ -326,42 +420,36 @@ public class DocumentRedactor :
 
         return referencesAreValid;
     }
+    private bool IsValidDocumentIndex(int index)
+    {
+        return documents != null &&
+               index >= 0 &&
+               index < documents.Count;
+    }
+
     private bool IsCurrentDocumentTutorial()
     {
-        if (currentDocumentIndex < 0 ||
-            currentDocumentIndex >= documents.Count)
-        {
-            return false;
-        }
-
-        DocumentData currentDocument =
-            documents[currentDocumentIndex];
-
-        return currentDocument != null &&
-               currentDocument.IsTutorial;
+        return CurrentDocument != null &&
+               CurrentDocument.IsTutorial;
     }
+
     private void LoadCurrentDocument()
     {
-        if (currentDocumentIndex < 0 ||
-            currentDocumentIndex >= documents.Count)
+        if (!IsValidDocumentIndex(currentDocumentIndex))
         {
             Debug.LogError(
-                "Некорректный индекс документа."
+                $"Некорректный индекс документа: {currentDocumentIndex}."
             );
-
             return;
         }
 
-        DocumentData currentDocument =
-            documents[currentDocumentIndex];
+        DocumentData currentDocument = CurrentDocument;
 
         if (currentDocument == null)
         {
             Debug.LogError(
-                $"Документ под индексом " +
-                $"{currentDocumentIndex} не назначен."
+                $"Документ под индексом {currentDocumentIndex} не назначен."
             );
-
             return;
         }
 
@@ -551,13 +639,8 @@ public class DocumentRedactor :
         List<bool> secretCharacters
     )
     {
-        Regex wordPattern = new Regex(
-            @"[\p{L}\p{N}]+" +
-            @"(?:[-–—'][\p{L}\p{N}]+)*"
-        );
-
         MatchCollection matches =
-            wordPattern.Matches(cleanText);
+            WordPattern.Matches(cleanText);
 
         int currentPosition = 0;
         int wordId = 0;
@@ -926,8 +1009,6 @@ public class DocumentRedactor :
             );
     }
 
-    [SerializeField]
-    private LocalizedString inspectionsLocalizedText;
     private void UpdateInspectionsDisplay()
     {
         if (IsCurrentDocumentTutorial())
@@ -967,6 +1048,28 @@ public class DocumentRedactor :
         }
     }
 
+    private void CountDocumentErrors(
+        out int missedSecretWords,
+        out int extraRedactedWords
+    )
+    {
+        missedSecretWords = 0;
+        extraRedactedWords = 0;
+
+        foreach (WordData word in words)
+        {
+            if (word.isSecret && !word.isRedacted)
+            {
+                missedSecretWords++;
+            }
+
+            if (!word.isSecret && word.isRedacted)
+            {
+                extraRedactedWords++;
+            }
+        }
+    }
+
     public void SubmitDocument()
     {
         if (documentFinished)
@@ -976,23 +1079,10 @@ public class DocumentRedactor :
 
         StopDragging();
 
-        int missedSecretWords = 0;
-        int extraRedactedWords = 0;
-
-        foreach (WordData word in words)
-        {
-            if (word.isSecret &&
-                !word.isRedacted)
-            {
-                missedSecretWords++;
-            }
-
-            if (!word.isSecret &&
-                word.isRedacted)
-            {
-                extraRedactedWords++;
-            }
-        }
+        CountDocumentErrors(
+            out int missedSecretWords,
+            out int extraRedactedWords
+        );
 
         bool documentIsCorrect =
             missedSecretWords == 0 &&
@@ -1030,11 +1120,6 @@ public class DocumentRedactor :
         }
     }
 
-    [SerializeField]
-    private LocalizedString documentRejectedText;
-
-    [SerializeField]
-    private LocalizedString documentFixRetryText;
     private void RejectDocument(
     int missedSecretWords,
     int extraRedactedWords
@@ -1226,8 +1311,6 @@ public class DocumentRedactor :
         }
 
         SetStatus(string.Empty);
-
-        SetStatus(string.Empty);
     }
 
     private int GetMaximumTotalScore()
@@ -1342,23 +1425,10 @@ public class DocumentRedactor :
 
     private void UpdateTutorialStatus()
     {
-        int missedSecretWords = 0;
-        int extraRedactedWords = 0;
-
-        foreach (WordData word in words)
-        {
-            if (word.isSecret &&
-                !word.isRedacted)
-            {
-                missedSecretWords++;
-            }
-
-            if (!word.isSecret &&
-                word.isRedacted)
-            {
-                extraRedactedWords++;
-            }
-        }
+        CountDocumentErrors(
+            out int missedSecretWords,
+            out int extraRedactedWords
+        );
 
         if (missedSecretWords == 0 &&
      extraRedactedWords == 0)
@@ -1787,68 +1857,6 @@ public class DocumentRedactor :
             selectedText.GetLocalizedString();
     }
 
-    [Header("Локализация интерфейса")]
-
-    [SerializeField]
-    private LocalizedString statusSelectInfo;
-
-    [SerializeField]
-    private LocalizedString statusDocumentChanged;
-
-    [SerializeField]
-    private LocalizedString statusUvOn;
-
-    [SerializeField]
-    private LocalizedString statusUvOff;
-
-    [SerializeField]
-    private LocalizedString tutorialModeText;
-
-    [SerializeField]
-    private LocalizedString tutorialReadyText;
-
-    [SerializeField]
-    private LocalizedString tutorialExtraText;
-
-    [SerializeField]
-    private LocalizedString tutorialContinueText;
-
-    [SerializeField]
-    private LocalizedString progressTutorialText;
-
-    [SerializeField]
-    private LocalizedString progressDocumentText;
-
-    [SerializeField]
-    private LocalizedString resultTutorialCompleteText;
-
-    [SerializeField]
-    private LocalizedString resultAllCompleteText;
-
-    [SerializeField]
-    private LocalizedString resultDocumentAcceptedText;
-
-    [SerializeField]
-    private LocalizedString resultProcessingCompleteText;
-
-    [SerializeField]
-    private LocalizedString resultDocumentFailedText;
-
-    [SerializeField]
-    private LocalizedString resultTutorialScoreText;
-
-    [SerializeField]
-    private LocalizedString resultScoreLocalizedText;
-
-    [SerializeField]
-    private LocalizedString resultFinalScoreLocalizedText;
-
-    [SerializeField]
-    private LocalizedString errorMissedText;
-
-    [SerializeField]
-    private LocalizedString errorExtraText;
-
     private string Localize(
     LocalizedString localizedString,
     params object[] arguments
@@ -1892,21 +1900,16 @@ public class DocumentRedactor :
             return;
         }
 
-        if (documents == null ||
-            documents.Count == 0 ||
-            currentDocumentIndex < 0 ||
-            currentDocumentIndex >= documents.Count)
+        DocumentData document = CurrentDocument;
+
+        if (document == null)
         {
             briefingText.text = string.Empty;
             briefingText.gameObject.SetActive(false);
             return;
         }
 
-        DocumentData document =
-            documents[currentDocumentIndex];
-
-        if (document == null ||
-            document.IsTutorial)
+        if (document.IsTutorial)
         {
             briefingText.text = string.Empty;
             briefingText.gameObject.SetActive(false);
