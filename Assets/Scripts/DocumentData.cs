@@ -1,51 +1,31 @@
 using UnityEngine;
 using UnityEngine.Localization;
 
-/// <summary>
-/// Хранит содержимое и настройки одного документа.
-/// </summary>
 [CreateAssetMenu(
     fileName = "NewDocument",
-    menuName = "Document Redactor/Document"
+    menuName = "Classified/Document Data"
 )]
 public class DocumentData : ScriptableObject
 {
-    [Header("Основная информация")]
+    [Header("Document")]
 
     [SerializeField]
-    private string documentNumber = "ДОКУМЕНТ № 001";
+    private string documentNumber;
 
     [SerializeField]
-    private string documentTitle = "Название документа";
+    private string documentTitle;
 
+    [TextArea(10, 30)]
     [SerializeField]
-    [TextArea(8, 25)]
     private string documentText;
-
-    [Header("Обучение")]
 
     [SerializeField]
     private bool isTutorial;
 
-    [SerializeField]
-    [TextArea(2, 5)]
-    private string instructionText =
-        "Найдите и засекретьте служебные сведения.";
+    [Header("Localization")]
 
     [SerializeField]
-    private LocalizedString localizedBriefing;
-
-    public string DocumentNumber => documentNumber;
-
-    public string DocumentTitle => documentTitle;
-
-    public string DocumentText => documentText;
-
-    public bool IsTutorial => isTutorial;
-
-    public string InstructionText => instructionText;
-
-    [Header("Локализация")]
+    private string localizationId;
 
     [SerializeField]
     private LocalizedString localizedDocumentNumber;
@@ -57,10 +37,17 @@ public class DocumentData : ScriptableObject
     private LocalizedString localizedDocumentText;
 
     [SerializeField]
-    private LocalizedString localizedInstructionText;
+    private LocalizedString localizedBriefing;
+
+    public string DocumentNumber => documentNumber;
+    public string DocumentTitle => documentTitle;
+    public string DocumentText => documentText;
+    public bool IsTutorial => isTutorial;
+
+    public string LocalizationId => localizationId;
 
     public LocalizedString LocalizedDocumentNumber =>
-    localizedDocumentNumber;
+        localizedDocumentNumber;
 
     public LocalizedString LocalizedDocumentTitle =>
         localizedDocumentTitle;
@@ -68,9 +55,73 @@ public class DocumentData : ScriptableObject
     public LocalizedString LocalizedDocumentText =>
         localizedDocumentText;
 
-    public LocalizedString LocalizedInstructionText =>
-        localizedInstructionText;
-
     public LocalizedString LocalizedBriefing =>
-    localizedBriefing;
+        localizedBriefing;
+
+    public void AutoBindLocalization()
+    {
+        if (string.IsNullOrWhiteSpace(localizationId))
+        {
+            Debug.LogWarning(
+                $"Localization ID РЅРµ СѓРєР°Р·Р°РЅ Сѓ {name}.",
+                this
+            );
+
+            return;
+        }
+
+        const string tableName = "Documents";
+
+        BindLocalizedString(
+            ref localizedDocumentNumber,
+            tableName,
+            $"{localizationId}_number"
+        );
+
+        BindLocalizedString(
+            ref localizedDocumentTitle,
+            tableName,
+            $"{localizationId}_title"
+        );
+
+        BindLocalizedString(
+            ref localizedDocumentText,
+            tableName,
+            $"{localizationId}_text"
+        );
+
+        BindLocalizedString(
+            ref localizedBriefing,
+            tableName,
+            $"{localizationId}_briefing"
+        );
+
+#if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+#endif
+
+        Debug.Log(
+            $"Localization РїСЂРёРІСЏР·Р°РЅР°: {localizationId}",
+            this
+        );
+    }
+
+    private void BindLocalizedString(
+        ref LocalizedString localizedString,
+        string tableName,
+        string entryKey
+    )
+    {
+        if (localizedString == null)
+        {
+            localizedString =
+                new LocalizedString();
+        }
+
+        localizedString.TableReference =
+            tableName;
+
+        localizedString.TableEntryReference =
+            entryKey;
+    }
 }

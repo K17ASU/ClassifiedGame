@@ -63,6 +63,26 @@ MonoBehaviour:
     m_Key: document_test_briefing
     m_Metadata:
       m_Items: []
+  - m_Id: 253372523921408
+    m_Key: document_02_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 253372599418880
+    m_Key: document_02_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 253372599418881
+    m_Key: document_02_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 253372599418882
+    m_Key: document_02_instruction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 253372599418883
+    m_Key: document_02_briefing
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

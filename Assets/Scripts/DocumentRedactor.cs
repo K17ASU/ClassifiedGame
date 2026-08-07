@@ -476,34 +476,9 @@ public class DocumentRedactor :
         RefreshDocument();
         UpdateInspectionsDisplay();
 
-        if (currentDocument.IsTutorial)
-        {
-            string tutorialInstruction =
-                GetLocalizedDocumentString(
-                    currentDocument.LocalizedInstructionText,
-                    currentDocument.InstructionText
-                );
-
-            if (string.IsNullOrWhiteSpace(
-                    tutorialInstruction))
-            {
-                SetStatus(
-                    Localize(statusSelectInfo)
-                );
-            }
-            else
-            {
-                SetStatus(
-                    tutorialInstruction
-                );
-            }
-        }
-        else
-        {
-            SetStatus(
-                Localize(statusSelectInfo)
-            );
-        }
+        SetStatus(
+            Localize(statusSelectInfo)
+        );
 
         UpdateDynamicButtonTexts();
         UpdateBriefing();
@@ -1718,13 +1693,6 @@ public class DocumentRedactor :
         DocumentData document = CurrentDocument;
 
         if (document == null)
-        {
-            briefingText.text = string.Empty;
-            briefingText.gameObject.SetActive(false);
-            return;
-        }
-
-        if (document.IsTutorial)
         {
             briefingText.text = string.Empty;
             briefingText.gameObject.SetActive(false);
