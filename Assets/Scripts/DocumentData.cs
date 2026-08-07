@@ -32,6 +32,9 @@ public class DocumentData : ScriptableObject
     private string instructionText =
         "Найдите и засекретьте служебные сведения.";
 
+    [SerializeField]
+    private LocalizedString localizedBriefing;
+
     public string DocumentNumber => documentNumber;
 
     public string DocumentTitle => documentTitle;
@@ -67,4 +70,7 @@ public class DocumentData : ScriptableObject
 
     public LocalizedString LocalizedInstructionText =>
         localizedInstructionText;
+
+    public LocalizedString LocalizedBriefing =>
+    localizedBriefing;
 }

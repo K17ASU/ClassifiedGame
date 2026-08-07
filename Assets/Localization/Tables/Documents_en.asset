@@ -27,7 +27,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915520
-    m_Localized: Use the UV lamp to detect hidden information.
+    m_Localized: 'Turn on the UV lamp and examine the document.
+
+      Find the
+      hidden information, then turn off the lamp
+
+      and redact the discovered
+      data.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915521
@@ -40,16 +46,40 @@ MonoBehaviour:
       [[Organisation Training Facility]].
 
 
-      Use the ultraviolet lamp
+      Click on a word
 
-      to
-      detect hidden information.
+      (Or hover
+      over text while holding LMB)
+
+      to redact it.
 
 
-      After locating it, turn off the lamp
+      Some information
+      cannot be detected
 
-      and
-      redact the discovered data.'
+      under normal lighting.
+
+
+      Use the ultraviolet
+      lamp
+
+      to locate the hidden data.
+
+
+      After locating it, turn off
+      the lamp
+
+      and redact the classified information.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 2300135915525
+    m_Localized: 'ASSIGNMENT:
+
+
+      Redact employee names
+
+      and facility code
+      names.'
     m_Metadata:
       m_Items: []
   references:

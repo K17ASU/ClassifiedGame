@@ -40,6 +40,9 @@ public class DocumentRedactor :
     private TMP_Text inspectionsText;
 
     [SerializeField]
+    private TMP_Text briefingText;
+
+    [SerializeField]
     private GameObject submitButton;
 
     [Header("Ультрафиолетовая лампа")]
@@ -415,6 +418,7 @@ public class DocumentRedactor :
         }
 
         UpdateDynamicButtonTexts();
+        UpdateBriefing();
     }
 
     private void UpdateDocumentTitle(
@@ -1732,6 +1736,7 @@ public class DocumentRedactor :
         UpdateDynamicButtonTexts();
         UpdateProgress();
         UpdateInspectionsDisplay();
+        UpdateBriefing();
     }
 
     private void UpdateDynamicButtonTexts()
@@ -1878,5 +1883,50 @@ public class DocumentRedactor :
         return string.IsNullOrWhiteSpace(result)
             ? fallback
             : result;
+    }
+
+    private void UpdateBriefing()
+    {
+        if (briefingText == null)
+        {
+            return;
+        }
+
+        if (documents == null ||
+            documents.Count == 0 ||
+            currentDocumentIndex < 0 ||
+            currentDocumentIndex >= documents.Count)
+        {
+            briefingText.text = string.Empty;
+            briefingText.gameObject.SetActive(false);
+            return;
+        }
+
+        DocumentData document =
+            documents[currentDocumentIndex];
+
+        if (document == null ||
+            document.IsTutorial)
+        {
+            briefingText.text = string.Empty;
+            briefingText.gameObject.SetActive(false);
+            return;
+        }
+
+        string briefing =
+            GetLocalizedDocumentString(
+                document.LocalizedBriefing,
+                string.Empty
+            );
+
+        if (string.IsNullOrWhiteSpace(briefing))
+        {
+            briefingText.text = string.Empty;
+            briefingText.gameObject.SetActive(false);
+            return;
+        }
+
+        briefingText.gameObject.SetActive(true);
+        briefingText.text = briefing;
     }
 }
