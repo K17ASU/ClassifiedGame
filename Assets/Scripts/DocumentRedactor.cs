@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -207,11 +206,6 @@ public class DocumentRedactor :
     [SerializeField]
     private LocalizedString documentFixRetryText;
 
-    private static readonly Regex WordPattern = new Regex(
-        @"[\p{L}\p{N}]+(?:[-–—'][\p{L}\p{N}]+)*",
-        RegexOptions.Compiled
-    );
-
     private DocumentData CurrentDocument
     {
         get
@@ -222,14 +216,17 @@ public class DocumentRedactor :
         }
     }
 
-    private readonly List<WordData> words =
-        new List<WordData>();
+    private readonly List<DocumentWord> words =
+        new List<DocumentWord>();
 
-    private readonly List<TextPart> textParts =
-        new List<TextPart>();
+    private readonly List<DocumentTextPart> textParts =
+        new List<DocumentTextPart>();
 
     private readonly HashSet<int> processedDragWords =
         new HashSet<int>();
+
+    private readonly DocumentParser documentParser =
+        new DocumentParser();
 
     private int currentDocumentIndex;
     private int inspectionsRemaining;
@@ -549,171 +546,25 @@ public class DocumentRedactor :
             return;
         }
 
-        ParsedSource parsedSource =
-            RemoveSecretMarkers(sourceText);
+        DocumentParseResult result =
+            documentParser.Parse(sourceText);
 
-        CreateWordsAndTextParts(
-            parsedSource.cleanText,
-            parsedSource.secretCharacters
-        );
+        words.AddRange(result.words);
+        textParts.AddRange(result.textParts);
 
-        int secretWordCount = 0;
-
-        foreach (WordData word in words)
-        {
-            if (word.isSecret)
-            {
-                secretWordCount++;
-            }
-        }
-
-        if (secretWordCount == 0)
-        {
-            Debug.LogWarning(
-                "В документе нет секретных слов [[...]]."
-            );
-        }
-    }
-
-    private ParsedSource RemoveSecretMarkers(
-        string sourceText
-    )
-    {
-        StringBuilder cleanText =
-            new StringBuilder();
-
-        List<bool> secretCharacters =
-            new List<bool>();
-
-        bool insideSecretFragment = false;
-        int position = 0;
-
-        while (position < sourceText.Length)
-        {
-            bool startsSecretFragment =
-                position + 1 < sourceText.Length &&
-                sourceText[position] == '[' &&
-                sourceText[position + 1] == '[';
-
-            bool endsSecretFragment =
-                position + 1 < sourceText.Length &&
-                sourceText[position] == ']' &&
-                sourceText[position + 1] == ']';
-
-            if (startsSecretFragment)
-            {
-                insideSecretFragment = true;
-                position += 2;
-                continue;
-            }
-
-            if (endsSecretFragment)
-            {
-                insideSecretFragment = false;
-                position += 2;
-                continue;
-            }
-
-            cleanText.Append(sourceText[position]);
-            secretCharacters.Add(insideSecretFragment);
-
-            position++;
-        }
-
-        if (insideSecretFragment)
+        if (result.hasUnclosedSecretMarker)
         {
             Debug.LogWarning(
                 "В документе не закрыта пара скобок [[...]]."
             );
         }
 
-        return new ParsedSource
+        if (result.secretWordCount == 0)
         {
-            cleanText = cleanText.ToString(),
-            secretCharacters = secretCharacters
-        };
-    }
-
-    private void CreateWordsAndTextParts(
-        string cleanText,
-        List<bool> secretCharacters
-    )
-    {
-        MatchCollection matches =
-            WordPattern.Matches(cleanText);
-
-        int currentPosition = 0;
-        int wordId = 0;
-
-        foreach (Match match in matches)
-        {
-            if (match.Index > currentPosition)
-            {
-                string separator =
-                    cleanText.Substring(
-                        currentPosition,
-                        match.Index - currentPosition
-                    );
-
-                textParts.Add(
-                    TextPart.CreateSeparator(separator)
-                );
-            }
-
-            bool isSecret = IsWordSecret(
-                match.Index,
-                match.Length,
-                secretCharacters
-            );
-
-            WordData word = new WordData
-            {
-                id = wordId,
-                originalText = match.Value,
-                isSecret = isSecret,
-                isRedacted = false,
-                isUltravioletRevealed = false
-            };
-
-            words.Add(word);
-            textParts.Add(TextPart.CreateWord(wordId));
-
-            wordId++;
-            currentPosition =
-                match.Index + match.Length;
-        }
-
-        if (currentPosition < cleanText.Length)
-        {
-            string remainingText =
-                cleanText.Substring(currentPosition);
-
-            textParts.Add(
-                TextPart.CreateSeparator(remainingText)
+            Debug.LogWarning(
+                "В документе нет секретных слов [[...]]."
             );
         }
-    }
-
-    private bool IsWordSecret(
-        int startIndex,
-        int length,
-        List<bool> secretCharacters
-    )
-    {
-        int endIndex = startIndex + length;
-
-        for (int i = startIndex;
-             i < endIndex &&
-             i < secretCharacters.Count;
-             i++)
-        {
-            if (secretCharacters[i])
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public void OnPointerDown(
@@ -745,7 +596,7 @@ public class DocumentRedactor :
         isDragging = true;
         processedDragWords.Clear();
 
-        WordData firstWord = words[wordId];
+        DocumentWord firstWord = words[wordId];
 
         dragRedactionState =
             !firstWord.isRedacted;
@@ -854,7 +705,7 @@ public class DocumentRedactor :
 
         processedDragWords.Add(wordId);
 
-        WordData word = words[wordId];
+        DocumentWord word = words[wordId];
 
         if (word.isRedacted == dragRedactionState)
         {
@@ -888,7 +739,7 @@ public class DocumentRedactor :
         StringBuilder result =
             new StringBuilder();
 
-        foreach (TextPart part in textParts)
+        foreach (DocumentTextPart part in textParts)
         {
             if (!part.isWord)
             {
@@ -901,7 +752,7 @@ public class DocumentRedactor :
                 continue;
             }
 
-            WordData word = words[part.wordId];
+            DocumentWord word = words[part.wordId];
 
             result.Append(
                 CreateWordMarkup(word)
@@ -914,7 +765,7 @@ public class DocumentRedactor :
         UpdateProgress();
     }
 
-    private string CreateWordMarkup(WordData word)
+    private string CreateWordMarkup(DocumentWord word)
     {
         string visibleWord;
 
@@ -975,7 +826,7 @@ public class DocumentRedactor :
     {
         int redactedWordCount = 0;
 
-        foreach (WordData word in words)
+        foreach (DocumentWord word in words)
         {
             if (word.isRedacted)
             {
@@ -1056,7 +907,7 @@ public class DocumentRedactor :
         missedSecretWords = 0;
         extraRedactedWords = 0;
 
-        foreach (WordData word in words)
+        foreach (DocumentWord word in words)
         {
             if (word.isSecret && !word.isRedacted)
             {
@@ -1342,50 +1193,6 @@ public class DocumentRedactor :
         LoadCurrentDocument();
     }
 
-    private class WordData
-    {
-        public int id;
-        public string originalText;
-        public bool isSecret;
-        public bool isRedacted;
-        public bool isUltravioletRevealed;
-    }
-
-    private class TextPart
-    {
-        public bool isWord;
-        public int wordId;
-        public string separatorText;
-
-        public static TextPart CreateWord(int id)
-        {
-            return new TextPart
-            {
-                isWord = true,
-                wordId = id,
-                separatorText = string.Empty
-            };
-        }
-
-        public static TextPart CreateSeparator(
-            string text
-        )
-        {
-            return new TextPart
-            {
-                isWord = false,
-                wordId = -1,
-                separatorText = text
-            };
-        }
-    }
-
-    private class ParsedSource
-    {
-        public string cleanText;
-        public List<bool> secretCharacters;
-    }
-
     private int GetPlayableDocumentCount()
     {
         int count = 0;
@@ -1598,7 +1405,7 @@ public class DocumentRedactor :
                 continue;
             }
 
-            WordData word = words[wordId];
+            DocumentWord word = words[wordId];
 
             bool shouldBeRevealed =
                 word.isSecret &&
@@ -1768,7 +1575,7 @@ public class DocumentRedactor :
     {
         bool displayChanged = false;
 
-        foreach (WordData word in words)
+        foreach (DocumentWord word in words)
         {
             if (!word.isUltravioletRevealed)
             {
