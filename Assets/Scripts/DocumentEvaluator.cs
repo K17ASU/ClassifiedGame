@@ -21,13 +21,13 @@ public sealed class DocumentEvaluator
                 continue;
             }
 
-            if (word.isSecret &&
-                !word.isRedacted)
+            if (word.requiresRedaction &&
+    !word.isRedacted)
             {
                 result.missedWords++;
             }
 
-            if (!word.isSecret &&
+            if (!word.requiresRedaction &&
                 word.isRedacted)
             {
                 result.extraRedactions++;

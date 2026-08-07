@@ -31,7 +31,7 @@ public sealed class DocumentParser
 
         foreach (DocumentWord word in result.words)
         {
-            if (word.isSecret)
+            if (word.requiresRedaction)
             {
                 result.secretWordCount++;
             }
@@ -112,31 +112,42 @@ public sealed class DocumentParser
                 );
             }
 
-            bool isSecret = IsWordSecret(
-                match.Index,
-                match.Length,
-                secretCharacters
-            );
+            bool requiresRedaction =
+                IsWordSecret(
+                    match.Index,
+                    match.Length,
+                    secretCharacters
+                );
 
-            DocumentWord word = new DocumentWord
-            {
-                id = wordId,
-                originalText = match.Value,
-                isSecret = isSecret,
-                isRedacted = false,
-                isUltravioletRevealed = false
-            };
+            DocumentWord word =
+                new DocumentWord
+                {
+                    id = wordId,
+                    originalText = match.Value,
+                    requiresRedaction = requiresRedaction,
+                    revealMethods = requiresRedaction
+                        ? RevealMethod.Ultraviolet
+                        : RevealMethod.None,
+                    isRedacted = false,
+                    isUltravioletRevealed = false
+                };
 
             result.words.Add(word);
-            result.textParts.Add(DocumentTextPart.CreateWord(wordId));
+
+            result.textParts.Add(
+                DocumentTextPart.CreateWord(wordId)
+            );
 
             wordId++;
-            currentPosition = match.Index + match.Length;
+
+            currentPosition =
+                match.Index + match.Length;
         }
 
         if (currentPosition < cleanText.Length)
         {
-            string remainingText = cleanText.Substring(currentPosition);
+            string remainingText =
+                cleanText.Substring(currentPosition);
 
             result.textParts.Add(
                 DocumentTextPart.CreateSeparator(remainingText)
@@ -153,7 +164,8 @@ public sealed class DocumentParser
         int endIndex = startIndex + length;
 
         for (int i = startIndex;
-             i < endIndex && i < secretCharacters.Count;
+             i < endIndex &&
+             i < secretCharacters.Count;
              i++)
         {
             if (secretCharacters[i])

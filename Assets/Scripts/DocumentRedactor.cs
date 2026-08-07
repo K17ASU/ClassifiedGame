@@ -779,8 +779,7 @@ public class DocumentRedactor :
                     word.originalText
                 );
         }
-        else if (word.isSecret &&
-                 word.isUltravioletRevealed)
+        else if (word.isUltravioletRevealed)
         {
             visibleWord =
                 CreateUltravioletWord(
@@ -912,12 +911,12 @@ public class DocumentRedactor :
 
         foreach (DocumentWord word in words)
         {
-            if (word.isSecret && !word.isRedacted)
+            if (word.requiresRedaction && !word.isRedacted)
             {
                 missedSecretWords++;
             }
 
-            if (!word.isSecret && word.isRedacted)
+            if (!word.requiresRedaction && word.isRedacted)
             {
                 extraRedactedWords++;
             }
@@ -1415,7 +1414,9 @@ public class DocumentRedactor :
             DocumentWord word = words[wordId];
 
             bool shouldBeRevealed =
-                word.isSecret &&
+                word.CanBeRevealedBy(
+                    RevealMethod.Ultraviolet
+                ) &&
                 !word.isRedacted &&
                 IsLinkInsideUltravioletLight(
                     linkInfo,
