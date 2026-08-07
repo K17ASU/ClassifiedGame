@@ -228,6 +228,9 @@ public class DocumentRedactor :
     private readonly DocumentParser documentParser =
         new DocumentParser();
 
+    private readonly DocumentEvaluator documentEvaluator =
+        new DocumentEvaluator();
+
     private int currentDocumentIndex;
     private int inspectionsRemaining;
     private int totalScore;
@@ -930,16 +933,16 @@ public class DocumentRedactor :
 
         StopDragging();
 
-        CountDocumentErrors(
-            out int missedSecretWords,
-            out int extraRedactedWords
-        );
+        DocumentEvaluationResult evaluation =
+            documentEvaluator.Evaluate(words);
 
-        bool documentIsCorrect =
-            missedSecretWords == 0 &&
-            extraRedactedWords == 0;
+        int missedSecretWords =
+            evaluation.missedWords;
 
-        if (documentIsCorrect)
+        int extraRedactedWords =
+            evaluation.extraRedactions;
+
+        if (evaluation.IsCorrect)
         {
             CompleteDocumentSuccessfully();
             return;
@@ -956,6 +959,7 @@ public class DocumentRedactor :
         }
 
         inspectionsRemaining--;
+
         UpdateInspectionsDisplay();
 
         if (inspectionsRemaining <= 0)
@@ -1232,13 +1236,16 @@ public class DocumentRedactor :
 
     private void UpdateTutorialStatus()
     {
-        CountDocumentErrors(
-            out int missedSecretWords,
-            out int extraRedactedWords
-        );
+        DocumentEvaluationResult evaluation =
+            documentEvaluator.Evaluate(words);
 
-        if (missedSecretWords == 0 &&
-     extraRedactedWords == 0)
+        int missedSecretWords =
+            evaluation.missedWords;
+
+        int extraRedactedWords =
+            evaluation.extraRedactions;
+
+        if (evaluation.IsCorrect)
         {
             SetStatus(
                 Localize(tutorialReadyText)
