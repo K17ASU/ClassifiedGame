@@ -75,12 +75,56 @@ MonoBehaviour:
     m_Key: document_02_text
     m_Metadata:
       m_Items: []
-  - m_Id: 253372599418882
-    m_Key: document_02_instruction
-    m_Metadata:
-      m_Items: []
   - m_Id: 253372599418883
     m_Key: document_02_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266054698319872
+    m_Key: document_03_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266054761234432
+    m_Key: document_03_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266054761234433
+    m_Key: document_03_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266054761234434
+    m_Key: document_03_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266127087812608
+    m_Key: document_04_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266127087812609
+    m_Key: document_04_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266127087812610
+    m_Key: document_04_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 266127087812611
+    m_Key: document_04_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465328381952
+    m_Key: document_promo_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465340964864
+    m_Key: document_promo_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465340964865
+    m_Key: document_promo_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465340964866
+    m_Key: document_promo_briefing
     m_Metadata:
       m_Items: []
   m_Metadata:
