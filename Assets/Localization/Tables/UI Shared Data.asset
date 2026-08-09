@@ -213,6 +213,22 @@ MonoBehaviour:
     m_Key: header_tools
     m_Metadata:
       m_Items: []
+  - m_Id: 1197393580703744
+    m_Key: tutorial_rejected
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1197405597384704
+    m_Key: tutorial_missed
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1197408428539904
+    m_Key: tutorial_extra_redactions
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1197411347775488
+    m_Key: tutorial_retry
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

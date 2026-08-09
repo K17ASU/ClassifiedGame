@@ -148,6 +148,18 @@ public class DocumentRedactor :
     private LocalizedString tutorialContinueText;
 
     [SerializeField]
+    private LocalizedString tutorialRejectedText;
+
+    [SerializeField]
+    private LocalizedString tutorialMissedText;
+
+    [SerializeField]
+    private LocalizedString tutorialExtraRedactionsText;
+
+    [SerializeField]
+    private LocalizedString tutorialRetryText;
+
+    [SerializeField]
     private LocalizedString progressTutorialText;
 
     [SerializeField]
@@ -1101,7 +1113,10 @@ public class DocumentRedactor :
     {
         documentFinished = true;
         StopDragging();
+
         ultravioletTool.DisableMode();
+        magnifierTool.DisableMode();
+        decoderTool.DisableMode();
 
         submitButton.SetActive(false);
         winPanel.SetActive(true);
@@ -1301,34 +1316,39 @@ public class DocumentRedactor :
     }
 
     private void RejectTutorialDocument(
-    int missedSecretWords,
-    int extraRedactedWords
-)
+        int missedSecretWords,
+        int extraRedactedWords
+    )
     {
         StringBuilder message =
             new StringBuilder();
 
         message.AppendLine(
-            "УЧЕБНЫЙ ДОКУМЕНТ НЕ ГОТОВ"
+            Localize(tutorialRejectedText)
         );
 
         if (missedSecretWords > 0)
         {
             message.AppendLine(
-                $"Пропущено слов: {missedSecretWords}"
+                Localize(
+                    tutorialMissedText,
+                    missedSecretWords
+                )
             );
         }
 
         if (extraRedactedWords > 0)
         {
             message.AppendLine(
-                $"Лишних плашек: {extraRedactedWords}"
+                Localize(
+                    tutorialExtraRedactionsText,
+                    extraRedactedWords
+                )
             );
         }
 
         message.Append(
-            "Исправьте выделение и попробуйте снова. " +
-            "Проверка не была потрачена."
+            Localize(tutorialRetryText)
         );
 
         SetStatus(message.ToString());

@@ -223,6 +223,22 @@ MonoBehaviour:
     m_Localized: TOOLS
     m_Metadata:
       m_Items: []
+  - m_Id: 1197393580703744
+    m_Localized: TRAINING DOCUMENT NOT READY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1197405597384704
+    m_Localized: 'Missed entries: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1197408428539904
+    m_Localized: 'Extra redactions: {0}'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1197411347775488
+    m_Localized: Correct the redactions and try again. No inspection was used.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:
