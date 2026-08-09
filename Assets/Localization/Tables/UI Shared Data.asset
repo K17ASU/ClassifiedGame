@@ -205,6 +205,14 @@ MonoBehaviour:
     m_Key: status_decoder_off
     m_Metadata:
       m_Items: []
+  - m_Id: 1045968343056384
+    m_Key: header_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1045970779947008
+    m_Key: header_tools
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

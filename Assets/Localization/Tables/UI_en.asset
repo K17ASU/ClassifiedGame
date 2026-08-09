@@ -215,6 +215,14 @@ MonoBehaviour:
     m_Localized: Decoder put away.
     m_Metadata:
       m_Items: []
+  - m_Id: 1045968343056384
+    m_Localized: BRIEFING
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1045970779947008
+    m_Localized: TOOLS
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:
