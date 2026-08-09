@@ -1615,7 +1615,7 @@ MonoBehaviour:
     m_WaitForCompletion: 0
     m_LocalVariables: []
   revealRadius: 70
-  shakeAmplitude: 1.5
+  shakeAmplitude: 0.5
   shakeSpeed: 32
   references:
     version: 2
