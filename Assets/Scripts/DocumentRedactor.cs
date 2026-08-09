@@ -53,6 +53,18 @@ public class DocumentRedactor :
     [SerializeField]
     private DecoderTool decoderTool;
 
+    [SerializeField]
+    private GameObject toolsPanel;
+
+    [SerializeField]
+    private GameObject ultravioletButton;
+
+    [SerializeField]
+    private GameObject magnifierButton;
+
+    [SerializeField]
+    private GameObject decoderButton;
+
     [Header("Панель результата")]
 
     [SerializeField]
@@ -209,6 +221,9 @@ public class DocumentRedactor :
     private int inspectionsRemaining;
     private int totalScore;
 
+    private RevealMethod unlockedTools =
+        RevealMethod.None;
+
     private bool documentFinished;
     private bool isDragging;
     private bool dragRedactionState;
@@ -268,6 +283,8 @@ public class DocumentRedactor :
 
         currentDocumentIndex = 0;
         totalScore = 0;
+
+        unlockedTools = RevealMethod.None;
 
         LoadCurrentDocument();
         isInitialized = true;
@@ -428,6 +445,42 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (toolsPanel == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Tools Panel."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (ultravioletButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Ultraviolet Button."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (magnifierButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Magnifier Button."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (decoderButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Decoder Button."
+            );
+
+            referencesAreValid = false;
+        }
+
         return referencesAreValid;
     }
     private bool IsValidDocumentIndex(int index)
@@ -494,6 +547,7 @@ public class DocumentRedactor :
 
         UpdateDynamicButtonTexts();
         UpdateBriefing();
+        RefreshToolAvailability();
     }
 
     private void UpdateDocumentTitle(
@@ -1151,12 +1205,13 @@ public class DocumentRedactor :
     }
     public void NextDocument()
     {
-
         if (currentDocumentIndex >=
             documents.Count - 1)
         {
             return;
         }
+
+        UnlockToolsFromCurrentDocument();
 
         currentDocumentIndex++;
         LoadCurrentDocument();
@@ -1169,6 +1224,7 @@ public class DocumentRedactor :
         currentDocumentIndex = 0;
         totalScore = 0;
         documentFinished = false;
+        unlockedTools = RevealMethod.None;
 
         LoadCurrentDocument();
     }
@@ -1417,5 +1473,50 @@ public class DocumentRedactor :
 
         briefingText.gameObject.SetActive(true);
         briefingText.text = briefing;
+    }
+    private void RefreshToolAvailability()
+    {
+        bool ultravioletUnlocked =
+            (unlockedTools &
+             RevealMethod.Ultraviolet) != 0;
+
+        bool magnifierUnlocked =
+            (unlockedTools &
+             RevealMethod.Magnifier) != 0;
+
+        bool decoderUnlocked =
+            (unlockedTools &
+             RevealMethod.Decoder) != 0;
+
+        ultravioletButton.SetActive(
+            ultravioletUnlocked
+        );
+
+        magnifierButton.SetActive(
+            magnifierUnlocked
+        );
+
+        decoderButton.SetActive(
+            decoderUnlocked
+        );
+
+        bool hasAnyUnlockedTool =
+            ultravioletUnlocked ||
+            magnifierUnlocked ||
+            decoderUnlocked;
+
+        toolsPanel.SetActive(
+            hasAnyUnlockedTool
+        );
+    }
+    private void UnlockToolsFromCurrentDocument()
+    {
+        if (CurrentDocument == null)
+        {
+            return;
+        }
+
+        unlockedTools |=
+            CurrentDocument.UnlocksAfterCompletion;
     }
 }

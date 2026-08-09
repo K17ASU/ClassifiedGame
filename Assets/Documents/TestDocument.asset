@@ -16,17 +16,8 @@ MonoBehaviour:
   documentTitle: "\u041D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442\u0430"
   documentText: 
   isTutorial: 0
-  instructionText: "\u041D\u0430\u0439\u0434\u0438\u0442\u0435 \u0438 \u0437\u0430\u0441\u0435\u043A\u0440\u0435\u0442\u044C\u0442\u0435
-    \u0441\u043B\u0443\u0436\u0435\u0431\u043D\u044B\u0435 \u0441\u0432\u0435\u0434\u0435\u043D\u0438\u044F."
-  localizedBriefing:
-    m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
-    m_TableEntryReference:
-      m_KeyId: 192144309010432
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
+  unlocksAfterCompletion: 0
+  localizationId: 
   localizedDocumentNumber:
     m_TableReference:
       m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
@@ -54,11 +45,11 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  localizedInstructionText:
+  localizedBriefing:
     m_TableReference:
-      m_TableCollectionName: 
+      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
     m_TableEntryReference:
-      m_KeyId: 0
+      m_KeyId: 192144309010432
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0

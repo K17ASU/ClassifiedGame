@@ -22,6 +22,12 @@ public class DocumentData : ScriptableObject
     [SerializeField]
     private bool isTutorial;
 
+    [Header("Progression")]
+
+    [SerializeField]
+    private RevealMethod unlocksAfterCompletion =
+        RevealMethod.None;
+
     [Header("Localization")]
 
     [SerializeField]
@@ -43,6 +49,9 @@ public class DocumentData : ScriptableObject
     public string DocumentTitle => documentTitle;
     public string DocumentText => documentText;
     public bool IsTutorial => isTutorial;
+
+    public RevealMethod UnlocksAfterCompletion =>
+        unlocksAfterCompletion;
 
     public string LocalizationId => localizationId;
 

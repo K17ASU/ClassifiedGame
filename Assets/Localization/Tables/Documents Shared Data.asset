@@ -127,6 +127,54 @@ MonoBehaviour:
     m_Key: document_promo_briefing
     m_Metadata:
       m_Items: []
+  - m_Id: 1057939662618624
+    m_Key: document_05_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057939662618625
+    m_Key: document_05_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057939662618626
+    m_Key: document_05_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057939662618627
+    m_Key: document_05_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057959837220864
+    m_Key: document_05.1_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057959837220865
+    m_Key: document_05.1_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057959841415168
+    m_Key: document_05.1_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057959841415169
+    m_Key: document_05.1_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057859786293248
+    m_Key: document_06_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057859891150848
+    m_Key: document_06_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057859891150849
+    m_Key: document_06_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1057859891150850
+    m_Key: document_06_briefing
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
