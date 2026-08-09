@@ -8,6 +8,7 @@ using UnityEngine.Localization;
 /// <summary>
 /// Декодер показывает скрытое значение кодового слова,
 /// когда его область анализа находится над таким словом.
+/// Результат отображается рядом с курсором декодера.
 /// </summary>
 public sealed class DecoderTool : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public sealed class DecoderTool : MonoBehaviour
     private RectTransform decoderCursor;
 
     [SerializeField]
-    private GameObject decoderResultContainer;
+    private RectTransform decoderResultContainer;
 
     [SerializeField]
     private TMP_Text decoderResultText;
@@ -45,21 +46,26 @@ public sealed class DecoderTool : MonoBehaviour
     [Min(10f)]
     private float revealRadius = 75f;
 
-    [Header("Отображение")]
+    [Header("Отображение результата")]
 
     [SerializeField]
     private string resultFormat = "{0}";
 
+    [SerializeField]
+    private Vector2 resultOffset =
+        new Vector2(110f, -70f);
+
+    [SerializeField]
+    [Min(0f)]
+    private float screenPadding = 20f;
+
     public bool IsActive { get; private set; }
 
     private TMP_Text documentText;
-
     private IReadOnlyList<DocumentWord> words;
 
     private Action stopDragging;
-
     private Func<bool> isDocumentFinished;
-
     private Action<string> setStatus;
 
     private bool isInitialized;
@@ -87,7 +93,7 @@ public sealed class DecoderTool : MonoBehaviour
         IsActive = false;
 
         decoderCursor.gameObject.SetActive(false);
-        decoderResultContainer.SetActive(false);
+        decoderResultContainer.gameObject.SetActive(false);
 
         RefreshLocalizedText();
 
@@ -193,6 +199,14 @@ public sealed class DecoderTool : MonoBehaviour
         UpdateDecodedResult(
             mousePosition
         );
+
+        if (decoderResultContainer
+            .gameObject.activeSelf)
+        {
+            UpdateResultPosition(
+                mousePosition
+            );
+        }
     }
 
     public void ToggleMode()
@@ -213,12 +227,15 @@ public sealed class DecoderTool : MonoBehaviour
 
         if (IsActive)
         {
-            decoderCursor.position =
+            Vector2 mousePosition =
                 Mouse.current != null
                     ? Mouse.current.position.ReadValue()
                     : Vector2.zero;
 
-            decoderResultContainer.SetActive(false);
+            decoderCursor.position =
+                mousePosition;
+
+            HideResult();
         }
         else
         {
@@ -288,6 +305,7 @@ public sealed class DecoderTool : MonoBehaviour
             documentText.textInfo;
 
         DocumentWord closestWord = null;
+
         float closestDistance =
             float.PositiveInfinity;
 
@@ -369,11 +387,13 @@ public sealed class DecoderTool : MonoBehaviour
                 decodedText
             );
 
-        if (!decoderResultContainer.activeSelf)
+        decoderResultText.ForceMeshUpdate();
+
+        if (!decoderResultContainer
+            .gameObject.activeSelf)
         {
-            decoderResultContainer.SetActive(
-                true
-            );
+            decoderResultContainer
+                .gameObject.SetActive(true);
         }
     }
 
@@ -381,10 +401,60 @@ public sealed class DecoderTool : MonoBehaviour
     {
         if (decoderResultContainer != null)
         {
-            decoderResultContainer.SetActive(
-                false
-            );
+            decoderResultContainer
+                .gameObject.SetActive(false);
         }
+    }
+
+    private void UpdateResultPosition(
+        Vector2 mouseScreenPosition
+    )
+    {
+        Vector2 desiredPosition =
+            mouseScreenPosition +
+            resultOffset;
+
+        Rect rect =
+            decoderResultContainer.rect;
+
+        float halfWidth =
+            rect.width * 0.5f;
+
+        float halfHeight =
+            rect.height * 0.5f;
+
+        float minimumX =
+            screenPadding + halfWidth;
+
+        float maximumX =
+            Screen.width -
+            screenPadding -
+            halfWidth;
+
+        float minimumY =
+            screenPadding + halfHeight;
+
+        float maximumY =
+            Screen.height -
+            screenPadding -
+            halfHeight;
+
+        desiredPosition.x =
+            Mathf.Clamp(
+                desiredPosition.x,
+                minimumX,
+                maximumX
+            );
+
+        desiredPosition.y =
+            Mathf.Clamp(
+                desiredPosition.y,
+                minimumY,
+                maximumY
+            );
+
+        decoderResultContainer.position =
+            desiredPosition;
     }
 
     private float GetDistanceToLink(
