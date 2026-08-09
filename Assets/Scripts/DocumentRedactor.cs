@@ -50,6 +50,9 @@ public class DocumentRedactor :
     [SerializeField]
     private MagnifierTool magnifierTool;
 
+    [SerializeField]
+    private DecoderTool decoderTool;
+
     [Header("Панель результата")]
 
     [SerializeField]
@@ -252,6 +255,17 @@ public class DocumentRedactor :
             return;
         }
 
+        if (!decoderTool.Initialize(
+                documentText,
+                words,
+                StopDragging,
+                () => documentFinished,
+                SetStatus))
+        {
+            enabled = false;
+            return;
+        }
+
         currentDocumentIndex = 0;
         totalScore = 0;
 
@@ -271,6 +285,7 @@ public class DocumentRedactor :
 
         ultravioletTool?.DisableMode();
         magnifierTool?.DisableMode();
+        decoderTool?.DisableMode();
         StopDragging();
     }
 
@@ -404,6 +419,15 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (decoderTool == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Decoder Tool."
+            );
+
+            referencesAreValid = false;
+        }
+
         return referencesAreValid;
     }
     private bool IsValidDocumentIndex(int index)
@@ -442,6 +466,7 @@ public class DocumentRedactor :
         StopDragging();
         ultravioletTool.DisableMode();
         magnifierTool.DisableMode();
+        decoderTool.DisableMode();
 
         documentFinished = false;
         inspectionsRemaining = maximumInspections;
@@ -538,7 +563,8 @@ public class DocumentRedactor :
     {
         if (documentFinished ||
             ultravioletTool.IsActive ||
-            magnifierTool.IsActive)
+            magnifierTool.IsActive ||
+            decoderTool.IsActive)
         {
             return;
         }
@@ -577,6 +603,7 @@ public class DocumentRedactor :
         if (documentFinished ||
             ultravioletTool.IsActive ||
             magnifierTool.IsActive ||
+            decoderTool.IsActive ||
             !isDragging)
         {
             return;
@@ -1258,6 +1285,7 @@ public class DocumentRedactor :
         if (!ultravioletTool.IsActive)
         {
             magnifierTool.DisableMode();
+            decoderTool.DisableMode();
         }
 
         ultravioletTool.ToggleMode();
@@ -1268,9 +1296,21 @@ public class DocumentRedactor :
         if (!magnifierTool.IsActive)
         {
             ultravioletTool.DisableMode();
+            decoderTool.DisableMode();
         }
 
         magnifierTool.ToggleMode();
+    }
+
+    public void ToggleDecoderMode()
+    {
+        if (!decoderTool.IsActive)
+        {
+            ultravioletTool.DisableMode();
+            magnifierTool.DisableMode();
+        }
+
+        decoderTool.ToggleMode();
     }
 
     private void OnSelectedLocaleChanged(
@@ -1287,6 +1327,7 @@ public class DocumentRedactor :
     {
         ultravioletTool.RefreshLocalizedText();
         magnifierTool.RefreshLocalizedText();
+        decoderTool.RefreshLocalizedText();
         UpdateNextDocumentButtonText();
     }
     private void UpdateNextDocumentButtonText()
