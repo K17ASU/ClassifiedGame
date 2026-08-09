@@ -47,6 +47,9 @@ public class DocumentRedactor :
     [SerializeField]
     private UltravioletTool ultravioletTool;
 
+    [SerializeField]
+    private MagnifierTool magnifierTool;
+
     [Header("Панель результата")]
 
     [SerializeField]
@@ -238,6 +241,17 @@ public class DocumentRedactor :
             return;
         }
 
+        if (!magnifierTool.Initialize(
+                documentText,
+                words,
+                StopDragging,
+                () => documentFinished,
+                SetStatus))
+        {
+            enabled = false;
+            return;
+        }
+
         currentDocumentIndex = 0;
         totalScore = 0;
 
@@ -256,6 +270,7 @@ public class DocumentRedactor :
             OnSelectedLocaleChanged;
 
         ultravioletTool?.DisableMode();
+        magnifierTool?.DisableMode();
         StopDragging();
     }
 
@@ -380,6 +395,15 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (magnifierTool == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Magnifier Tool."
+            );
+
+            referencesAreValid = false;
+        }
+
         return referencesAreValid;
     }
     private bool IsValidDocumentIndex(int index)
@@ -417,6 +441,7 @@ public class DocumentRedactor :
 
         StopDragging();
         ultravioletTool.DisableMode();
+        magnifierTool.DisableMode();
 
         documentFinished = false;
         inspectionsRemaining = maximumInspections;
@@ -512,7 +537,8 @@ public class DocumentRedactor :
     )
     {
         if (documentFinished ||
-            ultravioletTool.IsActive)
+            ultravioletTool.IsActive ||
+            magnifierTool.IsActive)
         {
             return;
         }
@@ -550,6 +576,7 @@ public class DocumentRedactor :
     {
         if (documentFinished ||
             ultravioletTool.IsActive ||
+            magnifierTool.IsActive ||
             !isDragging)
         {
             return;
@@ -1228,7 +1255,22 @@ public class DocumentRedactor :
 
     public void ToggleUltravioletMode()
     {
+        if (!ultravioletTool.IsActive)
+        {
+            magnifierTool.DisableMode();
+        }
+
         ultravioletTool.ToggleMode();
+    }
+
+    public void ToggleMagnifierMode()
+    {
+        if (!magnifierTool.IsActive)
+        {
+            ultravioletTool.DisableMode();
+        }
+
+        magnifierTool.ToggleMode();
     }
 
     private void OnSelectedLocaleChanged(
@@ -1244,6 +1286,7 @@ public class DocumentRedactor :
     private void UpdateDynamicButtonTexts()
     {
         ultravioletTool.RefreshLocalizedText();
+        magnifierTool.RefreshLocalizedText();
         UpdateNextDocumentButtonText();
     }
     private void UpdateNextDocumentButtonText()

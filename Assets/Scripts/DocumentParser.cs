@@ -14,19 +14,23 @@ public sealed class DocumentParser
         None,
         RedactAndUltraviolet,
         RedactOnly,
-        UltravioletOnly
+        UltravioletOnly,
+        RedactAndMagnifier,
+        MagnifierOnly
     }
 
     public DocumentParseResult Parse(string sourceText)
     {
-        DocumentParseResult result = new DocumentParseResult();
+        DocumentParseResult result =
+            new DocumentParseResult();
 
         if (string.IsNullOrWhiteSpace(sourceText))
         {
             return result;
         }
 
-        ParsedSource parsedSource = RemoveMarkers(sourceText);
+        ParsedSource parsedSource =
+            RemoveMarkers(sourceText);
 
         result.hasUnclosedSecretMarker =
             parsedSource.hasUnclosedMarker;
@@ -35,6 +39,7 @@ public sealed class DocumentParser
             parsedSource.cleanText,
             parsedSource.redactionCharacters,
             parsedSource.ultravioletCharacters,
+            parsedSource.magnifierCharacters,
             result
         );
 
@@ -49,9 +54,12 @@ public sealed class DocumentParser
         return result;
     }
 
-    private ParsedSource RemoveMarkers(string sourceText)
+    private ParsedSource RemoveMarkers(
+        string sourceText
+    )
     {
-        StringBuilder cleanText = new StringBuilder();
+        StringBuilder cleanText =
+            new StringBuilder();
 
         List<bool> redactionCharacters =
             new List<bool>();
@@ -59,14 +67,22 @@ public sealed class DocumentParser
         List<bool> ultravioletCharacters =
             new List<bool>();
 
-        MarkerType currentMarker = MarkerType.None;
+        List<bool> magnifierCharacters =
+            new List<bool>();
+
+        MarkerType currentMarker =
+            MarkerType.None;
+
         int position = 0;
 
         while (position < sourceText.Length)
         {
             if (currentMarker == MarkerType.None)
             {
-                if (StartsWith(sourceText, position, "[["))
+                if (StartsWith(
+                        sourceText,
+                        position,
+                        "[["))
                 {
                     currentMarker =
                         MarkerType.RedactAndUltraviolet;
@@ -75,7 +91,10 @@ public sealed class DocumentParser
                     continue;
                 }
 
-                if (StartsWith(sourceText, position, "{{"))
+                if (StartsWith(
+                        sourceText,
+                        position,
+                        "{{"))
                 {
                     currentMarker =
                         MarkerType.RedactOnly;
@@ -84,10 +103,37 @@ public sealed class DocumentParser
                     continue;
                 }
 
-                if (StartsWith(sourceText, position, "(("))
+                if (StartsWith(
+                        sourceText,
+                        position,
+                        "(("))
                 {
                     currentMarker =
                         MarkerType.UltravioletOnly;
+
+                    position += 2;
+                    continue;
+                }
+
+                if (StartsWith(
+                        sourceText,
+                        position,
+                        "<<"))
+                {
+                    currentMarker =
+                        MarkerType.RedactAndMagnifier;
+
+                    position += 2;
+                    continue;
+                }
+
+                if (StartsWith(
+                        sourceText,
+                        position,
+                        "##"))
+                {
+                    currentMarker =
+                        MarkerType.MagnifierOnly;
 
                     position += 2;
                     continue;
@@ -103,13 +149,17 @@ public sealed class DocumentParser
                 continue;
             }
 
-            cleanText.Append(sourceText[position]);
+            cleanText.Append(
+                sourceText[position]
+            );
 
             redactionCharacters.Add(
                 currentMarker ==
                     MarkerType.RedactAndUltraviolet ||
                 currentMarker ==
-                    MarkerType.RedactOnly
+                    MarkerType.RedactOnly ||
+                currentMarker ==
+                    MarkerType.RedactAndMagnifier
             );
 
             ultravioletCharacters.Add(
@@ -117,6 +167,13 @@ public sealed class DocumentParser
                     MarkerType.RedactAndUltraviolet ||
                 currentMarker ==
                     MarkerType.UltravioletOnly
+            );
+
+            magnifierCharacters.Add(
+                currentMarker ==
+                    MarkerType.RedactAndMagnifier ||
+                currentMarker ==
+                    MarkerType.MagnifierOnly
             );
 
             position++;
@@ -132,6 +189,9 @@ public sealed class DocumentParser
             ultravioletCharacters =
                 ultravioletCharacters,
 
+            magnifierCharacters =
+                magnifierCharacters,
+
             hasUnclosedMarker =
                 currentMarker != MarkerType.None
         };
@@ -141,6 +201,7 @@ public sealed class DocumentParser
         string cleanText,
         List<bool> redactionCharacters,
         List<bool> ultravioletCharacters,
+        List<bool> magnifierCharacters,
         DocumentParseResult result
     )
     {
@@ -181,10 +242,27 @@ public sealed class DocumentParser
                     ultravioletCharacters
                 );
 
+            bool magnifierVisible =
+                IsWordMarked(
+                    match.Index,
+                    match.Length,
+                    magnifierCharacters
+                );
+
             RevealMethod revealMethods =
-                ultravioletVisible
-                    ? RevealMethod.Ultraviolet
-                    : RevealMethod.None;
+                RevealMethod.None;
+
+            if (ultravioletVisible)
+            {
+                revealMethods |=
+                    RevealMethod.Ultraviolet;
+            }
+
+            if (magnifierVisible)
+            {
+                revealMethods |=
+                    RevealMethod.Magnifier;
+            }
 
             DocumentWord word =
                 new DocumentWord
@@ -218,7 +296,9 @@ public sealed class DocumentParser
         if (currentPosition < cleanText.Length)
         {
             string remainingText =
-                cleanText.Substring(currentPosition);
+                cleanText.Substring(
+                    currentPosition
+                );
 
             result.textParts.Add(
                 DocumentTextPart.CreateSeparator(
@@ -234,7 +314,8 @@ public sealed class DocumentParser
         List<bool> markedCharacters
     )
     {
-        int endIndex = startIndex + length;
+        int endIndex =
+            startIndex + length;
 
         for (int i = startIndex;
              i < endIndex &&
@@ -279,6 +360,20 @@ public sealed class DocumentParser
                     "))"
                 );
 
+            case MarkerType.RedactAndMagnifier:
+                return StartsWith(
+                    sourceText,
+                    position,
+                    ">>"
+                );
+
+            case MarkerType.MagnifierOnly:
+                return StartsWith(
+                    sourceText,
+                    position,
+                    "##"
+                );
+
             default:
                 return false;
         }
@@ -305,6 +400,8 @@ public sealed class DocumentParser
         public List<bool> redactionCharacters;
 
         public List<bool> ultravioletCharacters;
+
+        public List<bool> magnifierCharacters;
 
         public bool hasUnclosedMarker;
     }

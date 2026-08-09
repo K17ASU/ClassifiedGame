@@ -171,6 +171,24 @@ MonoBehaviour:
     m_Key: result_header
     m_Metadata:
       m_Items: []
+  - m_Id: 999718113558528
+    m_Key: button_magnifier
+    m_Metadata:
+      m_Items: []
+  - m_Id: 999720881799168
+    m_Key: button_magnifier_disable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 999722744070144
+    m_Key: 'status_magnifier_on
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 999724702810112
+    m_Key: status_magnifier_off
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

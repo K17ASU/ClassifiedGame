@@ -183,6 +183,22 @@ MonoBehaviour:
     m_Localized: DISINFORMATION CENTER
     m_Metadata:
       m_Items: []
+  - m_Id: 999718113558528
+    m_Localized: MAGNIFIER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 999720881799168
+    m_Localized: PUT AWAY MAGNIFIER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 999722744070144
+    m_Localized: Magnifier activated.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 999724702810112
+    m_Localized: Magnifier put away.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:
