@@ -225,6 +225,22 @@ MonoBehaviour:
     m_Localized: "\u041B\u0443\u043F\u0430 \u0443\u0431\u0440\u0430\u043D\u0430."
     m_Metadata:
       m_Items: []
+  - m_Id: 1014240836632576
+    m_Localized: "\u0414\u0415\u041A\u041E\u0414\u0415\u0420"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1014243177054208
+    m_Localized: "\u0423\u0411\u0420\u0410\u0422\u042C \u0414\u0415\u041A\u041E\u0414\u0415\u0420"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1014243852337152
+    m_Localized: "\u0414\u0435\u043A\u043E\u0434\u0435\u0440 \u0430\u043A\u0442\u0438\u0432\u0438\u0440\u043E\u0432\u0430\u043D."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1014244510842880
+    m_Localized: "\u0414\u0435\u043A\u043E\u0434\u0435\u0440 \u0443\u0431\u0440\u0430\u043D."
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

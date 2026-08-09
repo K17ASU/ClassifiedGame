@@ -189,6 +189,22 @@ MonoBehaviour:
     m_Key: status_magnifier_off
     m_Metadata:
       m_Items: []
+  - m_Id: 1014240836632576
+    m_Key: button_decoder
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1014243177054208
+    m_Key: button_decoder_disable
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1014243852337152
+    m_Key: status_decoder_on
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1014244510842880
+    m_Key: status_decoder_off
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
