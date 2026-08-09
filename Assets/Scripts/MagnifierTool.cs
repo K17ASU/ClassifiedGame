@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Localization;
+using UnityEngine.UI;
 
 /// <summary>
 /// Управляет лупой.
@@ -17,7 +18,20 @@ public sealed class MagnifierTool : MonoBehaviour
     private TMP_Text magnifierButtonText;
 
     [SerializeField]
+    private Button toolButton;
+
+    [SerializeField]
     private RectTransform magnifierCursor;
+
+    [Header("Состояние кнопки")]
+
+    [SerializeField]
+    private Color inactiveButtonColor =
+        new Color32(52, 46, 63, 255);
+
+    [SerializeField]
+    private Color activeButtonColor =
+        new Color32(107, 53, 168, 255);
 
     [Header("Локализация")]
 
@@ -114,6 +128,16 @@ public sealed class MagnifierTool : MonoBehaviour
         {
             Debug.LogError(
                 "MagnifierTool: не назначен Magnifier Button Text.",
+                this
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (toolButton == null)
+        {
+            Debug.LogError(
+                "MagnifierTool: не назначен Tool Button.",
                 this
             );
 
@@ -234,8 +258,37 @@ public sealed class MagnifierTool : MonoBehaviour
         RefreshLocalizedText();
     }
 
+    private void RefreshButtonVisual()
+    {
+        if (toolButton == null)
+        {
+            return;
+        }
+
+        ColorBlock colors =
+            toolButton.colors;
+
+        Color stateColor =
+            IsActive
+                ? activeButtonColor
+                : inactiveButtonColor;
+
+        colors.normalColor = stateColor;
+        colors.selectedColor = stateColor;
+
+        toolButton.colors = colors;
+
+        if (toolButton.targetGraphic != null)
+        {
+            toolButton.targetGraphic.color =
+                stateColor;
+        }
+    }
+
     public void RefreshLocalizedText()
     {
+        RefreshButtonVisual();
+
         if (magnifierButtonText == null)
         {
             return;

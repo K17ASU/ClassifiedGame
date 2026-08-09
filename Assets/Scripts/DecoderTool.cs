@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Localization;
+using UnityEngine.UI;
 
 /// <summary>
 /// Декодер показывает скрытое значение кодового слова,
@@ -18,6 +19,9 @@ public sealed class DecoderTool : MonoBehaviour
     private TMP_Text decoderButtonText;
 
     [SerializeField]
+    private Button toolButton;
+
+    [SerializeField]
     private RectTransform decoderCursor;
 
     [SerializeField]
@@ -25,6 +29,16 @@ public sealed class DecoderTool : MonoBehaviour
 
     [SerializeField]
     private TMP_Text decoderResultText;
+
+    [Header("Состояние кнопки")]
+
+    [SerializeField]
+    private Color inactiveButtonColor =
+        new Color32(52, 46, 63, 255);
+
+    [SerializeField]
+    private Color activeButtonColor =
+        new Color32(107, 53, 168, 255);
 
     [Header("Локализация")]
 
@@ -120,6 +134,16 @@ public sealed class DecoderTool : MonoBehaviour
         {
             Debug.LogError(
                 "DecoderTool: не назначен Decoder Button Text.",
+                this
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (toolButton == null)
+        {
+            Debug.LogError(
+                "DecoderTool: не назначен Tool Button.",
                 this
             );
 
@@ -273,8 +297,37 @@ public sealed class DecoderTool : MonoBehaviour
         RefreshLocalizedText();
     }
 
+    private void RefreshButtonVisual()
+    {
+        if (toolButton == null)
+        {
+            return;
+        }
+
+        ColorBlock colors =
+            toolButton.colors;
+
+        Color stateColor =
+            IsActive
+                ? activeButtonColor
+                : inactiveButtonColor;
+
+        colors.normalColor = stateColor;
+        colors.selectedColor = stateColor;
+
+        toolButton.colors = colors;
+
+        if (toolButton.targetGraphic != null)
+        {
+            toolButton.targetGraphic.color =
+                stateColor;
+        }
+    }
+
     public void RefreshLocalizedText()
     {
+        RefreshButtonVisual();
+
         if (decoderButtonText == null)
         {
             return;
