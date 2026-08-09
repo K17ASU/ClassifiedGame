@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,17 +10,33 @@ public sealed class DocumentParser
         RegexOptions.Compiled
     );
 
-    private enum MarkerType
+    private sealed class CharacterMetadata
     {
-        None,
-        RedactAndUltraviolet,
-        RedactOnly,
-        UltravioletOnly,
-        RedactAndMagnifier,
-        MagnifierOnly
+        public bool requiresRedaction;
+        public RevealMethod revealMethods;
+        public string decoderPayload;
     }
 
-    public DocumentParseResult Parse(string sourceText)
+    private sealed class ActiveAnnotation
+    {
+        public bool requiresRedaction;
+        public RevealMethod revealMethods;
+        public string decoderPayload;
+    }
+
+    private sealed class ParsedSource
+    {
+        public string cleanText;
+
+        public List<CharacterMetadata> metadata =
+            new List<CharacterMetadata>();
+
+        public bool hasUnclosedMarker;
+    }
+
+    public DocumentParseResult Parse(
+        string sourceText
+    )
     {
         DocumentParseResult result =
             new DocumentParseResult();
@@ -36,10 +53,7 @@ public sealed class DocumentParser
             parsedSource.hasUnclosedMarker;
 
         CreateWordsAndTextParts(
-            parsedSource.cleanText,
-            parsedSource.redactionCharacters,
-            parsedSource.ultravioletCharacters,
-            parsedSource.magnifierCharacters,
+            parsedSource,
             result
         );
 
@@ -58,155 +72,358 @@ public sealed class DocumentParser
         string sourceText
     )
     {
+        ParsedSource result =
+            new ParsedSource();
+
         StringBuilder cleanText =
             new StringBuilder();
 
-        List<bool> redactionCharacters =
-            new List<bool>();
+        ActiveAnnotation activeAnnotation = null;
 
-        List<bool> ultravioletCharacters =
-            new List<bool>();
-
-        List<bool> magnifierCharacters =
-            new List<bool>();
-
-        MarkerType currentMarker =
-            MarkerType.None;
+        string legacyClosingMarker = null;
 
         int position = 0;
 
         while (position < sourceText.Length)
         {
-            if (currentMarker == MarkerType.None)
+            if (activeAnnotation == null)
             {
-                if (StartsWith(
+                if (TryReadUnifiedOpeningTag(
                         sourceText,
                         position,
-                        "[["))
+                        out ActiveAnnotation annotation,
+                        out int openingLength))
                 {
-                    currentMarker =
-                        MarkerType.RedactAndUltraviolet;
-
-                    position += 2;
+                    activeAnnotation = annotation;
+                    legacyClosingMarker = null;
+                    position += openingLength;
                     continue;
                 }
 
-                if (StartsWith(
+                if (TryReadLegacyOpeningMarker(
                         sourceText,
                         position,
-                        "{{"))
+                        out annotation,
+                        out legacyClosingMarker))
                 {
-                    currentMarker =
-                        MarkerType.RedactOnly;
-
-                    position += 2;
-                    continue;
-                }
-
-                if (StartsWith(
-                        sourceText,
-                        position,
-                        "(("))
-                {
-                    currentMarker =
-                        MarkerType.UltravioletOnly;
-
-                    position += 2;
-                    continue;
-                }
-
-                if (StartsWith(
-                        sourceText,
-                        position,
-                        "<<"))
-                {
-                    currentMarker =
-                        MarkerType.RedactAndMagnifier;
-
-                    position += 2;
-                    continue;
-                }
-
-                if (StartsWith(
-                        sourceText,
-                        position,
-                        "##"))
-                {
-                    currentMarker =
-                        MarkerType.MagnifierOnly;
-
+                    activeAnnotation = annotation;
                     position += 2;
                     continue;
                 }
             }
-            else if (IsClosingMarker(
-                         sourceText,
-                         position,
-                         currentMarker))
+            else
             {
-                currentMarker = MarkerType.None;
-                position += 2;
-                continue;
+                if (legacyClosingMarker != null)
+                {
+                    if (StartsWith(
+                            sourceText,
+                            position,
+                            legacyClosingMarker))
+                    {
+                        activeAnnotation = null;
+                        legacyClosingMarker = null;
+                        position += 2;
+                        continue;
+                    }
+                }
+                else if (StartsWith(
+                             sourceText,
+                             position,
+                             "[/]"))
+                {
+                    activeAnnotation = null;
+                    position += 3;
+                    continue;
+                }
             }
 
             cleanText.Append(
                 sourceText[position]
             );
 
-            redactionCharacters.Add(
-                currentMarker ==
-                    MarkerType.RedactAndUltraviolet ||
-                currentMarker ==
-                    MarkerType.RedactOnly ||
-                currentMarker ==
-                    MarkerType.RedactAndMagnifier
-            );
-
-            ultravioletCharacters.Add(
-                currentMarker ==
-                    MarkerType.RedactAndUltraviolet ||
-                currentMarker ==
-                    MarkerType.UltravioletOnly
-            );
-
-            magnifierCharacters.Add(
-                currentMarker ==
-                    MarkerType.RedactAndMagnifier ||
-                currentMarker ==
-                    MarkerType.MagnifierOnly
+            result.metadata.Add(
+                CreateCharacterMetadata(
+                    activeAnnotation
+                )
             );
 
             position++;
         }
 
-        return new ParsedSource
+        result.cleanText =
+            cleanText.ToString();
+
+        result.hasUnclosedMarker =
+            activeAnnotation != null;
+
+        return result;
+    }
+
+    private bool TryReadUnifiedOpeningTag(
+        string sourceText,
+        int position,
+        out ActiveAnnotation annotation,
+        out int openingLength
+    )
+    {
+        annotation = null;
+        openingLength = 0;
+
+        if (position >= sourceText.Length ||
+            sourceText[position] != '[')
         {
-            cleanText = cleanText.ToString(),
+            return false;
+        }
 
-            redactionCharacters =
-                redactionCharacters,
+        // Старый UV-маркер [[...]] должен
+        // обрабатываться legacy-парсером.
+        if (StartsWith(
+                sourceText,
+                position,
+                "[["))
+        {
+            return false;
+        }
 
-            ultravioletCharacters =
-                ultravioletCharacters,
+        int closingBracket =
+            sourceText.IndexOf(
+                ']',
+                position + 1
+            );
 
-            magnifierCharacters =
-                magnifierCharacters,
+        if (closingBracket < 0)
+        {
+            return false;
+        }
 
-            hasUnclosedMarker =
-                currentMarker != MarkerType.None
+        string tagContent =
+            sourceText.Substring(
+                position + 1,
+                closingBracket - position - 1
+            );
+
+        if (string.IsNullOrWhiteSpace(
+                tagContent) ||
+            tagContent == "/")
+        {
+            return false;
+        }
+
+        ActiveAnnotation parsedAnnotation =
+            new ActiveAnnotation();
+
+        string[] tokens =
+            tagContent.Split(',');
+
+        bool hasKnownToken = false;
+
+        foreach (string rawToken in tokens)
+        {
+            string token =
+                rawToken.Trim();
+
+            if (token.Equals(
+                    "redact",
+                    StringComparison
+                        .OrdinalIgnoreCase))
+            {
+                parsedAnnotation
+                    .requiresRedaction = true;
+
+                hasKnownToken = true;
+                continue;
+            }
+
+            if (token.Equals(
+                    "uv",
+                    StringComparison
+                        .OrdinalIgnoreCase))
+            {
+                parsedAnnotation.revealMethods |=
+                    RevealMethod.Ultraviolet;
+
+                hasKnownToken = true;
+                continue;
+            }
+
+            if (token.Equals(
+                    "magnifier",
+                    StringComparison
+                        .OrdinalIgnoreCase) ||
+                token.Equals(
+                    "mag",
+                    StringComparison
+                        .OrdinalIgnoreCase))
+            {
+                parsedAnnotation.revealMethods |=
+                    RevealMethod.Magnifier;
+
+                hasKnownToken = true;
+                continue;
+            }
+
+            const string decoderPrefix =
+                "decoder=";
+
+            if (token.StartsWith(
+                    decoderPrefix,
+                    StringComparison
+                        .OrdinalIgnoreCase))
+            {
+                parsedAnnotation.revealMethods |=
+                    RevealMethod.Decoder;
+
+                parsedAnnotation.decoderPayload =
+                    token.Substring(
+                        decoderPrefix.Length
+                    );
+
+                hasKnownToken = true;
+                continue;
+            }
+        }
+
+        if (!hasKnownToken)
+        {
+            return false;
+        }
+
+        annotation = parsedAnnotation;
+
+        openingLength =
+            closingBracket - position + 1;
+
+        return true;
+    }
+
+    private bool TryReadLegacyOpeningMarker(
+        string sourceText,
+        int position,
+        out ActiveAnnotation annotation,
+        out string closingMarker
+    )
+    {
+        annotation = null;
+        closingMarker = null;
+
+        if (StartsWith(
+                sourceText,
+                position,
+                "[["))
+        {
+            annotation =
+                new ActiveAnnotation
+                {
+                    requiresRedaction = true,
+
+                    revealMethods =
+                        RevealMethod.Ultraviolet
+                };
+
+            closingMarker = "]]";
+            return true;
+        }
+
+        if (StartsWith(
+                sourceText,
+                position,
+                "{{"))
+        {
+            annotation =
+                new ActiveAnnotation
+                {
+                    requiresRedaction = true
+                };
+
+            closingMarker = "}}";
+            return true;
+        }
+
+        if (StartsWith(
+                sourceText,
+                position,
+                "(("))
+        {
+            annotation =
+                new ActiveAnnotation
+                {
+                    revealMethods =
+                        RevealMethod.Ultraviolet
+                };
+
+            closingMarker = "))";
+            return true;
+        }
+
+        if (StartsWith(
+                sourceText,
+                position,
+                "<<"))
+        {
+            annotation =
+                new ActiveAnnotation
+                {
+                    requiresRedaction = true,
+
+                    revealMethods =
+                        RevealMethod.Magnifier
+                };
+
+            closingMarker = ">>";
+            return true;
+        }
+
+        if (StartsWith(
+                sourceText,
+                position,
+                "##"))
+        {
+            annotation =
+                new ActiveAnnotation
+                {
+                    revealMethods =
+                        RevealMethod.Magnifier
+                };
+
+            closingMarker = "##";
+            return true;
+        }
+
+        return false;
+    }
+
+    private CharacterMetadata
+        CreateCharacterMetadata(
+            ActiveAnnotation annotation
+        )
+    {
+        if (annotation == null)
+        {
+            return new CharacterMetadata();
+        }
+
+        return new CharacterMetadata
+        {
+            requiresRedaction =
+                annotation.requiresRedaction,
+
+            revealMethods =
+                annotation.revealMethods,
+
+            decoderPayload =
+                annotation.decoderPayload
         };
     }
 
     private void CreateWordsAndTextParts(
-        string cleanText,
-        List<bool> redactionCharacters,
-        List<bool> ultravioletCharacters,
-        List<bool> magnifierCharacters,
+        ParsedSource parsedSource,
         DocumentParseResult result
     )
     {
         MatchCollection matches =
-            WordPattern.Matches(cleanText);
+            WordPattern.Matches(
+                parsedSource.cleanText
+            );
 
         int currentPosition = 0;
         int wordId = 0;
@@ -216,7 +433,7 @@ public sealed class DocumentParser
             if (match.Index > currentPosition)
             {
                 string separator =
-                    cleanText.Substring(
+                    parsedSource.cleanText.Substring(
                         currentPosition,
                         match.Index - currentPosition
                     );
@@ -228,40 +445,36 @@ public sealed class DocumentParser
                 );
             }
 
-            bool requiresRedaction =
-                IsWordMarked(
-                    match.Index,
-                    match.Length,
-                    redactionCharacters
-                );
-
-            bool ultravioletVisible =
-                IsWordMarked(
-                    match.Index,
-                    match.Length,
-                    ultravioletCharacters
-                );
-
-            bool magnifierVisible =
-                IsWordMarked(
-                    match.Index,
-                    match.Length,
-                    magnifierCharacters
-                );
+            bool requiresRedaction = false;
 
             RevealMethod revealMethods =
                 RevealMethod.None;
 
-            if (ultravioletVisible)
-            {
-                revealMethods |=
-                    RevealMethod.Ultraviolet;
-            }
+            string decoderPayload = null;
 
-            if (magnifierVisible)
+            int endIndex =
+                match.Index + match.Length;
+
+            for (int i = match.Index;
+                 i < endIndex &&
+                 i < parsedSource.metadata.Count;
+                 i++)
             {
+                CharacterMetadata metadata =
+                    parsedSource.metadata[i];
+
+                requiresRedaction |=
+                    metadata.requiresRedaction;
+
                 revealMethods |=
-                    RevealMethod.Magnifier;
+                    metadata.revealMethods;
+
+                if (!string.IsNullOrEmpty(
+                        metadata.decoderPayload))
+                {
+                    decoderPayload =
+                        metadata.decoderPayload;
+                }
             }
 
             DocumentWord word =
@@ -278,8 +491,18 @@ public sealed class DocumentParser
 
                     isRedacted = false,
 
-                    isUltravioletRevealed = false
+                    isUltravioletRevealed =
+                        false
                 };
+
+            if (!string.IsNullOrEmpty(
+                    decoderPayload))
+            {
+                word.SetAnalysisPayload(
+                    RevealMethod.Decoder,
+                    decoderPayload
+                );
+            }
 
             result.words.Add(word);
 
@@ -293,10 +516,11 @@ public sealed class DocumentParser
                 match.Index + match.Length;
         }
 
-        if (currentPosition < cleanText.Length)
+        if (currentPosition <
+            parsedSource.cleanText.Length)
         {
             string remainingText =
-                cleanText.Substring(
+                parsedSource.cleanText.Substring(
                     currentPosition
                 );
 
@@ -305,77 +529,6 @@ public sealed class DocumentParser
                     remainingText
                 )
             );
-        }
-    }
-
-    private bool IsWordMarked(
-        int startIndex,
-        int length,
-        List<bool> markedCharacters
-    )
-    {
-        int endIndex =
-            startIndex + length;
-
-        for (int i = startIndex;
-             i < endIndex &&
-             i < markedCharacters.Count;
-             i++)
-        {
-            if (markedCharacters[i])
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private bool IsClosingMarker(
-        string sourceText,
-        int position,
-        MarkerType markerType
-    )
-    {
-        switch (markerType)
-        {
-            case MarkerType.RedactAndUltraviolet:
-                return StartsWith(
-                    sourceText,
-                    position,
-                    "]]"
-                );
-
-            case MarkerType.RedactOnly:
-                return StartsWith(
-                    sourceText,
-                    position,
-                    "}}"
-                );
-
-            case MarkerType.UltravioletOnly:
-                return StartsWith(
-                    sourceText,
-                    position,
-                    "))"
-                );
-
-            case MarkerType.RedactAndMagnifier:
-                return StartsWith(
-                    sourceText,
-                    position,
-                    ">>"
-                );
-
-            case MarkerType.MagnifierOnly:
-                return StartsWith(
-                    sourceText,
-                    position,
-                    "##"
-                );
-
-            default:
-                return false;
         }
     }
 
@@ -391,18 +544,5 @@ public sealed class DocumentParser
                    position,
                    marker.Length
                ) == marker;
-    }
-
-    private sealed class ParsedSource
-    {
-        public string cleanText;
-
-        public List<bool> redactionCharacters;
-
-        public List<bool> ultravioletCharacters;
-
-        public List<bool> magnifierCharacters;
-
-        public bool hasUnclosedMarker;
     }
 }

@@ -1,24 +1,63 @@
+using System.Collections.Generic;
+
 public sealed class DocumentWord
 {
     public int id;
     public string originalText;
 
-    // ƒÓÎÊÂÌ ÎË Ë„ÓÍ Á‡ÒÂÍÂÚËÚ¸ ˝ÚÓ ÒÎÓ‚Ó.
+    // –î–æ–ª–∂–µ–Ω –ª–∏ –∏–≥—Ä–æ–∫ –∑–∞—Å–µ–∫—Ä–µ—Ç–∏—Ç—å —ç—Ç–æ —Å–ª–æ–≤–æ.
     public bool requiresRedaction;
 
-    //  ‡ÍËÏË ËÌÒÚÛÏÂÌÚ‡ÏË ÒÎÓ‚Ó ÏÓÊÌÓ Ó·Ì‡ÛÊËÚ¸.
+    // –ö–∞–∫–∏–º–∏ –∏–Ω—Å—Ç—Ä—É–º–µ–Ω—Ç–∞–º–∏ —Å–ª–æ–≤–æ –º–æ–∂–Ω–æ –æ–±–Ω–∞—Ä—É–∂–∏—Ç—å.
     public RevealMethod revealMethods;
 
-    // “ÂÍÛ˘ÂÂ ÒÓÒÚÓˇÌËÂ Ë„ÓÍ‡.
+    // –¢–µ–∫—É—â–µ–µ —Å–æ—Å—Ç–æ—è–Ω–∏–µ –∏–≥—Ä–æ–∫–∞.
     public bool isRedacted;
 
-    // ¬ÂÏÂÌÌÓ ÎË ÒÎÓ‚Ó ÔÓˇ‚ÎÂÌÓ ÒÂÈ˜‡Ò.
+    // –í—Ä–µ–º–µ–Ω–Ω–æ–µ —Å–æ—Å—Ç–æ—è–Ω–∏–µ UV-–≤–∏–∑—É–∞–ª–∏–∑–∞—Ü–∏–∏.
     public bool isUltravioletRevealed;
+
+    // –î–æ–ø–æ–ª–Ω–∏—Ç–µ–ª—å–Ω—ã–µ –¥–∞–Ω–Ω—ã–µ –¥–ª—è –∏–Ω—Å—Ç—Ä—É–º–µ–Ω—Ç–æ–≤ –∞–Ω–∞–ª–∏–∑–∞.
+    // –ù–∞–ø—Ä–∏–º–µ—Ä:
+    // RevealMethod.Decoder -> "–í–û–õ–ö–û–í"
+    private readonly Dictionary<RevealMethod, string>
+        analysisPayloads =
+            new Dictionary<RevealMethod, string>();
 
     public bool CanBeRevealedBy(
         RevealMethod method
     )
     {
         return (revealMethods & method) != 0;
+    }
+
+    public void SetAnalysisPayload(
+        RevealMethod method,
+        string payload
+    )
+    {
+        if (method == RevealMethod.None)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(payload))
+        {
+            analysisPayloads.Remove(method);
+            return;
+        }
+
+        analysisPayloads[method] = payload;
+    }
+
+    public bool TryGetAnalysisPayload(
+        RevealMethod method,
+        out string payload
+    )
+    {
+        return analysisPayloads.TryGetValue(
+            method,
+            out payload
+        );
     }
 }
