@@ -3,10 +3,8 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
-using UnityEngine.UI;
 
 /// <summary>
 /// Управляет документами, засекречиванием слов,
@@ -44,34 +42,10 @@ public class DocumentRedactor :
     [SerializeField]
     private GameObject submitButton;
 
-    [Header("Ультрафиолетовая лампа")]
+    [Header("Инструменты анализа")]
 
     [SerializeField]
-    private Button ultravioletButton;
-
-    [SerializeField]
-    private TMP_Text ultravioletButtonText;
-
-    [SerializeField]
-    private RectTransform ultravioletCursor;
-
-    [SerializeField]
-    private LocalizedString ultravioletInactiveText;
-
-    [SerializeField]
-    private LocalizedString ultravioletActiveText;
-
-    [SerializeField]
-    private string ultravioletSecretTextColor =
-        "#6B35A8";
-
-    [SerializeField]
-    private string ultravioletSecretHighlightColor =
-        "#8A4DFF35";
-
-    [SerializeField]
-    [Min(10f)]
-    private float ultravioletRevealRadius = 110f;
+    private UltravioletTool ultravioletTool;
 
     [Header("Панель результата")]
 
@@ -142,12 +116,6 @@ public class DocumentRedactor :
 
     [SerializeField]
     private LocalizedString statusDocumentChanged;
-
-    [SerializeField]
-    private LocalizedString statusUvOn;
-
-    [SerializeField]
-    private LocalizedString statusUvOff;
 
     [SerializeField]
     private LocalizedString tutorialModeText;
@@ -238,7 +206,6 @@ public class DocumentRedactor :
     private bool documentFinished;
     private bool isDragging;
     private bool dragRedactionState;
-    private bool ultravioletModeActive;
     private bool isInitialized;
 
     private void Start()
@@ -255,6 +222,18 @@ public class DocumentRedactor :
                 "В списке Documents нет ни одного документа."
             );
 
+            enabled = false;
+            return;
+        }
+
+        if (!ultravioletTool.Initialize(
+                documentText,
+                words,
+                RefreshDocument,
+                StopDragging,
+                () => documentFinished,
+                SetStatus))
+        {
             enabled = false;
             return;
         }
@@ -276,6 +255,7 @@ public class DocumentRedactor :
         LocalizationSettings.SelectedLocaleChanged -=
             OnSelectedLocaleChanged;
 
+        ultravioletTool?.DisableMode();
         StopDragging();
     }
 
@@ -391,28 +371,10 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
-        if (ultravioletButton == null)
+        if (ultravioletTool == null)
         {
             Debug.LogError(
-                "Не назначено поле Ultraviolet Button."
-            );
-
-            referencesAreValid = false;
-        }
-
-        if (ultravioletButtonText == null)
-        {
-            Debug.LogError(
-                "Не назначено поле Ultraviolet Button Text."
-            );
-
-            referencesAreValid = false;
-        }
-
-        if (ultravioletCursor == null)
-        {
-            Debug.LogError(
-                "Не назначено поле Ultraviolet Cursor."
+                "Не назначено поле Ultraviolet Tool."
             );
 
             referencesAreValid = false;
@@ -454,7 +416,7 @@ public class DocumentRedactor :
         }
 
         StopDragging();
-        DisableUltravioletMode();
+        ultravioletTool.DisableMode();
 
         documentFinished = false;
         inspectionsRemaining = maximumInspections;
@@ -550,7 +512,7 @@ public class DocumentRedactor :
     )
     {
         if (documentFinished ||
-     ultravioletModeActive)
+            ultravioletTool.IsActive)
         {
             return;
         }
@@ -587,7 +549,7 @@ public class DocumentRedactor :
     )
     {
         if (documentFinished ||
-            ultravioletModeActive ||
+            ultravioletTool.IsActive ||
             !isDragging)
         {
             return;
@@ -757,7 +719,7 @@ public class DocumentRedactor :
         else if (word.isUltravioletRevealed)
         {
             visibleWord =
-                CreateUltravioletWord(
+                ultravioletTool.CreateRevealedWordMarkup(
                     word.originalText
                 );
         }
@@ -773,18 +735,6 @@ public class DocumentRedactor :
             $"<link=\"{word.id}\">" +
             visibleWord +
             "</link>";
-    }
-
-    private string CreateUltravioletWord(
-     string originalText
- )
-    {
-        return
-            $"<mark={ultravioletSecretHighlightColor}>" +
-            $"<color={ultravioletSecretTextColor}>" +
-            originalText +
-            "</color>" +
-            "</mark>";
     }
 
     private string CreateRedactedWord(
@@ -1045,7 +995,7 @@ public class DocumentRedactor :
     {
         documentFinished = true;
         StopDragging();
-        DisableUltravioletMode();
+        ultravioletTool.DisableMode();
 
         submitButton.SetActive(false);
         winPanel.SetActive(true);
@@ -1276,317 +1226,9 @@ public class DocumentRedactor :
         SetStatus(message.ToString());
     }
 
-    private void Update()
-    {
-        if (!ultravioletModeActive ||
-            ultravioletCursor == null ||
-            Mouse.current == null)
-        {
-            return;
-        }
-
-        Vector2 mousePosition =
-            Mouse.current.position.ReadValue();
-
-        ultravioletCursor.position =
-            mousePosition;
-
-        UpdateUltravioletReveal(
-            mousePosition
-        );
-    }
-
     public void ToggleUltravioletMode()
     {
-        if (documentFinished)
-        {
-            return;
-        }
-
-        ultravioletModeActive =
-            !ultravioletModeActive;
-
-        StopDragging();
-
-        if (ultravioletCursor == null)
-        {
-            Debug.LogError(
-                "Не назначен Ultraviolet Cursor."
-            );
-
-            ultravioletModeActive = false;
-            return;
-        }
-
-        ultravioletCursor.gameObject.SetActive(
-            ultravioletModeActive
-        );
-
-        if (ultravioletModeActive)
-        {
-            ultravioletCursor.position =
-                Mouse.current != null
-                    ? Mouse.current.position.ReadValue()
-                    : Vector2.zero;
-        }
-        else
-        {
-            ClearUltravioletReveal();
-        }
-
-        UpdateUltravioletButtonText();
-
-        if (ultravioletModeActive)
-        {
-            SetStatus(
-                Localize(statusUvOn)
-            );
-        }
-        else
-        {
-            SetStatus(
-                Localize(statusUvOff)
-            );
-        }
-    }
-
-    private void UpdateUltravioletReveal(
-    Vector2 lampScreenPosition
-)
-    {
-        if (documentText == null)
-        {
-            return;
-        }
-
-        documentText.ForceMeshUpdate();
-
-        TMP_TextInfo textInfo =
-            documentText.textInfo;
-
-        bool displayChanged = false;
-
-        for (int linkIndex = 0;
-             linkIndex < textInfo.linkCount;
-             linkIndex++)
-        {
-            TMP_LinkInfo linkInfo =
-                textInfo.linkInfo[linkIndex];
-
-            if (!int.TryParse(
-                    linkInfo.GetLinkID(),
-                    out int wordId))
-            {
-                continue;
-            }
-
-            if (wordId < 0 ||
-                wordId >= words.Count)
-            {
-                continue;
-            }
-
-            DocumentWord word = words[wordId];
-
-            bool shouldBeRevealed =
-                word.CanBeRevealedBy(
-                    RevealMethod.Ultraviolet
-                ) &&
-                !word.isRedacted &&
-                IsLinkInsideUltravioletLight(
-                    linkInfo,
-                    lampScreenPosition
-                );
-
-            if (word.isUltravioletRevealed ==
-                shouldBeRevealed)
-            {
-                continue;
-            }
-
-            word.isUltravioletRevealed =
-                shouldBeRevealed;
-
-            displayChanged = true;
-        }
-
-        if (displayChanged)
-        {
-            RefreshDocument();
-        }
-    }
-
-    private bool IsLinkInsideUltravioletLight(
-    TMP_LinkInfo linkInfo,
-    Vector2 lampScreenPosition
-)
-    {
-        TMP_TextInfo textInfo =
-            documentText.textInfo;
-
-        if (linkInfo.linkTextLength <= 0)
-        {
-            return false;
-        }
-
-        Vector2 minimum =
-            new Vector2(
-                float.PositiveInfinity,
-                float.PositiveInfinity
-            );
-
-        Vector2 maximum =
-            new Vector2(
-                float.NegativeInfinity,
-                float.NegativeInfinity
-            );
-
-        int firstCharacterIndex =
-            linkInfo.linkTextfirstCharacterIndex;
-
-        int lastCharacterIndex =
-            firstCharacterIndex +
-            linkInfo.linkTextLength;
-
-        for (int characterIndex =
-                 firstCharacterIndex;
-             characterIndex < lastCharacterIndex;
-             characterIndex++)
-        {
-            if (characterIndex < 0 ||
-                characterIndex >=
-                textInfo.characterCount)
-            {
-                continue;
-            }
-
-            TMP_CharacterInfo characterInfo =
-                textInfo.characterInfo[
-                    characterIndex
-                ];
-
-            if (!characterInfo.isVisible)
-            {
-                continue;
-            }
-
-            Vector3 bottomLeftWorld =
-                documentText.transform.TransformPoint(
-                    characterInfo.bottomLeft
-                );
-
-            Vector3 topRightWorld =
-                documentText.transform.TransformPoint(
-                    characterInfo.topRight
-                );
-
-            Vector2 bottomLeftScreen =
-                RectTransformUtility
-                    .WorldToScreenPoint(
-                        GetDocumentCanvasCamera(),
-                        bottomLeftWorld
-                    );
-
-            Vector2 topRightScreen =
-                RectTransformUtility
-                    .WorldToScreenPoint(
-                        GetDocumentCanvasCamera(),
-                        topRightWorld
-                    );
-
-            minimum = Vector2.Min(
-                minimum,
-                bottomLeftScreen
-            );
-
-            maximum = Vector2.Max(
-                maximum,
-                topRightScreen
-            );
-        }
-
-        if (float.IsInfinity(minimum.x))
-        {
-            return false;
-        }
-
-        Vector2 closestPoint =
-            new Vector2(
-                Mathf.Clamp(
-                    lampScreenPosition.x,
-                    minimum.x,
-                    maximum.x
-                ),
-                Mathf.Clamp(
-                    lampScreenPosition.y,
-                    minimum.y,
-                    maximum.y
-                )
-            );
-
-        float distance =
-            Vector2.Distance(
-                lampScreenPosition,
-                closestPoint
-            );
-
-        return distance <=
-               ultravioletRevealRadius;
-    }
-
-    private Camera GetDocumentCanvasCamera()
-    {
-        if (documentText == null ||
-            documentText.canvas == null)
-        {
-            return null;
-        }
-
-        Canvas canvas =
-            documentText.canvas;
-
-        if (canvas.renderMode ==
-            RenderMode.ScreenSpaceOverlay)
-        {
-            return null;
-        }
-
-        return canvas.worldCamera;
-    }
-
-    private void ClearUltravioletReveal()
-    {
-        bool displayChanged = false;
-
-        foreach (DocumentWord word in words)
-        {
-            if (!word.isUltravioletRevealed)
-            {
-                continue;
-            }
-
-            word.isUltravioletRevealed = false;
-            displayChanged = true;
-        }
-
-        if (displayChanged)
-        {
-            RefreshDocument();
-        }
-    }
-    private void DisableUltravioletMode()
-    {
-        ultravioletModeActive = false;
-
-        StopDragging();
-        ClearUltravioletReveal();
-
-        if (ultravioletCursor != null)
-        {
-            ultravioletCursor.gameObject.SetActive(false);
-        }
-
-        UpdateUltravioletButtonText();
+        ultravioletTool.ToggleMode();
     }
 
     private void OnSelectedLocaleChanged(
@@ -1601,29 +1243,8 @@ public class DocumentRedactor :
 
     private void UpdateDynamicButtonTexts()
     {
-        UpdateUltravioletButtonText();
+        ultravioletTool.RefreshLocalizedText();
         UpdateNextDocumentButtonText();
-    }
-    private void UpdateUltravioletButtonText()
-    {
-        if (ultravioletButtonText == null)
-        {
-            return;
-        }
-
-        LocalizedString selectedText =
-            ultravioletModeActive
-                ? ultravioletActiveText
-                : ultravioletInactiveText;
-
-        if (selectedText == null ||
-            selectedText.IsEmpty)
-        {
-            return;
-        }
-
-        ultravioletButtonText.text =
-            selectedText.GetLocalizedString();
     }
     private void UpdateNextDocumentButtonText()
     {
