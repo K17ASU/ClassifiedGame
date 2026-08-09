@@ -792,15 +792,13 @@ public class DocumentRedactor :
     }
 
     private string CreateRedactedWord(
-        string originalText
-    )
+       string originalText
+)
     {
         return
-            $"<mark={redactionColor}>" +
             "<color=#00000000>" +
             originalText +
-            "</color>" +
-            "</mark>";
+            "</color>";
     }
 
     private void UpdateProgress()
