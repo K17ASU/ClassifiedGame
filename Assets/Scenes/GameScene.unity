@@ -1118,6 +1118,7 @@ GameObject:
   - component: {fileID: 677106337}
   - component: {fileID: 677106336}
   - component: {fileID: 677106338}
+  - component: {fileID: 677106339}
   m_Layer: 5
   m_Name: DocumentText
   m_TagString: Untagged
@@ -1274,30 +1275,7 @@ MonoBehaviour:
   inspectionsText: {fileID: 1445037117}
   briefingText: {fileID: 1523993049}
   submitButton: {fileID: 117643633}
-  ultravioletButton: {fileID: 919276781}
-  ultravioletButtonText: {fileID: 2051226595}
-  ultravioletCursor: {fileID: 1034410594}
-  ultravioletInactiveText:
-    m_TableReference:
-      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
-    m_TableEntryReference:
-      m_KeyId: 472035934213
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  ultravioletActiveText:
-    m_TableReference:
-      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
-    m_TableEntryReference:
-      m_KeyId: 472035934214
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  ultravioletSecretTextColor: '#6B35A8'
-  ultravioletSecretHighlightColor: '#8A4DFF35'
-  ultravioletRevealRadius: 110
+  ultravioletTool: {fileID: 677106339}
   winPanel: {fileID: 428030212}
   completionText: {fileID: 162912340}
   resultScoreText: {fileID: 1080550773}
@@ -1323,6 +1301,7 @@ MonoBehaviour:
     m_LocalVariables: []
   restartButton: {fileID: 1171561494}
   documents:
+  - {fileID: 11400000, guid: b12d23c0cc0fe5c46ab2b69f602225c3, type: 2}
   - {fileID: 11400000, guid: 1360114f1983ede419b662f3fe1b9ca4, type: 2}
   - {fileID: 11400000, guid: 02bc9fcf05578c046a7fc9dfb3593fb1, type: 2}
   - {fileID: 11400000, guid: c938d2e2a87765e499756c1842e1904a, type: 2}
@@ -1349,24 +1328,6 @@ MonoBehaviour:
       m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
     m_TableEntryReference:
       m_KeyId: 110460599320576
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  statusUvOn:
-    m_TableReference:
-      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
-    m_TableEntryReference:
-      m_KeyId: 110460599320577
-      m_Key: 
-    m_FallbackState: 0
-    m_WaitForCompletion: 0
-    m_LocalVariables: []
-  statusUvOff:
-    m_TableReference:
-      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
-    m_TableEntryReference:
-      m_KeyId: 110460599320578
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
@@ -1542,6 +1503,62 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []
+--- !u!114 &677106339
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677106334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61cde2b1cc2f51d45bad47a922c703df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UltravioletTool
+  ultravioletButtonText: {fileID: 2051226595}
+  ultravioletCursor: {fileID: 1034410594}
+  ultravioletInactiveText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 472035934213
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  ultravioletActiveText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 472035934214
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  statusUvOn:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 110460599320577
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  statusUvOff:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 110460599320578
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  ultravioletSecretTextColor: '#6B35A8'
+  ultravioletSecretHighlightColor: '#8A4DFF35'
+  ultravioletRevealRadius: 110
   references:
     version: 2
     RefIds: []
