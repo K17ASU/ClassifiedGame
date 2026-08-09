@@ -1943,9 +1943,10 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  ultravioletSecretTextColor: '#6B35A8'
-  ultravioletSecretHighlightColor: '#8A4DFF35'
-  ultravioletRevealRadius: 110
+  ultravioletSecretTextColor:
+    serializedVersion: 2
+    rgba: 4283301749
+  ultravioletRevealRadius: 80
   references:
     version: 2
     RefIds: []
@@ -2002,7 +2003,7 @@ MonoBehaviour:
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
-  revealRadius: 70
+  revealRadius: 60
   shakeAmplitude: 0.5
   shakeSpeed: 32
   references:
