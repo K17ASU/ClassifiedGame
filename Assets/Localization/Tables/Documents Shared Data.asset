@@ -175,6 +175,10 @@ MonoBehaviour:
     m_Key: document_06_briefing
     m_Metadata:
       m_Items: []
+  - m_Id: 1100871866302464
+    m_Key: tutorial_briefing
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

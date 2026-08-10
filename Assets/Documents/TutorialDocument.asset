@@ -29,31 +29,31 @@ MonoBehaviour:
     \u0434\u043E\u043A\u0443\u043C\u0435\u043D\u0442 \u043D\u0430 \u043F\u0440\u043E\u0432\u0435\u0440\u043A\u0443."
   isTutorial: 1
   unlocksAfterCompletion: 1
-  localizationId: 
+  localizationId: tutorial
   localizedDocumentNumber:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300068806656
-      m_Key: 
+      m_KeyId: 0
+      m_Key: tutorial_number
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentTitle:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300131721216
-      m_Key: 
+      m_KeyId: 0
+      m_Key: tutorial_title
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentText:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300135915521
-      m_Key: 
+      m_KeyId: 0
+      m_Key: tutorial_text
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
