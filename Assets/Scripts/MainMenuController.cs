@@ -1,36 +1,152 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 /// <summary>
-/// Управляет кнопками главного меню.
+/// РЈРїСЂР°РІР»СЏРµС‚ РіР»Р°РІРЅС‹Рј РјРµРЅСЋ Рё СЂРµРіРёСЃС‚СЂР°С†РёРµР№ РёРјРµРЅРё РёРіСЂРѕРєР°.
 /// </summary>
 public class MainMenuController : MonoBehaviour
 {
-    [Header("Название игровой сцены")]
+    [Header("РРіСЂРѕРІР°СЏ СЃС†РµРЅР°")]
 
     [SerializeField]
     private string gameSceneName = "GameScene";
 
-    /// <summary>
-    /// Загружает игровую сцену.
-    /// </summary>
-    public void StartNewGame()
+    [Header("РРјСЏ СЃРѕС‚СЂСѓРґРЅРёРєР°")]
+
+    [SerializeField]
+    private TMP_InputField playerNameInput;
+
+    [SerializeField]
+    private Button startGameButton;
+
+    private bool isUpdatingInput;
+
+    private void Start()
     {
-        if (string.IsNullOrWhiteSpace(gameSceneName))
+        if (playerNameInput == null)
         {
             Debug.LogError(
-                "Название игровой сцены не указано."
+                "MainMenuController: РЅРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Player Name Input."
             );
 
             return;
         }
 
+        playerNameInput.characterLimit = 24;
+
+        string savedPlayerName = PlayerProfile.PlayerName;
+
+        if (!string.IsNullOrWhiteSpace(savedPlayerName))
+        {
+            playerNameInput.SetTextWithoutNotify(savedPlayerName);
+        }
+
+        playerNameInput.onValueChanged.AddListener(
+            OnPlayerNameChanged
+        );
+
+        RefreshStartButton();
+    }
+
+    private void OnDestroy()
+    {
+        if (playerNameInput != null)
+        {
+            playerNameInput.onValueChanged.RemoveListener(
+                OnPlayerNameChanged
+            );
+        }
+    }
+
+    private void OnPlayerNameChanged(string value)
+    {
+        if (isUpdatingInput)
+        {
+            return;
+        }
+
+        string sanitizedName =
+            PlayerProfile.SanitizePlayerName(value);
+
+        if (sanitizedName != value)
+        {
+            isUpdatingInput = true;
+
+            playerNameInput.SetTextWithoutNotify(
+                sanitizedName
+            );
+
+            playerNameInput.caretPosition =
+                sanitizedName.Length;
+
+            isUpdatingInput = false;
+        }
+
+        RefreshStartButton();
+    }
+
+    private void RefreshStartButton()
+    {
+        if (startGameButton == null)
+        {
+            return;
+        }
+
+        string playerName =
+            playerNameInput != null
+                ? PlayerProfile.SanitizePlayerName(
+                    playerNameInput.text
+                )
+                : string.Empty;
+
+        startGameButton.interactable =
+            !string.IsNullOrWhiteSpace(playerName);
+    }
+
+    /// <summary>
+    /// РЎРѕС…СЂР°РЅСЏРµС‚ РёРјСЏ РёРіСЂРѕРєР° Рё Р·Р°РіСЂСѓР¶Р°РµС‚ РёРіСЂРѕРІСѓСЋ СЃС†РµРЅСѓ.
+    /// </summary>
+    public void StartNewGame()
+    {
+        if (playerNameInput == null)
+        {
+            Debug.LogError(
+                "MainMenuController: РЅРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Player Name Input."
+            );
+
+            return;
+        }
+
+        string playerName =
+            PlayerProfile.SanitizePlayerName(
+                playerNameInput.text
+            );
+
+        if (string.IsNullOrWhiteSpace(playerName))
+        {
+            playerNameInput.ActivateInputField();
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(gameSceneName))
+        {
+            Debug.LogError(
+                "РќР°Р·РІР°РЅРёРµ РёРіСЂРѕРІРѕР№ СЃС†РµРЅС‹ РЅРµ СѓРєР°Р·Р°РЅРѕ."
+            );
+
+            return;
+        }
+
+        PlayerProfile.SetPlayerName(playerName);
+
         SceneManager.LoadScene(gameSceneName);
     }
 
     /// <summary>
-    /// Закрывает игру.
-    /// В редакторе Unity останавливает режим Play.
+    /// Р—Р°РєСЂС‹РІР°РµС‚ РёРіСЂСѓ.
+    /// Р’ СЂРµРґР°РєС‚РѕСЂРµ Unity РѕСЃС‚Р°РЅР°РІР»РёРІР°РµС‚ СЂРµР¶РёРј Play.
     /// </summary>
     public void QuitGame()
     {

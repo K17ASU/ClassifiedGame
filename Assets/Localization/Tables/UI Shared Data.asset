@@ -229,6 +229,14 @@ MonoBehaviour:
     m_Key: tutorial_retry
     m_Metadata:
       m_Items: []
+  - m_Id: 1532251435745280
+    m_Key: empoyee_name
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1532254724079616
+    m_Key: text_field_palceholder
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

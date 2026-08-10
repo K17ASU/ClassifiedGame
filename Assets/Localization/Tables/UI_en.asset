@@ -239,6 +239,14 @@ MonoBehaviour:
     m_Localized: Correct the redactions and try again. No inspection was used.
     m_Metadata:
       m_Items: []
+  - m_Id: 1532251435745280
+    m_Localized: EMPLOYEE NAME
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1532254724079616
+    m_Localized: Enter name
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

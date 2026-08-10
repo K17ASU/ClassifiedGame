@@ -34,19 +34,19 @@ MonoBehaviour:
     m_Localized: 'MEMORANDUM
 
 
-      You will be sent to the [[Organization Training
-      Center]].
+      Agent {PLAYER_NAME}, you will be sent to the
+      [[Organization Training Center]].
 
 
-      Click on a word to place a redaction bar over it.
+      Click on a word to place a redaction
+      bar over it.
 
-      To
-      redact several words in a row, hold down the left mouse button and drag across
-      the text.
+      To redact several words in a row, hold down the left mouse
+      button and drag across the text.
 
 
-      Redact the name of the Organization facility, then submit
-      the document for review.'
+      Redact the name of the Organization
+      facility, then submit the document for review.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915525

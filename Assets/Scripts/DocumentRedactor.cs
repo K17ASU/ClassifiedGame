@@ -1453,22 +1453,28 @@ public class DocumentRedactor :
     }
 
     private string GetLocalizedDocumentString(
-    LocalizedString localizedString,
-    string fallback
-)
+     LocalizedString localizedString,
+     string fallback
+ )
     {
+        string result;
+
         if (localizedString == null ||
             localizedString.IsEmpty)
         {
-            return fallback;
+            result = fallback;
+        }
+        else
+        {
+            result = localizedString.GetLocalizedString();
+
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                result = fallback;
+            }
         }
 
-        string result =
-            localizedString.GetLocalizedString();
-
-        return string.IsNullOrWhiteSpace(result)
-            ? fallback
-            : result;
+        return PlayerTextResolver.Resolve(result);
     }
 
     private void UpdateBriefing()
