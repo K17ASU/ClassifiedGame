@@ -113,16 +113,8 @@ public class DocumentRedactor :
     [Header("Очки")]
 
     [SerializeField]
-    [Min(0)]
-    private int firstTryScore = 100;
-
-    [SerializeField]
-    [Min(0)]
-    private int secondTryScore = 75;
-
-    [SerializeField]
-    [Min(0)]
-    private int thirdTryScore = 50;
+    [Min(1)]
+    private int maximumDocumentScore = 100;
 
     [Header("Обычный текст")]
 
@@ -1131,28 +1123,57 @@ public class DocumentRedactor :
 
     private int CalculateDocumentScore()
     {
-        int failedInspections =
-            maximumInspections -
-            inspectionsRemaining;
+        int requiredTotal = 0;
+        int correctlyRedacted = 0;
+        int extraRedactions = 0;
 
-        if (failedInspections <= 0)
+        foreach (DocumentWord word in words)
         {
-            return firstTryScore;
+            if (word.requiresRedaction)
+            {
+                requiredTotal++;
+
+                if (word.isRedacted)
+                {
+                    correctlyRedacted++;
+                }
+            }
+            else if (word.isRedacted)
+            {
+                extraRedactions++;
+            }
         }
 
-        if (failedInspections == 1)
+        if (requiredTotal <= 0)
         {
-            return secondTryScore;
+            return extraRedactions == 0
+                ? maximumDocumentScore
+                : 0;
         }
 
-        return thirdTryScore;
+        float accuracy =
+            (correctlyRedacted - extraRedactions) /
+            (float)requiredTotal;
+
+        accuracy = Mathf.Clamp01(accuracy);
+
+        return Mathf.RoundToInt(
+            accuracy * maximumDocumentScore
+        );
     }
 
     private void FailDocument()
     {
+        int documentScore =
+            IsCurrentDocumentTutorial()
+                ? 0
+                : CalculateDocumentScore();
+
+        totalScore += documentScore;
+
         ShowResultPanel(
             documentPassed: false,
-            documentScore: 0
+            documentScore: documentScore
         );
     }
 
@@ -1267,7 +1288,7 @@ public class DocumentRedactor :
     private int GetMaximumTotalScore()
     {
         return GetPlayableDocumentCount() *
-               firstTryScore;
+               maximumDocumentScore;
     }
     public void NextDocument()
     {

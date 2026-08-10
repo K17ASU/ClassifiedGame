@@ -247,6 +247,10 @@ MonoBehaviour:
     m_Localized: Enter name
     m_Metadata:
       m_Items: []
+  - m_Id: 1561197229424640
+    m_Localized: PENCIL
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

@@ -237,6 +237,14 @@ MonoBehaviour:
     m_Key: text_field_palceholder
     m_Metadata:
       m_Items: []
+  - m_Id: 1561197229424640
+    m_Key: pencil_active
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1561200207380480
+    m_Key: pencil_inactive
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
