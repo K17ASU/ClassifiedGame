@@ -246,6 +246,12 @@ public class DocumentRedactor :
     {
         yield return LocalizationSettings.InitializationOperation;
 
+        yield return LocalizationSettings.StringDatabase
+            .GetTableAsync("Documents");
+
+        yield return LocalizationSettings.StringDatabase
+            .GetTableAsync("UI");
+
         if (!ValidateReferences())
         {
             enabled = false;
