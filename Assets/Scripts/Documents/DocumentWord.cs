@@ -14,6 +14,10 @@ public sealed class DocumentWord
     // Текущее состояние игрока.
     public bool isRedacted;
 
+    // Пометка игрока карандашом.
+    // Не влияет на проверку документа и работу инструментов анализа.
+    public bool isStruckThrough;
+
     // Временное состояние UV-визуализации.
     public bool isUltravioletRevealed;
 

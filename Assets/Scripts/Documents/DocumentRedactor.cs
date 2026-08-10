@@ -55,6 +55,9 @@ public class DocumentRedactor :
     private DecoderTool decoderTool;
 
     [SerializeField]
+    private PencilTool pencilTool;
+
+    [SerializeField]
     private GameObject toolsPanel;
 
     [SerializeField]
@@ -65,6 +68,9 @@ public class DocumentRedactor :
 
     [SerializeField]
     private GameObject decoderButton;
+
+    [SerializeField]
+    private GameObject pencilButton;
 
     [Header("Панель результата")]
 
@@ -218,6 +224,8 @@ public class DocumentRedactor :
     private bool documentFinished;
     private bool isDragging;
     private bool dragRedactionState;
+    private bool dragStrikeThroughState;
+    private bool dragUsesPencil;
     private bool isInitialized;
 
     private bool hasInspectionStatus;
@@ -284,6 +292,14 @@ public class DocumentRedactor :
             yield break;
         }
 
+        if (!pencilTool.Initialize(
+                StopDragging,
+                () => documentFinished))
+        {
+            enabled = false;
+            yield break;
+        }
+
         currentDocumentIndex = 0;
         totalScore = 0;
 
@@ -306,6 +322,7 @@ public class DocumentRedactor :
         ultravioletTool?.DisableMode();
         magnifierTool?.DisableMode();
         decoderTool?.DisableMode();
+        pencilTool?.DisableMode();
         StopDragging();
     }
 
@@ -448,6 +465,15 @@ public class DocumentRedactor :
             referencesAreValid = false;
         }
 
+        if (pencilTool == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Pencil Tool."
+            );
+
+            referencesAreValid = false;
+        }
+
         if (toolsPanel == null)
         {
             Debug.LogError(
@@ -479,6 +505,15 @@ public class DocumentRedactor :
         {
             Debug.LogError(
                 "Не назначено поле Decoder Button."
+            );
+
+            referencesAreValid = false;
+        }
+
+        if (pencilButton == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Pencil Button."
             );
 
             referencesAreValid = false;
@@ -523,6 +558,7 @@ public class DocumentRedactor :
         ultravioletTool.DisableMode();
         magnifierTool.DisableMode();
         decoderTool.DisableMode();
+        pencilTool.DisableMode();
 
         documentFinished = false;
         inspectionsRemaining = maximumInspections;
@@ -645,8 +681,18 @@ public class DocumentRedactor :
 
         DocumentWord firstWord = words[wordId];
 
-        dragRedactionState =
-            !firstWord.isRedacted;
+        dragUsesPencil = pencilTool.IsActive;
+
+        if (dragUsesPencil)
+        {
+            dragStrikeThroughState =
+                !firstWord.isStruckThrough;
+        }
+        else
+        {
+            dragRedactionState =
+                !firstWord.isRedacted;
+        }
 
         ApplyDragState(wordId);
     }
@@ -756,12 +802,28 @@ public class DocumentRedactor :
 
         DocumentWord word = words[wordId];
 
-        if (word.isRedacted == dragRedactionState)
+        if (dragUsesPencil)
         {
-            return;
-        }
+            if (word.isStruckThrough ==
+                dragStrikeThroughState)
+            {
+                return;
+            }
 
-        word.isRedacted = dragRedactionState;
+            word.isStruckThrough =
+                dragStrikeThroughState;
+        }
+        else
+        {
+            if (word.isRedacted ==
+                dragRedactionState)
+            {
+                return;
+            }
+
+            word.isRedacted =
+                dragRedactionState;
+        }
 
         RefreshDocument();
     }
@@ -769,6 +831,7 @@ public class DocumentRedactor :
     private void StopDragging()
     {
         isDragging = false;
+        dragUsesPencil = false;
         processedDragWords.Clear();
     }
 
@@ -827,6 +890,15 @@ public class DocumentRedactor :
                 $"<color={normalTextColor}>" +
                 word.originalText +
                 "</color>";
+        }
+
+        if (!word.isRedacted &&
+            word.isStruckThrough)
+        {
+            visibleWord =
+                "<s>" +
+                visibleWord +
+                "</s>";
         }
 
         return
@@ -1095,6 +1167,7 @@ public class DocumentRedactor :
         ultravioletTool.DisableMode();
         magnifierTool.DisableMode();
         decoderTool.DisableMode();
+        pencilTool.DisableMode();
 
         submitButton.SetActive(false);
         winPanel.SetActive(true);
@@ -1265,6 +1338,7 @@ public class DocumentRedactor :
         {
             magnifierTool.DisableMode();
             decoderTool.DisableMode();
+            pencilTool.DisableMode();
         }
 
         ultravioletTool.ToggleMode();
@@ -1276,6 +1350,7 @@ public class DocumentRedactor :
         {
             ultravioletTool.DisableMode();
             decoderTool.DisableMode();
+            pencilTool.DisableMode();
         }
 
         magnifierTool.ToggleMode();
@@ -1287,9 +1362,22 @@ public class DocumentRedactor :
         {
             ultravioletTool.DisableMode();
             magnifierTool.DisableMode();
+            pencilTool.DisableMode();
         }
 
         decoderTool.ToggleMode();
+    }
+
+    public void TogglePencilMode()
+    {
+        if (!pencilTool.IsActive)
+        {
+            ultravioletTool.DisableMode();
+            magnifierTool.DisableMode();
+            decoderTool.DisableMode();
+        }
+
+        pencilTool.ToggleMode();
     }
 
     private void OnSelectedLocaleChanged(
@@ -1308,6 +1396,7 @@ public class DocumentRedactor :
         ultravioletTool.RefreshLocalizedText();
         magnifierTool.RefreshLocalizedText();
         decoderTool.RefreshLocalizedText();
+        pencilTool.RefreshLocalizedText();
         UpdateNextDocumentButtonText();
     }
     private void UpdateNextDocumentButtonText()
@@ -1432,14 +1521,9 @@ public class DocumentRedactor :
             decoderUnlocked
         );
 
-        bool hasAnyUnlockedTool =
-            ultravioletUnlocked ||
-            magnifierUnlocked ||
-            decoderUnlocked;
+        pencilButton.SetActive(true);
 
-        toolsPanel.SetActive(
-            hasAnyUnlockedTool
-        );
+        toolsPanel.SetActive(true);
     }
     private void UnlockToolsFromCurrentDocument()
     {
