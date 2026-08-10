@@ -21,6 +21,9 @@ public sealed class DocumentWord
     // Временное состояние UV-визуализации.
     public bool isUltravioletRevealed;
 
+    // Дополнительное выделение текста для создания акцента
+    public bool isBold;
+
     // Дополнительные данные для инструментов анализа.
     // Например:
     // RevealMethod.Decoder -> "ВОЛКОВ"

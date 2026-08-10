@@ -15,6 +15,7 @@ public sealed class DocumentParser
         public bool requiresRedaction;
         public RevealMethod revealMethods;
         public string decoderPayload;
+        public bool isBold;
     }
 
     private sealed class ActiveAnnotation
@@ -22,6 +23,7 @@ public sealed class DocumentParser
         public bool requiresRedaction;
         public RevealMethod revealMethods;
         public string decoderPayload;
+        public bool isBold;
     }
 
     private sealed class ParsedSource
@@ -235,6 +237,15 @@ public sealed class DocumentParser
             }
 
             if (token.Equals(
+                    "bold",
+                     StringComparison.OrdinalIgnoreCase))
+            {
+                parsedAnnotation.isBold = true;
+                hasKnownToken = true;
+                continue;
+            }
+
+            if (token.Equals(
                     "uv",
                     StringComparison
                         .OrdinalIgnoreCase))
@@ -411,7 +422,10 @@ public sealed class DocumentParser
                 annotation.revealMethods,
 
             decoderPayload =
-                annotation.decoderPayload
+                annotation.decoderPayload,
+
+            isBold =
+                annotation.isBold
         };
     }
 
@@ -451,6 +465,7 @@ public sealed class DocumentParser
                 RevealMethod.None;
 
             string decoderPayload = null;
+            bool isBold = false;
 
             int endIndex =
                 match.Index + match.Length;
@@ -468,6 +483,8 @@ public sealed class DocumentParser
 
                 revealMethods |=
                     metadata.revealMethods;
+                
+                isBold |= metadata.isBold;
 
                 if (!string.IsNullOrEmpty(
                         metadata.decoderPayload))
@@ -488,6 +505,9 @@ public sealed class DocumentParser
 
                     revealMethods =
                         revealMethods,
+
+                    isBold =
+                        isBold,
 
                     isRedacted = false,
 

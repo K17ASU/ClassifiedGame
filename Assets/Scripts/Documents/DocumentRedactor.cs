@@ -888,9 +888,18 @@ public class DocumentRedactor :
             word.isStruckThrough)
         {
             visibleWord =
-                "<s>" +
+                "<u>" +
                 visibleWord +
-                "</s>";
+                "</u>";
+        }
+       
+        if (!word.isRedacted &&
+             word.isBold)
+        {
+            visibleWord =
+                "<b>" +
+                visibleWord +
+                "</b>";
         }
 
         return
