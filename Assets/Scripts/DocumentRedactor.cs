@@ -130,35 +130,17 @@ public class DocumentRedactor :
 
     [Header("Локализация интерфейса")]
 
-    [SerializeField]
-    private LocalizedString statusSelectInfo;
 
-    [SerializeField]
-    private LocalizedString statusDocumentChanged;
 
     [SerializeField]
     private LocalizedString tutorialModeText;
 
-    [SerializeField]
-    private LocalizedString tutorialReadyText;
 
-    [SerializeField]
-    private LocalizedString tutorialExtraText;
 
-    [SerializeField]
-    private LocalizedString tutorialContinueText;
 
-    [SerializeField]
-    private LocalizedString tutorialRejectedText;
 
-    [SerializeField]
-    private LocalizedString tutorialMissedText;
 
-    [SerializeField]
-    private LocalizedString tutorialExtraRedactionsText;
 
-    [SerializeField]
-    private LocalizedString tutorialRetryText;
 
     [SerializeField]
     private LocalizedString progressTutorialText;
@@ -199,11 +181,7 @@ public class DocumentRedactor :
     [SerializeField]
     private LocalizedString inspectionsLocalizedText;
 
-    [SerializeField]
-    private LocalizedString documentRejectedText;
 
-    [SerializeField]
-    private LocalizedString documentFixRetryText;
 
     private DocumentData CurrentDocument
     {
@@ -242,6 +220,10 @@ public class DocumentRedactor :
     private bool dragRedactionState;
     private bool isInitialized;
 
+    private bool hasInspectionStatus;
+    private int lastMissedInformation;
+    private int lastExtraRedactions;
+
     private IEnumerator Start()
     {
         yield return LocalizationSettings.InitializationOperation;
@@ -274,7 +256,7 @@ public class DocumentRedactor :
                 RefreshDocument,
                 StopDragging,
                 () => documentFinished,
-                SetStatus))
+                _ => { }))
         {
             enabled = false;
             yield break;
@@ -285,7 +267,7 @@ public class DocumentRedactor :
                 words,
                 StopDragging,
                 () => documentFinished,
-                SetStatus))
+                _ => { }))
         {
             enabled = false;
             yield break;
@@ -296,7 +278,7 @@ public class DocumentRedactor :
                 words,
                 StopDragging,
                 () => documentFinished,
-                SetStatus))
+                _ => { }))
         {
             enabled = false;
             yield break;
@@ -562,9 +544,7 @@ public class DocumentRedactor :
         RefreshDocument();
         UpdateInspectionsDisplay();
 
-        SetStatus(
-            Localize(statusSelectInfo)
-        );
+        ClearInspectionStatus();
 
         UpdateDynamicButtonTexts();
         UpdateBriefing();
@@ -784,17 +764,6 @@ public class DocumentRedactor :
         word.isRedacted = dragRedactionState;
 
         RefreshDocument();
-
-        if (IsCurrentDocumentTutorial())
-        {
-            UpdateTutorialStatus();
-        }
-        else
-        {
-            SetStatus(
-               Localize(statusDocumentChanged)
-            );
-        }
     }
 
     private void StopDragging()
@@ -953,6 +922,52 @@ public class DocumentRedactor :
         }
     }
 
+    private void ClearInspectionStatus()
+    {
+        hasInspectionStatus = false;
+        lastMissedInformation = 0;
+        lastExtraRedactions = 0;
+
+        SetStatus(string.Empty);
+    }
+
+    private void UpdateInspectionStatus(
+        int missedInformation,
+        int extraRedactions
+    )
+    {
+        hasInspectionStatus = true;
+        lastMissedInformation = missedInformation;
+        lastExtraRedactions = extraRedactions;
+
+        RefreshInspectionStatus();
+    }
+
+    private void RefreshInspectionStatus()
+    {
+        if (!hasInspectionStatus)
+        {
+            SetStatus(string.Empty);
+            return;
+        }
+
+        string missedText =
+            Localize(
+                errorMissedText,
+                lastMissedInformation
+            );
+
+        string extraText =
+            Localize(
+                errorExtraText,
+                lastExtraRedactions
+            );
+
+        SetStatus(
+            $"{missedText}\n{extraText}"
+        );
+    }
+
     private void CountDocumentErrors(
         out int missedSecretWords,
         out int extraRedactedWords
@@ -993,6 +1008,11 @@ public class DocumentRedactor :
         int extraRedactedWords =
             evaluation.extraRedactions;
 
+        UpdateInspectionStatus(
+            missedSecretWords,
+            extraRedactedWords
+        );
+
         if (evaluation.IsCorrect)
         {
             CompleteDocumentSuccessfully();
@@ -1001,11 +1021,6 @@ public class DocumentRedactor :
 
         if (IsCurrentDocumentTutorial())
         {
-            RejectTutorialDocument(
-                missedSecretWords,
-                extraRedactedWords
-            );
-
             return;
         }
 
@@ -1017,52 +1032,6 @@ public class DocumentRedactor :
         {
             FailDocument();
         }
-        else
-        {
-            RejectDocument(
-                missedSecretWords,
-                extraRedactedWords
-            );
-        }
-    }
-
-    private void RejectDocument(
-    int missedSecretWords,
-    int extraRedactedWords
-)
-    {
-        StringBuilder message =
-            new StringBuilder();
-
-        message.AppendLine(
-            Localize(documentRejectedText)
-        );
-
-        if (missedSecretWords > 0)
-        {
-            message.AppendLine(
-                Localize(
-                    errorMissedText,
-                    missedSecretWords
-                )
-            );
-        }
-
-        if (extraRedactedWords > 0)
-        {
-            message.AppendLine(
-                Localize(
-                    errorExtraText,
-                    extraRedactedWords
-                )
-            );
-        }
-
-        message.Append(
-            Localize(documentFixRetryText)
-        );
-
-        SetStatus(message.ToString());
     }
 
     private void CompleteDocumentSuccessfully()
@@ -1219,7 +1188,7 @@ public class DocumentRedactor :
             );
         }
 
-        SetStatus(string.Empty);
+        ClearInspectionStatus();
     }
 
     private int GetMaximumTotalScore()
@@ -1290,79 +1259,6 @@ public class DocumentRedactor :
         return number;
     }
 
-    private void UpdateTutorialStatus()
-    {
-        DocumentEvaluationResult evaluation =
-            documentEvaluator.Evaluate(words);
-
-        int missedSecretWords =
-            evaluation.missedWords;
-
-        int extraRedactedWords =
-            evaluation.extraRedactions;
-
-        if (evaluation.IsCorrect)
-        {
-            SetStatus(
-                Localize(tutorialReadyText)
-            );
-
-            return;
-        }
-
-        if (extraRedactedWords > 0)
-        {
-            SetStatus(
-                Localize(tutorialExtraText)
-            );
-
-            return;
-        }
-
-        SetStatus(
-            Localize(tutorialContinueText)
-        );
-    }
-
-    private void RejectTutorialDocument(
-        int missedSecretWords,
-        int extraRedactedWords
-    )
-    {
-        StringBuilder message =
-            new StringBuilder();
-
-        message.AppendLine(
-            Localize(tutorialRejectedText)
-        );
-
-        if (missedSecretWords > 0)
-        {
-            message.AppendLine(
-                Localize(
-                    tutorialMissedText,
-                    missedSecretWords
-                )
-            );
-        }
-
-        if (extraRedactedWords > 0)
-        {
-            message.AppendLine(
-                Localize(
-                    tutorialExtraRedactionsText,
-                    extraRedactedWords
-                )
-            );
-        }
-
-        message.Append(
-            Localize(tutorialRetryText)
-        );
-
-        SetStatus(message.ToString());
-    }
-
     public void ToggleUltravioletMode()
     {
         if (!ultravioletTool.IsActive)
@@ -1404,6 +1300,7 @@ public class DocumentRedactor :
         UpdateProgress();
         UpdateInspectionsDisplay();
         UpdateBriefing();
+        RefreshInspectionStatus();
     }
 
     private void UpdateDynamicButtonTexts()
