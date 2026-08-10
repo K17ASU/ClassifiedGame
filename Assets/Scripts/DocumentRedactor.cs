@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using TMPro;
@@ -241,12 +242,14 @@ public class DocumentRedactor :
     private bool dragRedactionState;
     private bool isInitialized;
 
-    private void Start()
+    private IEnumerator Start()
     {
+        yield return LocalizationSettings.InitializationOperation;
+
         if (!ValidateReferences())
         {
             enabled = false;
-            return;
+            yield break;
         }
 
         if (documents.Count == 0)
@@ -256,7 +259,7 @@ public class DocumentRedactor :
             );
 
             enabled = false;
-            return;
+            yield break;
         }
 
         if (!ultravioletTool.Initialize(
@@ -268,7 +271,7 @@ public class DocumentRedactor :
                 SetStatus))
         {
             enabled = false;
-            return;
+            yield break;
         }
 
         if (!magnifierTool.Initialize(
@@ -279,7 +282,7 @@ public class DocumentRedactor :
                 SetStatus))
         {
             enabled = false;
-            return;
+            yield break;
         }
 
         if (!decoderTool.Initialize(
@@ -290,7 +293,7 @@ public class DocumentRedactor :
                 SetStatus))
         {
             enabled = false;
-            return;
+            yield break;
         }
 
         currentDocumentIndex = 0;

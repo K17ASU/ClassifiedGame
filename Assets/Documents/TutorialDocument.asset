@@ -59,10 +59,10 @@ MonoBehaviour:
     m_LocalVariables: []
   localizedBriefing:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300135915520
-      m_Key: 
+      m_KeyId: 0
+      m_Key: tutorial_briefing
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
