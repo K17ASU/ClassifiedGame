@@ -22,6 +22,43 @@ MonoBehaviour:
     m_Localized: Anomalous Fragment
     m_Metadata:
       m_Items: []
+  - m_Id: 222952996864
+    m_Localized: A document fragment with properties that can be detected using special
+      tools.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12497004838912
+    m_Localized: Hidden Mark
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12501106868224
+    m_Localized: An Anomalous Fragment detected with the UV Lamp.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12679842938880
+    m_Localized: Memeagent
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12992138231808
+    m_Localized: An Anomalous Fragment that should not be redacted.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13199768862720
+    m_Localized: Cognitive Hazard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13274331004928
+    m_Localized: An Anomalous Fragment detected with the Lens.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13304941035520
+    m_Localized: Cipher
+    m_Metadata:
+      m_Items: []
+  - m_Id: 13382971867136
+    m_Localized: An Anomalous Fragment detected with the Decoder.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds: []
