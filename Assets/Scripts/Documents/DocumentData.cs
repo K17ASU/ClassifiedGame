@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Localization;
 
@@ -28,6 +29,12 @@ public class DocumentData : ScriptableObject
     private RevealMethod unlocksAfterCompletion =
         RevealMethod.None;
 
+    [Header("Codex")]
+
+    [SerializeField]
+    private List<CodexEntry> codexEntriesToUnlock =
+        new List<CodexEntry>();
+
     [Header("Localization")]
 
     [SerializeField]
@@ -52,6 +59,9 @@ public class DocumentData : ScriptableObject
 
     public RevealMethod UnlocksAfterCompletion =>
         unlocksAfterCompletion;
+
+    public IReadOnlyList<CodexEntry> CodexEntriesToUnlock =>
+        codexEntriesToUnlock;
 
     public string LocalizationId => localizationId;
 

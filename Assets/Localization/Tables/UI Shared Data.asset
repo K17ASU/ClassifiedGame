@@ -245,6 +245,10 @@ MonoBehaviour:
     m_Key: pencil_inactive
     m_Metadata:
       m_Items: []
+  - m_Id: 1746393715228672
+    m_Key: codex_button
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
