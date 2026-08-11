@@ -41,6 +41,11 @@ public sealed class CodexProgressionBridge :
 
     public void RestartSession()
     {
+        if (codexManager != null)
+        {
+            codexManager.ResetProgress();
+        }
+
         currentDocumentIndex = 0;
         UnlockCurrentDocumentEntries();
     }

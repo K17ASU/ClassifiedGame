@@ -27,31 +27,34 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915520
-    m_Localized: Redact the name of the facility you were assigned to.
+    m_Localized: Redact the name of the facility you will be assigned to.
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915521
     m_Localized: 'MEMORANDUM
 
 
-      Agent {PLAYER_NAME}, you will be sent to the
-      [[Organization Training Center]].
+      You will be assigned to the {{Information Control
+      Department}}.
+
+      _______________________
 
 
-      Click on a word to place a redaction
-      bar over it.
+      Click a text fragment
+      to [bold]redact[/] it with the [bold]marker[/].
 
-      To redact several words in a row, hold down the left mouse
-      button and drag across the text.
+      To redact several fragments
+      in a row, hold down the left mouse button and drag across the text.
 
 
-      Redact the name of the Organization
-      facility, then submit the document for review.'
+      Redact
+      the name of the facility you will be assigned to, then submit the document
+      for review by clicking the "SUBMIT DOCUMENT" button in the bottom-right corner.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915525
-    m_Localized: "Redact:\n\n\u2022 Names of Organization facilities\n\u2022 Hazard
-      designations and types\n\u2022 Anomalous Fragments"
+    m_Localized: "Redact:\n\n\u2022 Names of Organization facilities\n\u2022 Anomalous
+      Fragments found in the text"
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915522
@@ -59,76 +62,25 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915523
-    m_Localized: 'JOB INSTRUCTIONS
-
-'
+    m_Localized: JOB INSTRUCTIONS
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915524
-    m_Localized: 'Welcome to the {{Information Control Department}}, Agent.
-
-
-      Your
+    m_Localized: "Welcome to the {{Information Control Department}}, Agent {PLAYER_NAME}.\n\nYour
       task will be to redact documents before they are processed by the {{Disinformation
-      Center}}.
-
-
-      Review the briefing and begin work on the document.
-
-
-      Due
-      to the growing number of {{"cognitive"}} hazards (including within the Organization''s
-      own documentation), every document must be manually [[redacted]] by Organization
-      personnel.
-
-
-      When using your tools, such Anomalous Fragments will stand
-      out from the rest of the text.'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 192010200334336
-    m_Localized: TEST DOCUMENT
-    m_Metadata:
-      m_Items: []
-  - m_Id: 192083919421440
-    m_Localized: TEST DOCUMENT
-    m_Metadata:
-      m_Items: []
-  - m_Id: 192118518235136
-    m_Localized: 'During an evening inspection, personnel discovered an [uv]unidentified[/]
-      light trace in the northern section of the complex.
-
-
-      Employee [magnifier]Smirnov[/]
-      reported a brief image distortion on a surveillance camera.
-
-
-      The access
-      log contains the code [uv]SECTOR-ALPHA-7291[/], which does not match the current
-      list of active passes.
-
-
-      During a second inspection of Room No. 4, a
-      [magnifier]microfragment[/] of unknown material was found on the inside of
-      a ventilation grille.
-
-
-      The word [redact,uv]CONFIDENTIAL[/] was also
-      noted; it must be detectable with the UV lamp and must also be redacted.
-
-
-      The
-      designation [redact,magnifier]OBJECT-CASCADE-12[/], which reacts to the magnifier,
-      was also found.
-
-
-      For a combined test, use the entry [redact,uv,magnifier]EXPERIMENTAL-MODULE-OMEGA[/].'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 192144309010432
-    m_Localized: "unidentified \u2014 long UV word;\nmicrofragment \u2014 long magnifier
-      word;\nSECTOR-ALPHA-7291 \u2014 letters + hyphens + digits;\nEXPERIMENTAL-MODULE-OMEGA
-      \u2014 long combined string."
+      Center}}.\n\nSome information contains [bold]\"Anomalous Fragments\"[/] that
+      can only be detected with special [bold]tools[/]. All of your tools are located
+      on the right side of the screen.\n\nDue to the growing number of such fragments
+      (including within the Organization's own documentation), every document must
+      be [redact,uv]manually edited by Organization personnel[/].\n_______________________\n\nThis
+      document contains an Anomalous Fragment \u2014 the [bold]\"Hidden Mark\"[/]
+      \u2014 which can be detected using the [bold]ultraviolet lamp (UV LAMP)[/].\n\nHidden
+      Marks [bold]differ in color[/] from the rest of the text.\n\nYou can also mark
+      a text fragment with the [bold]pencil[/] if you are unsure about it but are
+      not yet ready to [redact,uv]redact[/] it. Text marked with the pencil can still
+      be detected by other tools and [bold]is not counted[/] when the document is
+      submitted for processing.\n\nRedact only the information that matches the document
+      assignment. The assignment is shown on the left side of the screen."
     m_Metadata:
       m_Items: []
   - m_Id: 253372523921408
@@ -136,26 +88,46 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 253372599418880
-    m_Localized: 'JOB INSTRUCTIONS
-
-'
+    m_Localized: PERSONAL MESSAGE
     m_Metadata:
       m_Items: []
   - m_Id: 253372599418881
-    m_Localized: "Excellent work, Agent.\n\nAfter studying the {{cognitive}} hazard
-      from your previous document, the Organization decided to use some hazards of
-      this kind for its own benefit. The Research Department named them \u201Cmemetic
-      agents,\u201D or \u201Cmemagents.\u201D In this document, you must leave the
-      following [[memetic agent]], created from a {{cognitive}} hazard, unredacted:\n\u201C((THERE
-      IS NOTHING NEW UNDER THIS SUN))\u201D\n\nFrom now on, [[read the assignments
-      carefully]] for each individual document. Management will specify which memagents
-      are intended for public release.\n\nStarting with the next document, you will
-      begin your [[full duties]]."
+    m_Localized: 'Excellent work, {PLAYER_NAME}.
+
+
+      After studying the Anomalous
+      Fragment in your previous document, the Organization decided to use some similar
+      fragments for its own purposes. The [redact]Research Department[/] named them
+      [bold]"memetic agents," or "memagents"[/]. In this document, you must leave
+      the following memetic agent unredacted:
+
+      "((THERE IS NOTHING NEW UNDER
+      THIS SUN))"
+
+      _______________________
+
+
+      From now on, [[read the
+      assignments carefully]] for each individual document. [[Management]] will specify
+      which memagents are intended for public release.
+
+
+      [bold]IMPORTANT[/]:
+      "Do not redact" instructions have [bold]priority over all other instructions[/].
+
+
+      You
+      may have already noticed that the [bold]CODEX[/] is now available to you. It
+      contains the Organization''s terminology. Use it to clarify your current assignment.
+
+
+      Starting
+      with the next document, you will begin your [[full duties]].'
     m_Metadata:
       m_Items: []
   - m_Id: 253372599418883
-    m_Localized: "Redact:\n\n\u2022 Hazard types\n\u2022 Anomalous Fragments\n\nDo
-      not redact:\n\n\u2022 The memagent specified in the document"
+    m_Localized: "Redact:\n\n\u2022 Anomalous Fragments\n\u2022 Mentions of Organization
+      departments\n\nDo not redact:\n\n\u2022 The memagent specified in the document"
     m_Metadata:
       m_Items: []
   - m_Id: 266054698319872
@@ -167,44 +139,44 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 266054761234433
-    m_Localized: 'On {{May 2}}, {{1933}}, in the ((Scottish Highlands)) region, the
-      local newspaper {{Inverness Courier}} published a report about the {{Mackays}},
-      a married couple who spotted a huge whale-like animal in the waters of {{Loch
-      Ness}}.
+    m_Localized: 'On {{May 2}}, {{1933}}, in the Northern Scottish Highlands, the
+      local newspaper Inverness Courier published a report about the {{Mackays}},
+      a married couple who spotted a huge whale-like animal in the waters of [uv,redact]Loch
+      Ness[/].
 
 
-      After the story began gaining attention, Organization agents
-      were sent to the area. They were unable to establish contact with the couple,
-      but other possible witnesses were questioned.
+      After the story began gaining attention, [uv]Organization[/]
+      agents were sent to the area. They were unable to establish contact with the
+      couple, but other possible witnesses were questioned.
 
 
-      According to the initial
-      reports, the creature was about {{10}} meters long, had a neck covered in fur
-      or hair that tapered toward the head, and a back with several humps. After
-      conducting a reconnaissance operation, Organization agents discovered the bodies
-      of {{5}} local residents on the lakeshore, dressed in robes. Their bodies formed
-      a [[star-shaped symbol]], with a trail leading from them into the water.
+      According to
+      the initial reports, the creature was about {{10}} meters long, had a neck
+      [uv,redact]covered in fur or hair[/] that tapered toward the head, and a back
+      [redact,uv]with several humps[/]. After conducting a reconnaissance operation,
+      [uv]Organization[/] agents discovered the bodies of {{5}} local residents on
+      the lakeshore, dressed in robes. Their bodies formed a [[star-shaped symbol]],
+      with a trail leading from them into the water.
 
 
-      After
-      discovering the bodies, the agents again attempted to contact the witnesses
-      they had questioned, but the witnesses became extremely aggressive: they shouted
-      incomprehensible phrases and attacked Organization agents. All witnesses were
-      [[eliminated]].
+      After discovering the
+      [redact,uv]bodies[/], the agents again attempted to contact the witnesses they
+      had questioned, but the witnesses became extremely aggressive: they shouted
+      [redact,uv]incomprehensible[/] phrases and attacked [uv]Organization[/] agents.
+      All witnesses were [[eliminated]].
 
 
-      The Organization concluded that a cell of a [[currently
-      unidentified cult]] exists in the region.'
+      The [uv]Organization[/] concluded
+      that a cell of a [[currently unidentified cult]] exists in the region.'
     m_Metadata:
       m_Items: []
   - m_Id: 266054761234434
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 Proper names\n\u2022 Anomalous
-      Fragments\n\nDo not redact:\n\n\u2022 The region where the incident occurred\n\u2022
-      Mentions of the Organization"
+    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
+      Anomalous Fragments\n\nDo not redact:\n\u2022 Mentions of the Organization"
     m_Metadata:
       m_Items: []
   - m_Id: 266127087812608
-    m_Localized: DOCUMENT No. 002
+    m_Localized: DOCUMENT No. 003
     m_Metadata:
       m_Items: []
   - m_Id: 266127087812609
@@ -212,27 +184,41 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 266127087812610
-    m_Localized: "In {{2002}}, a graphic artist posted a photomontage of the [[\u201Cexcavation
-      of a giant skeleton\u201D]] on {{Worth1000}}. The image spread around the world
-      as a sensation.\n\nThe Organization's AI agents began flagging the information
-      as potentially dangerous and then attempted to contact the author. The author
-      stated that he had previously worked for the {{Smithsonian Institution}}, which
-      allegedly hides and destroys real skeletons of [[giant humans]] to avoid changing
-      [[history textbooks]].\n\nOrganization agents arrived at the {{National Museum
-      of Natural History}} in ((Washington)) to verify the information. They were
-      met by the museum director, {{Rupert Lane}}, who gave highly <<contradictory>>
-      information during questioning and denied the agents access to the museum archives.\n\nDuring
-      the subsequent investigation, the agents learned that {{Rupert Lane}} did not
-      appear in the museum's official employee records. When they returned to the
-      museum, the subject could not be found, and a <<token>> bearing a [[five-pointed
-      star]] was discovered in his office.\n\nThe Organization suspects a connection
-      between him and the cult operating in ##Scotland##."
+    m_Localized: 'In [redact]2002[/], a graphic artist posted a photomontage of the
+      "[uv,redact]excavation of a giant skeleton[/]" on [redact]Worth1000[/]. The
+      image spread around the world as a sensation.
+
+
+      The Organization''s AI
+      agents began flagging the information as [magnifier,redact]potentially dangerous[/]
+      and then attempted to contact the author. The author stated that he had previously
+      worked for the [uv]Smithsonian Institution[/], which allegedly hides and destroys
+      [magnifier,redact]real skeletons of giant humans[/] to avoid changing [uv,redact]history
+      textbooks[/].
+
+
+      Organization agents arrived at the [uv]National Museum
+      of Natural History[/] in Washington to verify the information. They were met
+      by the museum director, [redact]Rupert Lane[/], who gave [magnifier,redact]highly
+      contradictory information[/] during questioning and denied the agents access
+      to the museum archives.
+
+
+      During the subsequent [uv,redact]investigation[/],
+      the agents learned that [redact]Rupert Lane[/] did not appear in the museum''s
+      official employee records. When they returned to the museum, the subject could
+      not be found, and a [uv,redact]token[/] bearing a [magnifier,redact]five-pointed
+      star[/] was discovered in his office.
+
+
+      The Organization established
+      that he is connected to the [magnifier,uv,redact]"Cult of the Starborn"[/].'
     m_Metadata:
       m_Items: []
   - m_Id: 266127087812611
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 Proper names\n\u2022 Anomalous
-      Fragments\n\nDo not redact:\n\n\u2022 Geographical names\n\u2022 Mentions of
-      the Organization"
+    m_Localized: "Redact:\n\n\u2022 Text fragments containing numbers\n\u2022 First
+      and last names\n\u2022 Anomalous Fragments\n\nDo not redact:\n\u2022 Names
+      of scientific institutions"
     m_Metadata:
       m_Items: []
   - m_Id: 306465328381952
@@ -270,34 +256,39 @@ MonoBehaviour:
     m_Localized: "\u2022 Follow orders\n\nRedact:\n\u2022 Anomalous Fragments"
     m_Metadata:
       m_Items: []
-  - m_Id: 1057939662618624
-    m_Localized: DOCUMENT No. 003
-    m_Metadata:
-      m_Items: []
   - m_Id: 1057939662618625
     m_Localized: LINES IN THE SKY
     m_Metadata:
       m_Items: []
   - m_Id: 1057939662618626
-    m_Localized: "Chemtrails (chemical trails) are a popular [redact,uv]conspiracy
-      theory[/]. Supporters of the myth believe that the white trails left by aircraft
-      in the sky are the result of [redact,magnifier]secret chemical spraying[/]
-      intended to control the climate [redact,uv]or people[/].\n\nThis information
-      was spread by agents of the {{Organization}} after stories about chemtrails
+    m_Localized: 'Chemtrails are a popular conspiracy theory. Supporters of the theory
+      believe that the white trails left by aircraft in the sky are traces of [redact,magnifier]secret
+      chemical spraying[/] intended to control the climate [redact,uv]or people[/].
+
+
+      This
+      information was spread by Organization agents after stories about chemtrails
       became popular among the public and politicians. According to information obtained
       from classified sources, [redact,magnifier]none of the aircraft[/] leaving
       such trails appear in any aviation database. The tail numbers of aircraft leaving
-      chemtrails [uv,magnifier]could not be identified either[/], as they contain
-      [redact,uv]cognitive[/] hazards.\n\nOn {{October 2}}, {{2001}}, the {{United
-      States Congress}} passed H.R. {{2977}}, in which the term \u201Cchemtrails\u201D
-      is mentioned for the first time as part of a classification of exotic weapons
-      systems. {{Anthony Watts}}, who proposed the term, is under surveillance by
-      the {{Organization}}."
+      chemtrails [uv,redact]could not be identified either[/], as they contain [redact,magnifier]cognitive
+      hazards[/].
+
+
+      On {{December 14}}, {{2000}}, Organization agents managed
+      to track one such aircraft using an "EYE OF THE SUN"-class UAV. The aircraft
+      was flying from Washington to Edinburgh and belonged to "[uv,magnifier,redact]Starborne
+      Airlines[/]", with tail number N {{10202}}. No information about this airline
+      could be found.
+
+
+      This is the first case of [redact,magnifier,uv]cult[/]
+      activity from Scotland recently recorded by the Organization.'
     m_Metadata:
       m_Items: []
   - m_Id: 1057939662618627
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 Proper names\n\u2022 Anomalous
-      Fragments\n\nDo not redact:\n\n\u2022 Hazards highlighted by multiple tools"
+    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 Anomalous Fragments\n\nDo not
+      redact:\n\u2022 Mentions of the Organization"
     m_Metadata:
       m_Items: []
   - m_Id: 1057959837220864
@@ -309,28 +300,20 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057959841415168
-    m_Localized: 'You are performing well, Agent.
-
-
-      A new tool has been [redact]issued[/]
-      to you: the decoder.
-
-
-      To proceed, point the decoder at the following
-      phrase:
-
-      [decoder=issued]THERE IS NOTHING NEW UNDER THIS SUN[/]
-
-
-      Then
-      redact the word shown in the decoded message.'
+    m_Localized: "You are performing well, Agent.\n\nDue to potential information
+      leaks and possible activity by the Cult of the Starborn within the Organization,
+      Management has decided to use a new memagent based on Anomalous Fragment: [bold]\"CIPHER\"[/].\n\nA
+      new tool has been placed at your [redact]disposal[/] \u2014 the [bold]decoder[/],
+      which will allow you to identify ciphers and uncover their true meaning.\n\nTo
+      proceed, point the decoder at the following phrase:\n[decoder=disposal]ALL
+      SECRETS WILL COME TO LIGHT[/]\n\nThen redact the word shown in the decoded
+      message.\n\n[bold]IMPORTANT[/]: Anomalous Fragment \"CIPHER\" may be used against
+      you by the Cult of the Starborn. Remember: your assignments have the highest
+      priority."
     m_Metadata:
       m_Items: []
   - m_Id: 1057959841415169
-    m_Localized: 'Use the decoder on the code phrase.
-
-      Redact the word shown
-      in the decoded message.'
+    m_Localized: Follow the instructions in the document
     m_Metadata:
       m_Items: []
   - m_Id: 1057859786293248
@@ -338,37 +321,101 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150848
-    m_Localized: STAIRS IN THE WOODS
+    m_Localized: THEY SHOULDN'T BE THERE
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150849
-    m_Localized: "In {{2015}}, a blogger using the name \u201C{{searchandrescuewoods}}\u201D
-      on {{Geddit}} website described incidents from his work in a park-ranger search-and-rescue
-      service, as well as stories told by his colleagues.\n\nIn one of his posts,
-      he wrote: \u201CEvery time we were about {{50\u201360}} kilometers from the
-      base, at some point we would find a staircase in the middle of the woods. It
-      was as if someone had taken a staircase from an ordinary house, [redact,uv]cut
+    m_Localized: "In {{2015}}, a blogger using the name \"searchandrescuewoods\"
+      on Reddit described incidents from his work in a park-ranger search-and-rescue
+      service in the United States, as well as stories told by his colleagues.\n\nIn
+      one of his posts, he wrote: \"Every time we were about {{30\u201335}} miles
+      from the base, at some point we would find a staircase in the middle of the
+      woods. It was as if someone had taken a staircase from an ordinary house, [redact,magnifier,uv]cut
       it out of there[/], and [redact,magnifier]placed it[/] in the woods. The first
       time I saw one, I had a lot of [redact,uv]questions[/], but I was told it was
       perfectly normal. Now I just [redact,uv]ignore[/] the stairs when I come across
-      them: it happens [redact,magnifier]very often[/].\u201D\n\nThe post attracted
-      the Organization's attention. Agents were sent to national parks in the United
-      States for further investigation. According to the information they obtained,
-      these stairs act as \u201C[redact,magnifier]portals[/]\u201D to other [redact,uv]dimensions[/].
-      In addition, [redact,decoder=Miles Marsh]one of the agents[/] stationed in
-      ((Yosemite)) reported that his colleagues claimed that even without climbing
-      such a staircase, simply getting close enough to it would bring trouble.\n\nDuring
-      one rescue operation, an agent managed to locate one of these staircases, consisting
-      of {{5}} flights. While examining it, he discovered a [redact,uv,magnifier,decoder=Cult
-      of Five]star-shaped symbol[/] at its base and immediately reported it to the
-      Organization. Further contact with the agent could not be established. The
-      investigation is ongoing."
+      them: it happens [redact,magnifier]very often[/].\"\n\nThe post attracted the
+      Organization's attention. [redact,decoder=YOU CAN'T HIDE]Undercover agents[/]
+      were sent to national parks in the [magnifier]United States[/] for further
+      investigation. According to the information they obtained, these stairs act
+      as \"[redact,magnifier]portals[/]\" to other [redact,uv]dimensions[/]. In addition,
+      [redact,decoder=Miles Marsh]one agent[/] stationed in [uv]Yosemite[/] reported
+      that his colleagues claimed that even without climbing such a staircase, simply
+      getting close enough to it would bring trouble.\n\nDuring one rescue operation,
+      an agent managed to locate one of these staircases, consisting of {{5}} flights.
+      While examining it, he discovered a [redact,uv,magnifier,decoder=Cult of the
+      Starborn]star-shaped symbol[/] at its base and immediately reported it to the
+      Organization. Further contact with the agent could not be established."
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150850
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 Proper names\n\u2022 Anomalous
-      Fragments\n\nDo not redact:\n\n\u2022 Geographical names\n\u2022 Mentions of
-      the Organization"
+    m_Localized: "Redact:\n\n\u2022 Text fragments containing numbers\n\u2022 First
+      and last names\n\u2022 Anomalous Fragments\n\nDo not redact:\n\u2022 Geographical
+      names"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737424917544960
+    m_Localized: DOCUMENT No. 000.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425047568384
+    m_Localized: TRAINING DOCUMENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425051762688
+    m_Localized: "You are doing well, {PLAYER_NAME}.\n\nFor your further work, a
+      new tool has been issued to you \u2014 the [bold]\"Lens\"[/].\n\nThe Lens will
+      allow you to locate a new type of Anomalous Fragment in the text \u2014 a [bold]\"Cognitive
+      Hazard\"[/].\n\nPoint the Lens at the following text:\n\"[redact,magnifier]WE
+      MOVE UNDER HIS GAZE[/]\"\n\nThis is how Cognitive Hazards will be detected.
+      Keep in mind that a Cognitive Hazard may also be used as a memagent.\n\nTo
+      continue, redact the Cognitive Hazard in this document and submit it for review."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425051762689
+    m_Localized: Follow the instructions in the document
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425055956992
+    m_Localized: DOCUMENT No. 005
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425055956993
+    m_Localized: LOST AND FOUND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425055956994
+    m_Localized: 'On {{April 30}}, {{2018}}, a series of posts appeared on Twitter
+      from the [redact]account[/] [redact,decoder=Miles Marsh]"TheSunVanished"[/].
+      The user said that he had woken up late in the morning, but the [magnifier,redact]sun[/]
+      was nowhere to be seen. He shared photos and videos and described the events,
+      panic, and dangers of a [uv,redact]world without the sun[/].
+
+
+      After
+      analyzing the series of posts, the Organization''s AI agents [magnifier,redact]raised
+      the alarm[/] and reported a [decoder=account]"Convergence"[/]-class event.
+      Organization agents attempted to contact the creator of the [redact]account[/],
+      but all their attempts proved unsuccessful due to the large number of comments
+      under the posts and the risk of exposing the Organization''s activities.
+
+
+      Further
+      analysis established that the user was not located in the [uv,redact]current
+      reality[/], while his device was able to publish information into our''s due
+      to an [magnifier,redact]unknown modification[/]. By order of Management, all
+      interaction with the [redact]account[/] by the Organization was suspended.
+      The investigation is ongoing.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425055956995
+    m_Localized: "Redact:\n\n\u2022 Text fragments containing numbers\n\u2022 First
+      and last names\n\u2022 Anomalous Fragments\n\nDo not redact:\n\u2022 Matching
+      text fragments identified with the decoder"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1745272116396032
+    m_Localized: DOCUMENT No. 002
     m_Metadata:
       m_Items: []
   references:

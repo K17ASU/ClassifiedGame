@@ -37,8 +37,10 @@ MonoBehaviour:
     \u0438\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E
     \u0431\u0430\u0437\u0443 \u0438 \u043F\u0440\u043E\u0434\u043E\u043B\u0436\u0430\u044E\u0442
     \u043D\u0430\u0431\u043B\u044E\u0434\u0435\u043D\u0438\u0435 \u0437\u0430 \u0440\u0430\u0439\u043E\u043D\u043E\u043C. "
-  isTutorial: 0
+  isTutorial: 1
   unlocksAfterCompletion: 0
+  codexEntriesToUnlock:
+  - {fileID: 11400000, guid: 72b7473afb7094e47b18db3dd4eeb6fb, type: 2}
   localizationId: document_05.1
   localizedDocumentNumber:
     m_TableReference:

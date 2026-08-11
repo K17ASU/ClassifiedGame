@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3ef4614fdfd89049bb2af4a160e869c, type: 3}
-  m_Name: Document_03
+  m_Name: Document_03.1
   m_EditorClassIdentifier: Assembly-CSharp::DocumentData
   documentNumber: "\u0414\u041E\u041A\u041B\u0410\u0414 \u2116 002"
   documentTitle: "\u041E\u0437\u0435\u0440\u043D\u043E\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u043E"
@@ -37,16 +37,17 @@ MonoBehaviour:
     \u0438\u0441\u0441\u043B\u0435\u0434\u043E\u0432\u0430\u0442\u0435\u043B\u044C\u0441\u043A\u0443\u044E
     \u0431\u0430\u0437\u0443 \u0438 \u043F\u0440\u043E\u0434\u043E\u043B\u0436\u0430\u044E\u0442
     \u043D\u0430\u0431\u043B\u044E\u0434\u0435\u043D\u0438\u0435 \u0437\u0430 \u0440\u0430\u0439\u043E\u043D\u043E\u043C. "
-  isTutorial: 0
-  unlocksAfterCompletion: 2
-  codexEntriesToUnlock: []
-  localizationId: document_03
+  isTutorial: 1
+  unlocksAfterCompletion: 0
+  codexEntriesToUnlock:
+  - {fileID: 11400000, guid: b8f98dce56b53154cb50cb69dac04b44, type: 2}
+  localizationId: document_03.1
   localizedDocumentNumber:
     m_TableReference:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_03_number
+      m_Key: document_03.1_number
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -55,7 +56,7 @@ MonoBehaviour:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_03_title
+      m_Key: document_03.1_title
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -64,7 +65,7 @@ MonoBehaviour:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_03_text
+      m_Key: document_03.1_text
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -73,7 +74,7 @@ MonoBehaviour:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_03_briefing
+      m_Key: document_03.1_briefing
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []

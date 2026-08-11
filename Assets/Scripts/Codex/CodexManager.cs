@@ -4,12 +4,6 @@ using UnityEngine;
 
 public sealed class CodexManager : MonoBehaviour
 {
-    private const string UnlockedKey =
-        "Classified.Codex.Unlocked";
-
-    private const string ReadKey =
-        "Classified.Codex.Read";
-
     [Header("Все записи кодекса")]
 
     [SerializeField]
@@ -49,8 +43,7 @@ public sealed class CodexManager : MonoBehaviour
 
     private void Awake()
     {
-        LoadProgress();
-        RebuildUnlockedEntries();
+        ResetProgress();
     }
 
     public void UnlockEntries(
@@ -84,7 +77,6 @@ public sealed class CodexManager : MonoBehaviour
         }
 
         RebuildUnlockedEntries();
-        SaveProgress();
         EntriesChanged?.Invoke();
     }
 
@@ -106,7 +98,6 @@ public sealed class CodexManager : MonoBehaviour
             return;
         }
 
-        SaveProgress();
         EntriesChanged?.Invoke();
     }
 
@@ -114,6 +105,15 @@ public sealed class CodexManager : MonoBehaviour
     {
         return entry != null &&
                readIds.Contains(entry.EntryId);
+    }
+
+    public void ResetProgress()
+    {
+        unlockedIds.Clear();
+        readIds.Clear();
+        unlockedEntries.Clear();
+
+        EntriesChanged?.Invoke();
     }
 
     private void RebuildUnlockedEntries()
@@ -152,64 +152,5 @@ public sealed class CodexManager : MonoBehaviour
                 );
             }
         );
-    }
-
-    private void LoadProgress()
-    {
-        unlockedIds.Clear();
-        readIds.Clear();
-
-        LoadSet(
-            PlayerPrefs.GetString(
-                UnlockedKey,
-                string.Empty
-            ),
-            unlockedIds
-        );
-
-        LoadSet(
-            PlayerPrefs.GetString(
-                ReadKey,
-                string.Empty
-            ),
-            readIds
-        );
-    }
-
-    private void SaveProgress()
-    {
-        PlayerPrefs.SetString(
-            UnlockedKey,
-            string.Join("|", unlockedIds)
-        );
-
-        PlayerPrefs.SetString(
-            ReadKey,
-            string.Join("|", readIds)
-        );
-
-        PlayerPrefs.Save();
-    }
-
-    private static void LoadSet(
-        string serialized,
-        HashSet<string> target
-    )
-    {
-        if (string.IsNullOrWhiteSpace(serialized))
-        {
-            return;
-        }
-
-        string[] ids =
-            serialized.Split('|');
-
-        foreach (string id in ids)
-        {
-            if (!string.IsNullOrWhiteSpace(id))
-            {
-                target.Add(id);
-            }
-        }
     }
 }

@@ -47,22 +47,6 @@ MonoBehaviour:
     m_Key: document_01_briefing
     m_Metadata:
       m_Items: []
-  - m_Id: 192010200334336
-    m_Key: document_test_number
-    m_Metadata:
-      m_Items: []
-  - m_Id: 192083919421440
-    m_Key: document_test_title
-    m_Metadata:
-      m_Items: []
-  - m_Id: 192118518235136
-    m_Key: document_test_text
-    m_Metadata:
-      m_Items: []
-  - m_Id: 192144309010432
-    m_Key: document_test_briefing
-    m_Metadata:
-      m_Items: []
   - m_Id: 253372523921408
     m_Key: document_02_number
     m_Metadata:
@@ -95,51 +79,51 @@ MonoBehaviour:
     m_Key: document_03_briefing
     m_Metadata:
       m_Items: []
-  - m_Id: 266127087812608
+  - m_Id: 1737424917544960
+    m_Key: document_03.1_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425047568384
+    m_Key: document_03.1_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425051762688
+    m_Key: document_03.1_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425051762689
+    m_Key: document_03.1_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1745272116396032
     m_Key: document_04_number
     m_Metadata:
       m_Items: []
-  - m_Id: 266127087812609
+  - m_Id: 1057939662618625
     m_Key: document_04_title
     m_Metadata:
       m_Items: []
-  - m_Id: 266127087812610
+  - m_Id: 1057939662618626
     m_Key: document_04_text
     m_Metadata:
       m_Items: []
-  - m_Id: 266127087812611
+  - m_Id: 1057939662618627
     m_Key: document_04_briefing
     m_Metadata:
       m_Items: []
-  - m_Id: 306465328381952
-    m_Key: document_promo_number
-    m_Metadata:
-      m_Items: []
-  - m_Id: 306465340964864
-    m_Key: document_promo_title
-    m_Metadata:
-      m_Items: []
-  - m_Id: 306465340964865
-    m_Key: document_promo_text
-    m_Metadata:
-      m_Items: []
-  - m_Id: 306465340964866
-    m_Key: document_promo_briefing
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1057939662618624
+  - m_Id: 266127087812608
     m_Key: document_05_number
     m_Metadata:
       m_Items: []
-  - m_Id: 1057939662618625
+  - m_Id: 266127087812609
     m_Key: document_05_title
     m_Metadata:
       m_Items: []
-  - m_Id: 1057939662618626
+  - m_Id: 266127087812610
     m_Key: document_05_text
     m_Metadata:
       m_Items: []
-  - m_Id: 1057939662618627
+  - m_Id: 266127087812611
     m_Key: document_05_briefing
     m_Metadata:
       m_Items: []
@@ -175,8 +159,36 @@ MonoBehaviour:
     m_Key: document_06_briefing
     m_Metadata:
       m_Items: []
-  - m_Id: 1100871866302464
-    m_Key: tutorial_briefing
+  - m_Id: 1737425055956992
+    m_Key: document_07_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425055956993
+    m_Key: document_07_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425055956994
+    m_Key: document_07_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1737425055956995
+    m_Key: document_07_briefing
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465328381952
+    m_Key: document_promo_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465340964864
+    m_Key: document_promo_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465340964865
+    m_Key: document_promo_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 306465340964866
+    m_Key: document_promo_briefing
     m_Metadata:
       m_Items: []
   m_Metadata:
