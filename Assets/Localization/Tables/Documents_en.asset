@@ -48,9 +48,9 @@ MonoBehaviour:
 
 
       You
-      can also mark a text fragment with the [bold]pencil[/] if you are unsure about
-      it but are not yet ready to [redact,uv]redact[/] it. Text marked with the pencil
-      can still be detected by other tools and [bold]is not counted[/] when the document
+      can also mark a text fragment with the pencil if you are unsure about it but
+      are not yet ready to [redact,uv]redact[/] it. Text marked with the pencil can
+      still be detected by other tools and [bold]is not counted[/] when the document
       is submitted for processing.
 
 
