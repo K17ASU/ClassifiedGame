@@ -92,37 +92,19 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 253372599418881
-    m_Localized: 'Excellent work, {PLAYER_NAME}.
-
-
-      After studying the Anomalous
+    m_Localized: "Excellent work, {PLAYER_NAME}.\n\nAfter studying the Anomalous
       Fragment in your previous document, the Organization decided to use some similar
       fragments for its own purposes. The [redact]Research Department[/] named them
-      [bold]"memetic agents," or "memagents"[/]. In this document, you must leave
-      the following memetic agent unredacted:
-
-      "((THERE IS NOTHING NEW UNDER
-      THIS SUN))"
-
-      _______________________
-
-
-      From now on, [[read the
-      assignments carefully]] for each individual document. [[Management]] will specify
-      which memagents are intended for public release.
-
-
-      [bold]IMPORTANT[/]:
-      "Do not redact" instructions have [bold]priority over all other instructions[/].
-
-
-      You
-      may have already noticed that the [bold]CODEX[/] is now available to you. It
-      contains the Organization''s terminology. Use it to clarify your current assignment.
-
-
-      Starting
-      with the next document, you will begin your [[full duties]].'
+      [bold]\"memetic agents,\" or \"memagents\"[/]. In this document, you must leave
+      the following memetic agent unredacted:\n\"((THERE IS NOTHING NEW UNDER THIS
+      SUN))\"\n_______________________\n\nFrom now on, [[read the assignments carefully]]
+      for each individual document. [[Management]] will specify which memagents are
+      intended for public release.\n\n[bold]IMPORTANT[/]: \n- Memagents are always
+      detected by [bold]only one tool[/].\n- \"Do not redact\" instructions have
+      [bold]priority over all other instructions[/].\n\nYou may have already noticed
+      that the [bold]CODEX[/] is now available to you. It contains the Organization's
+      terminology. Use it to clarify your current assignment.\n\nStarting with the
+      next document, you will begin your [[full duties]]."
     m_Metadata:
       m_Items: []
   - m_Id: 253372599418883
