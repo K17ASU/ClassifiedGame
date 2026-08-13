@@ -49,14 +49,14 @@ MonoBehaviour:
 
       You
       can also mark a text fragment with the pencil if you are unsure about it but
-      are not yet ready to [redact,uv]redact[/] it. Text marked with the pencil can
-      still be detected by other tools and [bold]is not counted[/] when the document
-      is submitted for processing.
+      are not yet ready to redact it. Text marked with the pencil can still be detected
+      by other tools and [bold]is not counted[/] when the document is submitted for
+      processing.
 
 
-      Redact the name of the facility you will
-      be assigned to, then submit the document for review by clicking the "SUBMIT
-      DOCUMENT" button in the bottom-right corner.'
+      Redact the name of the facility you will be assigned to,
+      then submit the document for review by clicking the "SUBMIT DOCUMENT" button
+      in the bottom-right corner.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915525
