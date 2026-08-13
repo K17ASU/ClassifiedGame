@@ -139,7 +139,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 266054761234433
-    m_Localized: 'On {{May 2}}, {{1933}}, in the Northern Scottish Highlands, the
+    m_Localized: 'On May {{2}}, {{1933}}, in the Northern Scottish Highlands, the
       local newspaper Inverness Courier published a report about the {{Mackays}},
       a married couple who spotted a huge whale-like animal in the waters of [uv,redact]Loch
       Ness[/].
@@ -275,7 +275,7 @@ MonoBehaviour:
       hazards[/].
 
 
-      On {{December 14}}, {{2000}}, Organization agents managed
+      On December {{14}}, {{2000}}, Organization agents managed
       to track one such aircraft using an "EYE OF THE SUN"-class UAV. The aircraft
       was flying from Washington to Edinburgh and belonged to "[uv,magnifier,redact]Starborne
       Airlines[/]", with tail number N {{10202}}. No information about this airline
@@ -384,7 +384,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1737425055956994
-    m_Localized: 'On {{April 30}}, {{2018}}, a series of posts appeared on Twitter
+    m_Localized: 'On April {{30}}, {{2018}}, a series of posts appeared on Twitter
       from the [redact]account[/] [redact,decoder,uv]=Miles Marsh]"TheSunVanished"[/].
       The user said that he had woken up late in the morning, but the [magnifier,redact]sun[/]
       was nowhere to be seen. He shared photos and videos and described the events,
@@ -408,9 +408,9 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1737425055956995
-    m_Localized: "Redact:\n\n\u2022 Text fragments containing numbers\n\u2022 First
-      and last names\n\u2022 Anomalous Fragments\n\u2022 Matching text fragments
-      identified with the decoder\n\nDo not redact:\n\u2022 \"Cipher\" memagent"
+    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
+      Anomalous Fragments\n\u2022 Matching text fragments identified with the decoder\n\nDo
+      not redact:\n\u2022 \"Cipher\" memagent"
     m_Metadata:
       m_Items: []
   - m_Id: 1745272116396032
