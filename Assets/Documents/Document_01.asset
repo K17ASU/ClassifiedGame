@@ -29,40 +29,40 @@ MonoBehaviour:
   codexEntriesToUnlock:
   - {fileID: 11400000, guid: d2a6353fd21e0c244ae97e23b39920d1, type: 2}
   - {fileID: 11400000, guid: dc8b12f37fbd1b64e9015e76868b634a, type: 2}
-  localizationId: 
+  localizationId: document_01
   localizedDocumentNumber:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300135915522
-      m_Key: 
+      m_KeyId: 0
+      m_Key: document_01_number
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentTitle:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300135915523
-      m_Key: 
+      m_KeyId: 0
+      m_Key: document_01_title
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentText:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300135915524
-      m_Key: 
+      m_KeyId: 0
+      m_Key: document_01_text
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedBriefing:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 2300135915525
-      m_Key: 
+      m_KeyId: 0
+      m_Key: document_01_briefing
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []

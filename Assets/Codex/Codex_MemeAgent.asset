@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Codex_MemeAgent
   m_EditorClassIdentifier: Assembly-CSharp::CodexEntry
   entryId: meme_agent
-  order: 16
+  order: 30
   localizedTitle:
     m_TableReference:
       m_TableCollectionName: GUID:36c33b865f5279f4cbc27f93046778b6

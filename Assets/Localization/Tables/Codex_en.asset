@@ -40,7 +40,10 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 12992138231808
-    m_Localized: An Anomalous Fragment that should not be redacted.
+    m_Localized: 'An Anomalous Fragment that should not be redacted.
+
+      Memeagents
+      are always detected by only one tool.'
     m_Metadata:
       m_Items: []
   - m_Id: 13199768862720

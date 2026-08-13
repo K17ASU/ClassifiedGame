@@ -333,13 +333,13 @@ MonoBehaviour:
       woods. It was as if someone had taken a staircase from an ordinary house, [redact,magnifier,uv]cut
       it out of there[/], and [redact,magnifier]placed it[/] in the woods. The first
       time I saw one, I had a lot of [redact,uv]questions[/], but I was told it was
-      perfectly normal. Now I just [redact,uv]ignore[/] the stairs when I come across
-      them: it happens [redact,magnifier]very often[/].\"\n\nThe post attracted the
-      Organization's attention. [redact,decoder=YOU CAN'T HIDE]Undercover agents[/]
+      perfectly normal. Now I just [redact,magnifier]ignore[/] the stairs when I
+      come across them: it happens [redact,uv]very often[/].\"\n\nThe post attracted
+      the Organization's attention. [redact,decoder=YOU CAN'T HIDE]Undercover agents[/]
       were sent to national parks in the [magnifier]United States[/] for further
       investigation. According to the information they obtained, these stairs act
       as \"[redact,magnifier]portals[/]\" to other [redact,uv]dimensions[/]. In addition,
-      [redact,decoder=Miles Marsh]one agent[/] stationed in [uv]Yosemite[/] reported
+      {{one}} [redact,decoder=Miles Marsh]agent[/] stationed in [uv]Yosemite[/] reported
       that his colleagues claimed that even without climbing such a staircase, simply
       getting close enough to it would bring trouble.\n\nDuring one rescue operation,
       an agent managed to locate one of these staircases, consisting of {{5}} flights.
@@ -349,9 +349,8 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150850
-    m_Localized: "Redact:\n\n\u2022 Text fragments containing numbers\n\u2022 First
-      and last names\n\u2022 Anomalous Fragments\n\nDo not redact:\n\u2022 Geographical
-      names"
+    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
+      Anomalous Fragments\n\nDo not redact:\n\u2022 Geographical names"
     m_Metadata:
       m_Items: []
   - m_Id: 1737424917544960
@@ -386,7 +385,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1737425055956994
     m_Localized: 'On {{April 30}}, {{2018}}, a series of posts appeared on Twitter
-      from the [redact]account[/] [redact,decoder=Miles Marsh]"TheSunVanished"[/].
+      from the [redact]account[/] [redact,decoder,uv]=Miles Marsh]"TheSunVanished"[/].
       The user said that he had woken up late in the morning, but the [magnifier,redact]sun[/]
       was nowhere to be seen. He shared photos and videos and described the events,
       panic, and dangers of a [uv,redact]world without the sun[/].
@@ -410,8 +409,8 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1737425055956995
     m_Localized: "Redact:\n\n\u2022 Text fragments containing numbers\n\u2022 First
-      and last names\n\u2022 Anomalous Fragments\n\nDo not redact:\n\u2022 Matching
-      text fragments identified with the decoder"
+      and last names\n\u2022 Anomalous Fragments\n\u2022 Matching text fragments
+      identified with the decoder\n\nDo not redact:\n\u2022 \"Cipher\" memagent"
     m_Metadata:
       m_Items: []
   - m_Id: 1745272116396032

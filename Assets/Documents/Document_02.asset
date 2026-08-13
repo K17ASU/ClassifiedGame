@@ -36,6 +36,9 @@ MonoBehaviour:
     \u043F\u0440\u0435\u043F\u043E\u0434\u043D\u0435\u0441\u0435\u043D\u043D\u0443\u044E
     \u043D\u0430\u043C\u0438 \u0438\u043D\u0444\u043E\u0440\u043C\u0430\u0446\u0438\u044E."
   isTutorial: 0
+  unlocksAfterCompletion: 0
+  codexEntriesToUnlock:
+  - {fileID: 11400000, guid: cb73169276398b445b8ee3b2e07a9109, type: 2}
   localizationId: document_02
   localizedDocumentNumber:
     m_TableReference:
