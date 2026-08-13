@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.EventSystems;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
@@ -316,6 +317,19 @@ public class DocumentRedactor :
         decoderTool?.DisableMode();
         pencilTool?.DisableMode();
         StopDragging();
+    }
+
+    private void Update()
+    {
+        if (Mouse.current == null)
+        {
+            return;
+        }
+
+        if (Mouse.current.rightButton.wasPressedThisFrame)
+        {
+            DisableActiveTool();
+        }
     }
 
     private bool ValidateReferences()
@@ -1408,6 +1422,16 @@ public class DocumentRedactor :
         }
 
         pencilTool.ToggleMode();
+    }
+
+    private void DisableActiveTool()
+    {
+        StopDragging();
+
+        ultravioletTool.DisableMode();
+        magnifierTool.DisableMode();
+        decoderTool.DisableMode();
+        pencilTool.DisableMode();
     }
 
     private void OnSelectedLocaleChanged(

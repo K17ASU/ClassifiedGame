@@ -47,9 +47,16 @@ MonoBehaviour:
       in a row, hold down the left mouse button and drag across the text.
 
 
-      Redact
-      the name of the facility you will be assigned to, then submit the document
-      for review by clicking the "SUBMIT DOCUMENT" button in the bottom-right corner.'
+      You
+      can also mark a text fragment with the [bold]pencil[/] if you are unsure about
+      it but are not yet ready to [redact,uv]redact[/] it. Text marked with the pencil
+      can still be detected by other tools and [bold]is not counted[/] when the document
+      is submitted for processing.
+
+
+      Redact the name of the facility you will
+      be assigned to, then submit the document for review by clicking the "SUBMIT
+      DOCUMENT" button in the bottom-right corner.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915525
@@ -74,13 +81,11 @@ MonoBehaviour:
       (including within the Organization's own documentation), every document must
       be [redact,uv]manually edited by Organization personnel[/].\n_______________________\n\nThis
       document contains an Anomalous Fragment \u2014 the [bold]\"Hidden Mark\"[/]
-      \u2014 which can be detected using the [bold]ultraviolet lamp (UV LAMP)[/].\n\nHidden
-      Marks [bold]differ in color[/] from the rest of the text.\n\nYou can also mark
-      a text fragment with the [bold]pencil[/] if you are unsure about it but are
-      not yet ready to [redact,uv]redact[/] it. Text marked with the pencil can still
-      be detected by other tools and [bold]is not counted[/] when the document is
-      submitted for processing.\n\nRedact only the information that matches the document
-      assignment. The assignment is shown on the left side of the screen."
+      \u2014 which can be detected using the [bold]ultraviolet lamp (UV LAMP)[/].\n\nTo
+      turn off a tool, click its button again or press the right mouse button.\n\nHidden
+      Marks [bold]differ in color[/] from the rest of the text.\n\nRedact only the
+      information that matches the document assignment. The assignment is shown on
+      the left side of the screen."
     m_Metadata:
       m_Items: []
   - m_Id: 253372523921408
