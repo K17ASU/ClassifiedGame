@@ -372,7 +372,7 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1737425055956994
     m_Localized: 'On April {{30}}, {{2018}}, a series of posts appeared on Twitter
-      from the [redact]account[/] [redact,uv,decoder]=Miles Marsh]"TheSunVanished"[/].
+      from the [redact]account[/] [redact,uv,decoder=Miles Marsh]"TheSunVanished"[/].
       The user said that he had woken up late in the morning, but the [magnifier,redact]sun[/]
       was nowhere to be seen. He shared photos and videos and described the events,
       panic, and dangers of a [uv,redact]world without the sun[/].

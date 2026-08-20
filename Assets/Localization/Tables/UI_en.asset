@@ -48,7 +48,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 472035934214
-    m_Localized: TURN OFF UV LAMP
+    m_Localized: UV LAMP
     m_Metadata:
       m_Items: []
   - m_Id: 14569246867456
@@ -184,11 +184,11 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 999718113558528
-    m_Localized: MAGNIFIER
+    m_Localized: LENSE
     m_Metadata:
       m_Items: []
   - m_Id: 999720881799168
-    m_Localized: PUT AWAY MAGNIFIER
+    m_Localized: LENSE
     m_Metadata:
       m_Items: []
   - m_Id: 999722744070144
@@ -204,7 +204,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1014243177054208
-    m_Localized: PUT AWAY DECODER
+    m_Localized: DECODER
     m_Metadata:
       m_Items: []
   - m_Id: 1014243852337152
