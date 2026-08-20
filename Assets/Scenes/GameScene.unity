@@ -1351,7 +1351,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1034410594}
   - {fileID: 808984250}
   - {fileID: 1623063561}
   - {fileID: 759447104}
@@ -2214,12 +2213,12 @@ MonoBehaviour:
   ultravioletTool: {fileID: 677106339}
   magnifierTool: {fileID: 677106340}
   decoderTool: {fileID: 677106341}
-  pencilTool: {fileID: 1146586261}
+  pencilTool: {fileID: 1976329495}
   toolsPanel: {fileID: 985758317}
   ultravioletButton: {fileID: 685289463}
   magnifierButton: {fileID: 1273558178}
   decoderButton: {fileID: 890684222}
-  pencilButton: {fileID: 1268115265}
+  pencilButton: {fileID: 1976329493}
   winPanel: {fileID: 428030212}
   completionText: {fileID: 162912340}
   resultScoreText: {fileID: 1080550773}
@@ -2403,7 +2402,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UltravioletTool
   ultravioletButtonText: {fileID: 2051226595}
   toolButton: {fileID: 919276781}
-  ultravioletCursor: {fileID: 1541018520}
+  ultravioletCursor: {fileID: 1034410594}
   inactiveButtonColor: {r: 0.20392157, g: 0.18039216, b: 0.24705882, a: 1}
   activeButtonColor: {r: 0.41960785, g: 0.20784314, b: 0.65882355, a: 1}
   ultravioletInactiveText:
@@ -2598,6 +2597,7 @@ GameObject:
   - component: {fileID: 685289466}
   - component: {fileID: 685289465}
   - component: {fileID: 685289464}
+  - component: {fileID: 685289467}
   m_Layer: 5
   m_Name: DeskUV
   m_TagString: Untagged
@@ -2663,6 +2663,18 @@ RectTransform:
   m_AnchoredPosition: {x: 730, y: -188}
   m_SizeDelta: {x: 490, y: 190}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &685289467
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685289463}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &694234149
 GameObject:
   m_ObjectHideFlags: 0
@@ -4910,7 +4922,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1034410594
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4918,14 +4930,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1034410593}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1541018520}
   - {fileID: 328848894}
-  m_Father: {fileID: 496885429}
+  m_Father: {fileID: 1596284666}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -7194,6 +7206,7 @@ RectTransform:
   - {fileID: 428030213}
   - {fileID: 164336661}
   - {fileID: 707287898}
+  - {fileID: 1976329494}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -8002,8 +8015,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -8297,6 +8310,7 @@ GameObject:
   - component: {fileID: 1596284666}
   - component: {fileID: 1596284668}
   - component: {fileID: 1596284667}
+  - component: {fileID: 1596284669}
   m_Layer: 5
   m_Name: CursorOverlay
   m_TagString: Untagged
@@ -8317,6 +8331,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1163516435}
+  - {fileID: 1034410594}
   m_Father: {fileID: 1435678081}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -8336,7 +8351,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3b8d6b0c1de7944183d11d9e2b86cb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PencilCursorController
-  pencilTool: {fileID: 1146586261}
+  pencilTool: {fileID: 1976329495}
   deskPencil: {fileID: 1268115265}
   cursorOverlay: {fileID: 1596284666}
   pencilCursorRoot: {fileID: 1163516435}
@@ -8348,6 +8363,21 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1596284665}
   m_CullTransparentMesh: 1
+--- !u!114 &1596284669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1596284665}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9069dfa4a07c5a4083384c73974adcf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UltravioletCursorController
+  ultravioletTool: {fileID: 677106339}
+  pencilTool: {fileID: 1976329495}
+  deskUltraviolet: {fileID: 685289467}
 --- !u!1 &1623063560
 GameObject:
   m_ObjectHideFlags: 0
@@ -10158,6 +10188,75 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1946318255}
   m_CullTransparentMesh: 1
+--- !u!1 &1976329493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1976329494}
+  - component: {fileID: 1976329495}
+  m_Layer: 0
+  m_Name: ToolRuntime
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1976329494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1976329493}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -960, y: -540, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1435678081}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1976329495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1976329493}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02f68dd160eb7834fb8e9614e8cf7893, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PencilTool
+  pencilButtonText: {fileID: 35564256}
+  toolButton: {fileID: 1026343029}
+  inactiveButtonColor: {r: 0.20392157, g: 0.18039216, b: 0.24705882, a: 1}
+  activeButtonColor: {r: 0.41960785, g: 0.20784314, b: 0.65882355, a: 1}
+  pencilInactiveText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 1561197229424640
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  pencilActiveText:
+    m_TableReference:
+      m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
+    m_TableEntryReference:
+      m_KeyId: 1561197229424640
+      m_Key: 
+    m_FallbackState: 0
+    m_WaitForCompletion: 0
+    m_LocalVariables: []
+  references:
+    version: 2
+    RefIds: []
 --- !u!1 &1991920554
 GameObject:
   m_ObjectHideFlags: 0
