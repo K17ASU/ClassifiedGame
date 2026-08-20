@@ -5,14 +5,17 @@ public sealed class AnalysisToolCursorController : MonoBehaviour
     [Header("Инструменты")]
     [SerializeField] private UltravioletTool ultravioletTool;
     [SerializeField] private MagnifierTool magnifierTool;
+    [SerializeField] private DecoderTool decoderTool;
     [SerializeField] private PencilTool pencilTool;
 
     [Header("Предметы на столе")]
     [SerializeField] private CanvasGroup deskUltraviolet;
     [SerializeField] private CanvasGroup deskMagnifier;
+    [SerializeField] private CanvasGroup deskDecoder;
 
     private bool lastUvActive;
     private bool lastMagnifierActive;
+    private bool lastDecoderActive;
     private bool stateInitialized;
 
     private void Awake()
@@ -30,6 +33,7 @@ public sealed class AnalysisToolCursorController : MonoBehaviour
     {
         bool uvActive = ultravioletTool.IsActive;
         bool magnifierActive = magnifierTool.IsActive;
+        bool decoderActive = decoderTool.IsActive;
 
         if (!stateInitialized || uvActive != lastUvActive)
         {
@@ -43,6 +47,12 @@ public sealed class AnalysisToolCursorController : MonoBehaviour
             lastMagnifierActive = magnifierActive;
         }
 
+        if (!stateInitialized || decoderActive != lastDecoderActive)
+        {
+            SetDeskItemVisible(deskDecoder, !decoderActive);
+            lastDecoderActive = decoderActive;
+        }
+
         stateInitialized = true;
     }
 
@@ -51,6 +61,7 @@ public sealed class AnalysisToolCursorController : MonoBehaviour
         bool anyCursorToolActive =
             ultravioletTool.IsActive ||
             magnifierTool.IsActive ||
+            decoderTool.IsActive ||
             (pencilTool != null && pencilTool.IsActive);
 
         Cursor.visible = !anyCursorToolActive;
@@ -72,37 +83,37 @@ public sealed class AnalysisToolCursorController : MonoBehaviour
 
         if (ultravioletTool == null)
         {
-            Debug.LogError(
-                "AnalysisToolCursorController: не назначен Ultraviolet Tool.",
-                this
-            );
+            Debug.LogError("AnalysisToolCursorController: не назначен Ultraviolet Tool.", this);
             valid = false;
         }
 
         if (magnifierTool == null)
         {
-            Debug.LogError(
-                "AnalysisToolCursorController: не назначен Magnifier Tool.",
-                this
-            );
+            Debug.LogError("AnalysisToolCursorController: не назначен Magnifier Tool.", this);
+            valid = false;
+        }
+
+        if (decoderTool == null)
+        {
+            Debug.LogError("AnalysisToolCursorController: не назначен Decoder Tool.", this);
             valid = false;
         }
 
         if (deskUltraviolet == null)
         {
-            Debug.LogError(
-                "AnalysisToolCursorController: не назначен Desk Ultraviolet.",
-                this
-            );
+            Debug.LogError("AnalysisToolCursorController: не назначен Desk Ultraviolet.", this);
             valid = false;
         }
 
         if (deskMagnifier == null)
         {
-            Debug.LogError(
-                "AnalysisToolCursorController: не назначен Desk Magnifier.",
-                this
-            );
+            Debug.LogError("AnalysisToolCursorController: не назначен Desk Magnifier.", this);
+            valid = false;
+        }
+
+        if (deskDecoder == null)
+        {
+            Debug.LogError("AnalysisToolCursorController: не назначен Desk Decoder.", this);
             valid = false;
         }
 
@@ -113,6 +124,7 @@ public sealed class AnalysisToolCursorController : MonoBehaviour
     {
         SetDeskItemVisible(deskUltraviolet, true);
         SetDeskItemVisible(deskMagnifier, true);
+        SetDeskItemVisible(deskDecoder, true);
         Cursor.visible = true;
     }
 }
