@@ -24,7 +24,6 @@ public sealed class CodexProgressionBridge :
     private void Start()
     {
         currentDocumentIndex = 0;
-        UnlockCurrentDocumentEntries();
     }
 
     public void AdvanceDocument()
@@ -47,7 +46,6 @@ public sealed class CodexProgressionBridge :
         }
 
         currentDocumentIndex = 0;
-        UnlockCurrentDocumentEntries();
     }
 
     private void UnlockCurrentDocumentEntries()

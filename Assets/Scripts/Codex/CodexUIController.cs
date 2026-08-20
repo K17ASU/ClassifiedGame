@@ -195,8 +195,8 @@ public sealed class CodexUIController : MonoBehaviour
 
         if (codexButton != null)
         {
-            codexButton.interactable =
-                hasEntries;
+            codexButton.gameObject.SetActive(hasEntries);
+            codexButton.interactable = hasEntries;
         }
 
         if (newEntryMarker != null)
