@@ -97,6 +97,7 @@ public sealed class CodexUIController : MonoBehaviour
     public void CloseCodex()
     {
         codexPanel.SetActive(false);
+        RefreshButtonState();
     }
 
     public void ShowPreviousEntry()
@@ -193,16 +194,28 @@ public sealed class CodexUIController : MonoBehaviour
             codexManager != null &&
             codexManager.UnlockedEntries.Count > 0;
 
+        bool codexIsOpen =
+            codexPanel != null &&
+            codexPanel.activeSelf;
+
         if (codexButton != null)
         {
-            codexButton.gameObject.SetActive(hasEntries);
-            codexButton.interactable = hasEntries;
+            bool shouldShowButton =
+                hasEntries && !codexIsOpen;
+
+            codexButton.gameObject.SetActive(
+                shouldShowButton
+            );
+
+            codexButton.interactable =
+                shouldShowButton;
         }
 
         if (newEntryMarker != null)
         {
             newEntryMarker.SetActive(
                 hasEntries &&
+                !codexIsOpen &&
                 codexManager.HasUnreadEntries
             );
         }
