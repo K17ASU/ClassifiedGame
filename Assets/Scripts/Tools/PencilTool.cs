@@ -1,8 +1,5 @@
 using System;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Localization;
-using UnityEngine.UI;
 
 /// <summary>
 /// Управляет режимом карандаша.
@@ -11,32 +8,6 @@ using UnityEngine.UI;
 /// </summary>
 public sealed class PencilTool : MonoBehaviour
 {
-    [Header("Интерфейс")]
-
-    [SerializeField]
-    private TMP_Text pencilButtonText;
-
-    [SerializeField]
-    private Button toolButton;
-
-    [Header("Состояние кнопки")]
-
-    [SerializeField]
-    private Color inactiveButtonColor =
-        new Color32(52, 46, 63, 255);
-
-    [SerializeField]
-    private Color activeButtonColor =
-        new Color32(107, 53, 168, 255);
-
-    [Header("Локализация")]
-
-    [SerializeField]
-    private LocalizedString pencilInactiveText;
-
-    [SerializeField]
-    private LocalizedString pencilActiveText;
-
     public bool IsActive { get; private set; }
 
     private Action stopDragging;
@@ -59,8 +30,6 @@ public sealed class PencilTool : MonoBehaviour
         }
 
         IsActive = false;
-        RefreshLocalizedText();
-
         isInitialized = true;
 
         return true;
@@ -93,10 +62,7 @@ public sealed class PencilTool : MonoBehaviour
         }
 
         IsActive = !IsActive;
-
         stopDragging();
-
-        RefreshLocalizedText();
     }
 
     public void DisableMode()
@@ -107,60 +73,12 @@ public sealed class PencilTool : MonoBehaviour
         }
 
         IsActive = false;
-
         stopDragging();
-
-        RefreshLocalizedText();
     }
 
-    private void RefreshButtonVisual()
-    {
-        if (toolButton == null)
-        {
-            return;
-        }
-
-        ColorBlock colors =
-            toolButton.colors;
-
-        Color stateColor =
-            IsActive
-                ? activeButtonColor
-                : inactiveButtonColor;
-
-        colors.normalColor = stateColor;
-        colors.selectedColor = stateColor;
-
-        toolButton.colors = colors;
-
-        if (toolButton.targetGraphic != null)
-        {
-            toolButton.targetGraphic.color =
-                stateColor;
-        }
-    }
-
+    // Оставлено временно для совместимости с DocumentRedactor.
+    // Старым UI кнопок этот метод больше не управляет.
     public void RefreshLocalizedText()
     {
-        RefreshButtonVisual();
-
-        if (pencilButtonText == null)
-        {
-            return;
-        }
-
-        LocalizedString selectedText =
-            IsActive
-                ? pencilActiveText
-                : pencilInactiveText;
-
-        if (selectedText == null ||
-            selectedText.IsEmpty)
-        {
-            return;
-        }
-
-        pencilButtonText.text =
-            selectedText.GetLocalizedString();
     }
 }

@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Localization;
-using UnityEngine.UI;
 
 /// <summary>
 /// Декодер показывает скрытое значение кодового слова,
@@ -14,13 +13,6 @@ using UnityEngine.UI;
 public sealed class DecoderTool : MonoBehaviour
 {
     [Header("Интерфейс")]
-
-    [SerializeField]
-    private TMP_Text decoderButtonText;
-
-    [SerializeField]
-    private Button toolButton;
-
     [SerializeField]
     private RectTransform decoderCursor;
 
@@ -30,24 +22,7 @@ public sealed class DecoderTool : MonoBehaviour
     [SerializeField]
     private TMP_Text decoderResultText;
 
-    [Header("Состояние кнопки")]
-
-    [SerializeField]
-    private Color inactiveButtonColor =
-        new Color32(52, 46, 63, 255);
-
-    [SerializeField]
-    private Color activeButtonColor =
-        new Color32(107, 53, 168, 255);
-
     [Header("Локализация")]
-
-    [SerializeField]
-    private LocalizedString decoderInactiveText;
-
-    [SerializeField]
-    private LocalizedString decoderActiveText;
-
     [SerializeField]
     private LocalizedString statusDecoderOn;
 
@@ -55,13 +30,11 @@ public sealed class DecoderTool : MonoBehaviour
     private LocalizedString statusDecoderOff;
 
     [Header("Обнаружение")]
-
     [SerializeField]
     [Min(10f)]
     private float revealRadius = 75f;
 
     [Header("Отображение результата")]
-
     [SerializeField]
     private string resultFormat = "{0}";
 
@@ -106,10 +79,13 @@ public sealed class DecoderTool : MonoBehaviour
 
         IsActive = false;
 
-        decoderCursor.gameObject.SetActive(false);
-        decoderResultContainer.gameObject.SetActive(false);
+        decoderCursor.gameObject.SetActive(
+            false
+        );
 
-        RefreshLocalizedText();
+        decoderResultContainer.gameObject.SetActive(
+            false
+        );
 
         isInitialized = true;
 
@@ -246,8 +222,6 @@ public sealed class DecoderTool : MonoBehaviour
             HideResult();
         }
 
-        RefreshLocalizedText();
-
         setStatus(
             Localize(
                 IsActive
@@ -273,59 +247,12 @@ public sealed class DecoderTool : MonoBehaviour
         decoderCursor.gameObject.SetActive(
             false
         );
-
-        RefreshLocalizedText();
     }
 
-    private void RefreshButtonVisual()
-    {
-        if (toolButton == null)
-        {
-            return;
-        }
-
-        ColorBlock colors =
-            toolButton.colors;
-
-        Color stateColor =
-            IsActive
-                ? activeButtonColor
-                : inactiveButtonColor;
-
-        colors.normalColor = stateColor;
-        colors.selectedColor = stateColor;
-
-        toolButton.colors = colors;
-
-        if (toolButton.targetGraphic != null)
-        {
-            toolButton.targetGraphic.color =
-                stateColor;
-        }
-    }
-
+    // Оставлено временно для совместимости с DocumentRedactor.
+    // Старым UI кнопок этот метод больше не управляет.
     public void RefreshLocalizedText()
     {
-        RefreshButtonVisual();
-
-        if (decoderButtonText == null)
-        {
-            return;
-        }
-
-        LocalizedString selectedText =
-            IsActive
-                ? decoderActiveText
-                : decoderInactiveText;
-
-        if (selectedText == null ||
-            selectedText.IsEmpty)
-        {
-            return;
-        }
-
-        decoderButtonText.text =
-            selectedText.GetLocalizedString();
     }
 
     private void UpdateDecodedResult(
@@ -375,7 +302,8 @@ public sealed class DecoderTool : MonoBehaviour
             if (!word.TryGetAnalysisPayload(
                     RevealMethod.Decoder,
                     out string payload) ||
-                string.IsNullOrWhiteSpace(payload))
+                string.IsNullOrWhiteSpace(
+                    payload))
             {
                 continue;
             }
@@ -457,7 +385,8 @@ public sealed class DecoderTool : MonoBehaviour
             rect.height * 0.5f;
 
         float minimumX =
-            screenPadding + halfWidth;
+            screenPadding +
+            halfWidth;
 
         float maximumX =
             Screen.width -
@@ -465,7 +394,8 @@ public sealed class DecoderTool : MonoBehaviour
             halfWidth;
 
         float minimumY =
-            screenPadding + halfHeight;
+            screenPadding +
+            halfHeight;
 
         float maximumY =
             Screen.height -
@@ -524,7 +454,8 @@ public sealed class DecoderTool : MonoBehaviour
 
         for (int characterIndex =
                  firstCharacterIndex;
-             characterIndex < lastCharacterIndex;
+             characterIndex <
+                 lastCharacterIndex;
              characterIndex++)
         {
             if (characterIndex < 0 ||
@@ -568,18 +499,21 @@ public sealed class DecoderTool : MonoBehaviour
                         topRightWorld
                     );
 
-            minimum = Vector2.Min(
-                minimum,
-                bottomLeftScreen
-            );
+            minimum =
+                Vector2.Min(
+                    minimum,
+                    bottomLeftScreen
+                );
 
-            maximum = Vector2.Max(
-                maximum,
-                topRightScreen
-            );
+            maximum =
+                Vector2.Max(
+                    maximum,
+                    topRightScreen
+                );
         }
 
-        if (float.IsInfinity(minimum.x))
+        if (float.IsInfinity(
+                minimum.x))
         {
             return float.PositiveInfinity;
         }
@@ -634,6 +568,7 @@ public sealed class DecoderTool : MonoBehaviour
             return string.Empty;
         }
 
-        return localizedString.GetLocalizedString();
+        return localizedString
+            .GetLocalizedString();
     }
 }

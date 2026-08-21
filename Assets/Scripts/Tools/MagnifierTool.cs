@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Localization;
-using UnityEngine.UI;
 
 /// <summary>
 /// Управляет лупой.
@@ -13,26 +12,22 @@ using UnityEngine.UI;
 public sealed class MagnifierTool : MonoBehaviour
 {
     [Header("Интерфейс")]
-    [SerializeField] private TMP_Text magnifierButtonText;
-    [SerializeField] private Button toolButton;
     [SerializeField] private RectTransform magnifierCursor;
 
-    [Header("Состояние кнопки")]
-    [SerializeField] private Color inactiveButtonColor = new Color32(52, 46, 63, 255);
-    [SerializeField] private Color activeButtonColor = new Color32(107, 53, 168, 255);
-
     [Header("Локализация")]
-    [SerializeField] private LocalizedString magnifierInactiveText;
-    [SerializeField] private LocalizedString magnifierActiveText;
     [SerializeField] private LocalizedString statusMagnifierOn;
     [SerializeField] private LocalizedString statusMagnifierOff;
 
     [Header("Обнаружение")]
-    [SerializeField, Min(10f)] private float revealRadius = 90f;
+    [SerializeField, Min(10f)]
+    private float revealRadius = 90f;
 
     [Header("Дрожание текста")]
-    [SerializeField, Min(0f)] private float shakeAmplitude = 1.5f;
-    [SerializeField, Min(0f)] private float shakeSpeed = 32f;
+    [SerializeField, Min(0f)]
+    private float shakeAmplitude = 1.5f;
+
+    [SerializeField, Min(0f)]
+    private float shakeSpeed = 32f;
 
     public bool IsActive { get; private set; }
 
@@ -61,7 +56,6 @@ public sealed class MagnifierTool : MonoBehaviour
 
         IsActive = false;
         magnifierCursor.gameObject.SetActive(false);
-        RefreshLocalizedText();
         isInitialized = true;
         return true;
     }
@@ -70,12 +64,41 @@ public sealed class MagnifierTool : MonoBehaviour
     {
         bool valid = true;
 
-        if (documentText == null) { Debug.LogError("MagnifierTool: не назначен Document Text.", this); valid = false; }
-        if (magnifierCursor == null) { Debug.LogError("MagnifierTool: не назначен Magnifier Cursor.", this); valid = false; }
-        if (words == null) { Debug.LogError("MagnifierTool: не передан список слов.", this); valid = false; }
-        if (stopDragging == null || isDocumentFinished == null || setStatus == null)
+        if (documentText == null)
         {
-            Debug.LogError("MagnifierTool: не переданы необходимые callbacks.", this);
+            Debug.LogError(
+                "MagnifierTool: не назначен Document Text.",
+                this
+            );
+            valid = false;
+        }
+
+        if (magnifierCursor == null)
+        {
+            Debug.LogError(
+                "MagnifierTool: не назначен Magnifier Cursor.",
+                this
+            );
+            valid = false;
+        }
+
+        if (words == null)
+        {
+            Debug.LogError(
+                "MagnifierTool: не передан список слов.",
+                this
+            );
+            valid = false;
+        }
+
+        if (stopDragging == null ||
+            isDocumentFinished == null ||
+            setStatus == null)
+        {
+            Debug.LogError(
+                "MagnifierTool: не переданы необходимые callbacks.",
+                this
+            );
             valid = false;
         }
 
@@ -84,36 +107,58 @@ public sealed class MagnifierTool : MonoBehaviour
 
     private void Update()
     {
-        if (!isInitialized || !IsActive || Mouse.current == null)
+        if (!isInitialized ||
+            !IsActive ||
+            Mouse.current == null)
+        {
             return;
+        }
 
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
-        magnifierCursor.position = mousePosition;
-        ApplyMagnifierEffect(mousePosition);
+        Vector2 mousePosition =
+            Mouse.current.position.ReadValue();
+
+        magnifierCursor.position =
+            mousePosition;
+
+        ApplyMagnifierEffect(
+            mousePosition
+        );
     }
 
     public void ToggleMode()
     {
-        if (!isInitialized || isDocumentFinished())
+        if (!isInitialized ||
+            isDocumentFinished())
+        {
             return;
+        }
 
         IsActive = !IsActive;
         stopDragging();
-        magnifierCursor.gameObject.SetActive(IsActive);
+
+        magnifierCursor.gameObject.SetActive(
+            IsActive
+        );
 
         if (IsActive)
         {
-            magnifierCursor.position = Mouse.current != null
-                ? Mouse.current.position.ReadValue()
-                : Vector2.zero;
+            magnifierCursor.position =
+                Mouse.current != null
+                    ? Mouse.current.position.ReadValue()
+                    : Vector2.zero;
         }
         else
         {
             RestoreTextMesh();
         }
 
-        RefreshLocalizedText();
-        setStatus(Localize(IsActive ? statusMagnifierOn : statusMagnifierOff));
+        setStatus(
+            Localize(
+                IsActive
+                    ? statusMagnifierOn
+                    : statusMagnifierOff
+            )
+        );
     }
 
     public void DisableMode()
@@ -124,80 +169,105 @@ public sealed class MagnifierTool : MonoBehaviour
         IsActive = false;
         stopDragging();
         RestoreTextMesh();
-        magnifierCursor.gameObject.SetActive(false);
-        RefreshLocalizedText();
+
+        magnifierCursor.gameObject.SetActive(
+            false
+        );
     }
 
-    private void RefreshButtonVisual()
-    {
-        if (toolButton == null)
-            return;
-
-        ColorBlock colors = toolButton.colors;
-        Color stateColor = IsActive ? activeButtonColor : inactiveButtonColor;
-        colors.normalColor = stateColor;
-        colors.selectedColor = stateColor;
-        toolButton.colors = colors;
-
-        if (toolButton.targetGraphic != null)
-            toolButton.targetGraphic.color = stateColor;
-    }
-
+    // Оставлено временно для совместимости с DocumentRedactor.
+    // Старым UI кнопок этот метод больше не управляет.
     public void RefreshLocalizedText()
     {
-        RefreshButtonVisual();
-
-        if (magnifierButtonText == null)
-            return;
-
-        LocalizedString selectedText = IsActive ? magnifierActiveText : magnifierInactiveText;
-        if (selectedText == null || selectedText.IsEmpty)
-            return;
-
-        magnifierButtonText.text = selectedText.GetLocalizedString();
     }
 
-    private void ApplyMagnifierEffect(Vector2 magnifierScreenPosition)
+    private void ApplyMagnifierEffect(
+        Vector2 magnifierScreenPosition)
     {
-        // Возвращаем исходную геометрию TMP, затем двигаем
-        // только символы, реально попавшие внутрь круга лупы.
         documentText.ForceMeshUpdate();
-        TMP_TextInfo textInfo = documentText.textInfo;
-        float time = Time.unscaledTime * shakeSpeed;
 
-        for (int linkIndex = 0; linkIndex < textInfo.linkCount; linkIndex++)
+        TMP_TextInfo textInfo =
+            documentText.textInfo;
+
+        float time =
+            Time.unscaledTime *
+            shakeSpeed;
+
+        for (int linkIndex = 0;
+             linkIndex < textInfo.linkCount;
+             linkIndex++)
         {
-            TMP_LinkInfo linkInfo = textInfo.linkInfo[linkIndex];
+            TMP_LinkInfo linkInfo =
+                textInfo.linkInfo[linkIndex];
 
-            if (!int.TryParse(linkInfo.GetLinkID(), out int wordId))
-                continue;
-            if (wordId < 0 || wordId >= words.Count)
-                continue;
-
-            DocumentWord word = words[wordId];
-            if (word.isRedacted || !word.CanBeRevealedBy(RevealMethod.Magnifier))
-                continue;
-
-            int first = linkInfo.linkTextfirstCharacterIndex;
-            int last = first + linkInfo.linkTextLength;
-
-            for (int characterIndex = first; characterIndex < last; characterIndex++)
+            if (!int.TryParse(
+                    linkInfo.GetLinkID(),
+                    out int wordId))
             {
-                if (characterIndex < 0 || characterIndex >= textInfo.characterCount)
-                    continue;
+                continue;
+            }
 
-                TMP_CharacterInfo characterInfo = textInfo.characterInfo[characterIndex];
+            if (wordId < 0 ||
+                wordId >= words.Count)
+            {
+                continue;
+            }
+
+            DocumentWord word =
+                words[wordId];
+
+            if (word.isRedacted ||
+                !word.CanBeRevealedBy(
+                    RevealMethod.Magnifier))
+            {
+                continue;
+            }
+
+            int first =
+                linkInfo.linkTextfirstCharacterIndex;
+
+            int last =
+                first + linkInfo.linkTextLength;
+
+            for (int characterIndex = first;
+                 characterIndex < last;
+                 characterIndex++)
+            {
+                if (characterIndex < 0 ||
+                    characterIndex >=
+                    textInfo.characterCount)
+                {
+                    continue;
+                }
+
+                TMP_CharacterInfo characterInfo =
+                    textInfo.characterInfo[
+                        characterIndex
+                    ];
+
                 if (!characterInfo.isVisible)
                     continue;
 
-                if (!IsCharacterInsideCircle(characterInfo, magnifierScreenPosition, revealRadius))
+                if (!IsCharacterInsideCircle(
+                        characterInfo,
+                        magnifierScreenPosition,
+                        revealRadius))
+                {
                     continue;
+                }
 
-                ShakeCharacter(characterInfo, textInfo, characterIndex, time);
+                ShakeCharacter(
+                    characterInfo,
+                    textInfo,
+                    characterIndex,
+                    time
+                );
             }
         }
 
-        documentText.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
+        documentText.UpdateVertexData(
+            TMP_VertexDataUpdateFlags.Vertices
+        );
     }
 
     private void ShakeCharacter(
@@ -206,20 +276,53 @@ public sealed class MagnifierTool : MonoBehaviour
         int characterIndex,
         float time)
     {
-        int materialIndex = characterInfo.materialReferenceIndex;
-        int vertexIndex = characterInfo.vertexIndex;
+        int materialIndex =
+            characterInfo.materialReferenceIndex;
 
-        if (materialIndex < 0 || materialIndex >= textInfo.meshInfo.Length)
+        int vertexIndex =
+            characterInfo.vertexIndex;
+
+        if (materialIndex < 0 ||
+            materialIndex >=
+            textInfo.meshInfo.Length)
+        {
             return;
+        }
 
-        Vector3[] vertices = textInfo.meshInfo[materialIndex].vertices;
-        if (vertices == null || vertexIndex < 0 || vertexIndex + 3 >= vertices.Length)
+        Vector3[] vertices =
+            textInfo.meshInfo[
+                materialIndex
+            ].vertices;
+
+        if (vertices == null ||
+            vertexIndex < 0 ||
+            vertexIndex + 3 >=
+            vertices.Length)
+        {
             return;
+        }
 
-        float phase = characterIndex * 1.618f;
-        float offsetX = Mathf.Sin(time + phase * 2.17f) * shakeAmplitude;
-        float offsetY = Mathf.Cos(time * 1.31f + phase * 1.73f) * shakeAmplitude;
-        Vector3 offset = new Vector3(offsetX, offsetY, 0f);
+        float phase =
+            characterIndex * 1.618f;
+
+        float offsetX =
+            Mathf.Sin(
+                time +
+                phase * 2.17f
+            ) * shakeAmplitude;
+
+        float offsetY =
+            Mathf.Cos(
+                time * 1.31f +
+                phase * 1.73f
+            ) * shakeAmplitude;
+
+        Vector3 offset =
+            new Vector3(
+                offsetX,
+                offsetY,
+                0f
+            );
 
         vertices[vertexIndex + 0] += offset;
         vertices[vertexIndex + 1] += offset;
@@ -227,25 +330,75 @@ public sealed class MagnifierTool : MonoBehaviour
         vertices[vertexIndex + 3] += offset;
     }
 
-    private bool IsCharacterInsideCircle(TMP_CharacterInfo characterInfo, Vector2 circleCenter, float radius)
+    private bool IsCharacterInsideCircle(
+        TMP_CharacterInfo characterInfo,
+        Vector2 circleCenter,
+        float radius)
     {
-        Vector3 bottomLeftWorld = documentText.transform.TransformPoint(characterInfo.bottomLeft);
-        Vector3 topRightWorld = documentText.transform.TransformPoint(characterInfo.topRight);
+        Vector3 bottomLeftWorld =
+            documentText.transform.TransformPoint(
+                characterInfo.bottomLeft
+            );
 
-        Vector2 bottomLeftScreen = RectTransformUtility.WorldToScreenPoint(GetDocumentCanvasCamera(), bottomLeftWorld);
-        Vector2 topRightScreen = RectTransformUtility.WorldToScreenPoint(GetDocumentCanvasCamera(), topRightWorld);
+        Vector3 topRightWorld =
+            documentText.transform.TransformPoint(
+                characterInfo.topRight
+            );
 
-        float minX = Mathf.Min(bottomLeftScreen.x, topRightScreen.x);
-        float maxX = Mathf.Max(bottomLeftScreen.x, topRightScreen.x);
-        float minY = Mathf.Min(bottomLeftScreen.y, topRightScreen.y);
-        float maxY = Mathf.Max(bottomLeftScreen.y, topRightScreen.y);
+        Vector2 bottomLeftScreen =
+            RectTransformUtility.WorldToScreenPoint(
+                GetDocumentCanvasCamera(),
+                bottomLeftWorld
+            );
 
-        Vector2 closestPoint = new Vector2(
-            Mathf.Clamp(circleCenter.x, minX, maxX),
-            Mathf.Clamp(circleCenter.y, minY, maxY)
-        );
+        Vector2 topRightScreen =
+            RectTransformUtility.WorldToScreenPoint(
+                GetDocumentCanvasCamera(),
+                topRightWorld
+            );
 
-        return Vector2.SqrMagnitude(circleCenter - closestPoint) <= radius * radius;
+        float minX =
+            Mathf.Min(
+                bottomLeftScreen.x,
+                topRightScreen.x
+            );
+
+        float maxX =
+            Mathf.Max(
+                bottomLeftScreen.x,
+                topRightScreen.x
+            );
+
+        float minY =
+            Mathf.Min(
+                bottomLeftScreen.y,
+                topRightScreen.y
+            );
+
+        float maxY =
+            Mathf.Max(
+                bottomLeftScreen.y,
+                topRightScreen.y
+            );
+
+        Vector2 closestPoint =
+            new Vector2(
+                Mathf.Clamp(
+                    circleCenter.x,
+                    minX,
+                    maxX
+                ),
+                Mathf.Clamp(
+                    circleCenter.y,
+                    minY,
+                    maxY
+                )
+            );
+
+        return Vector2.SqrMagnitude(
+            circleCenter -
+            closestPoint
+        ) <= radius * radius;
     }
 
     private void RestoreTextMesh()
@@ -254,26 +407,42 @@ public sealed class MagnifierTool : MonoBehaviour
             return;
 
         documentText.ForceMeshUpdate();
-        documentText.UpdateVertexData(TMP_VertexDataUpdateFlags.Vertices);
+
+        documentText.UpdateVertexData(
+            TMP_VertexDataUpdateFlags.Vertices
+        );
     }
 
     private Camera GetDocumentCanvasCamera()
     {
-        if (documentText == null || documentText.canvas == null)
+        if (documentText == null ||
+            documentText.canvas == null)
+        {
             return null;
+        }
 
-        Canvas canvas = documentText.canvas;
-        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+        Canvas canvas =
+            documentText.canvas;
+
+        if (canvas.renderMode ==
+            RenderMode.ScreenSpaceOverlay)
+        {
             return null;
+        }
 
         return canvas.worldCamera;
     }
 
-    private string Localize(LocalizedString localizedString)
+    private string Localize(
+        LocalizedString localizedString)
     {
-        if (localizedString == null || localizedString.IsEmpty)
+        if (localizedString == null ||
+            localizedString.IsEmpty)
+        {
             return string.Empty;
+        }
 
-        return localizedString.GetLocalizedString();
+        return localizedString
+            .GetLocalizedString();
     }
 }

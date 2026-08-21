@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Localization;
-using UnityEngine.UI;
 
 /// <summary>
 /// Управляет ультрафиолетовой лампой:
@@ -13,23 +12,18 @@ using UnityEngine.UI;
 public sealed class UltravioletTool : MonoBehaviour
 {
     [Header("Интерфейс")]
-    [SerializeField] private TMP_Text ultravioletButtonText;
-    [SerializeField] private Button toolButton;
     [SerializeField] private RectTransform ultravioletCursor;
 
-    [Header("Состояние кнопки")]
-    [SerializeField] private Color inactiveButtonColor = new Color32(52, 46, 63, 255);
-    [SerializeField] private Color activeButtonColor = new Color32(107, 53, 168, 255);
-
     [Header("Локализация")]
-    [SerializeField] private LocalizedString ultravioletInactiveText;
-    [SerializeField] private LocalizedString ultravioletActiveText;
     [SerializeField] private LocalizedString statusUvOn;
     [SerializeField] private LocalizedString statusUvOff;
 
     [Header("Внешний вид")]
-    [SerializeField] private Color32 ultravioletSecretTextColor = new Color32(107, 53, 168, 255);
-    [SerializeField, Min(10f)] private float ultravioletRevealRadius = 90f;
+    [SerializeField] private Color32 ultravioletSecretTextColor =
+        new Color32(107, 53, 168, 255);
+
+    [SerializeField, Min(10f)]
+    private float ultravioletRevealRadius = 90f;
 
     public bool IsActive { get; private set; }
 
@@ -61,7 +55,6 @@ public sealed class UltravioletTool : MonoBehaviour
 
         IsActive = false;
         ultravioletCursor.gameObject.SetActive(false);
-        RefreshLocalizedText();
         isInitialized = true;
         return true;
     }
@@ -70,12 +63,42 @@ public sealed class UltravioletTool : MonoBehaviour
     {
         bool valid = true;
 
-        if (documentText == null) { Debug.LogError("UltravioletTool: не назначен Document Text.", this); valid = false; }
-        if (ultravioletCursor == null) { Debug.LogError("UltravioletTool: не назначен Ultraviolet Cursor.", this); valid = false; }
-        if (words == null) { Debug.LogError("UltravioletTool: не передан список слов.", this); valid = false; }
-        if (refreshDocument == null || stopDragging == null || isDocumentFinished == null || setStatus == null)
+        if (documentText == null)
         {
-            Debug.LogError("UltravioletTool: не переданы необходимые callbacks.", this);
+            Debug.LogError(
+                "UltravioletTool: не назначен Document Text.",
+                this
+            );
+            valid = false;
+        }
+
+        if (ultravioletCursor == null)
+        {
+            Debug.LogError(
+                "UltravioletTool: не назначен Ultraviolet Cursor.",
+                this
+            );
+            valid = false;
+        }
+
+        if (words == null)
+        {
+            Debug.LogError(
+                "UltravioletTool: не передан список слов.",
+                this
+            );
+            valid = false;
+        }
+
+        if (refreshDocument == null ||
+            stopDragging == null ||
+            isDocumentFinished == null ||
+            setStatus == null)
+        {
+            Debug.LogError(
+                "UltravioletTool: не переданы необходимые callbacks.",
+                this
+            );
             valid = false;
         }
 
@@ -84,28 +107,45 @@ public sealed class UltravioletTool : MonoBehaviour
 
     private void Update()
     {
-        if (!isInitialized || !IsActive || Mouse.current == null)
+        if (!isInitialized ||
+            !IsActive ||
+            Mouse.current == null)
+        {
             return;
+        }
 
-        Vector2 mousePosition = Mouse.current.position.ReadValue();
-        ultravioletCursor.position = mousePosition;
-        ApplyUltravioletEffect(mousePosition);
+        Vector2 mousePosition =
+            Mouse.current.position.ReadValue();
+
+        ultravioletCursor.position =
+            mousePosition;
+
+        ApplyUltravioletEffect(
+            mousePosition
+        );
     }
 
     public void ToggleMode()
     {
-        if (!isInitialized || isDocumentFinished())
+        if (!isInitialized ||
+            isDocumentFinished())
+        {
             return;
+        }
 
         IsActive = !IsActive;
         stopDragging();
-        ultravioletCursor.gameObject.SetActive(IsActive);
+
+        ultravioletCursor.gameObject.SetActive(
+            IsActive
+        );
 
         if (IsActive)
         {
-            ultravioletCursor.position = Mouse.current != null
-                ? Mouse.current.position.ReadValue()
-                : Vector2.zero;
+            ultravioletCursor.position =
+                Mouse.current != null
+                    ? Mouse.current.position.ReadValue()
+                    : Vector2.zero;
         }
         else
         {
@@ -113,8 +153,13 @@ public sealed class UltravioletTool : MonoBehaviour
             ClearRevealState();
         }
 
-        RefreshLocalizedText();
-        setStatus(Localize(IsActive ? statusUvOn : statusUvOff));
+        setStatus(
+            Localize(
+                IsActive
+                    ? statusUvOn
+                    : statusUvOff
+            )
+        );
     }
 
     public void DisableMode()
@@ -126,99 +171,137 @@ public sealed class UltravioletTool : MonoBehaviour
         stopDragging();
         RestoreTextMesh();
         ClearRevealState();
-        ultravioletCursor.gameObject.SetActive(false);
-        RefreshLocalizedText();
+
+        ultravioletCursor.gameObject.SetActive(
+            false
+        );
     }
 
-    private void RefreshButtonVisual()
-    {
-        if (toolButton == null)
-            return;
-
-        ColorBlock colors = toolButton.colors;
-        Color stateColor = IsActive ? activeButtonColor : inactiveButtonColor;
-        colors.normalColor = stateColor;
-        colors.selectedColor = stateColor;
-        toolButton.colors = colors;
-
-        if (toolButton.targetGraphic != null)
-            toolButton.targetGraphic.color = stateColor;
-    }
-
+    // Оставлено временно для совместимости с DocumentRedactor.
+    // Старым UI кнопок этот метод больше не управляет.
     public void RefreshLocalizedText()
     {
-        RefreshButtonVisual();
-
-        if (ultravioletButtonText == null)
-            return;
-
-        LocalizedString selectedText = IsActive ? ultravioletActiveText : ultravioletInactiveText;
-        if (selectedText == null || selectedText.IsEmpty)
-            return;
-
-        ultravioletButtonText.text = selectedText.GetLocalizedString();
     }
 
     // Оставлен для совместимости с текущим DocumentRedactor.
     // Новая UV-визуализация работает напрямую через TMP mesh.
-    public string CreateRevealedWordMarkup(string originalText)
+    public string CreateRevealedWordMarkup(
+        string originalText)
     {
         return originalText;
     }
 
-    private void ApplyUltravioletEffect(Vector2 lampScreenPosition)
+    private void ApplyUltravioletEffect(
+        Vector2 lampScreenPosition)
     {
-        // Возвращаем исходные цвета TMP, затем красим только символы,
-        // которые реально попали внутрь круга лампы.
         documentText.ForceMeshUpdate();
-        TMP_TextInfo textInfo = documentText.textInfo;
 
-        for (int linkIndex = 0; linkIndex < textInfo.linkCount; linkIndex++)
+        TMP_TextInfo textInfo =
+            documentText.textInfo;
+
+        for (int linkIndex = 0;
+             linkIndex < textInfo.linkCount;
+             linkIndex++)
         {
-            TMP_LinkInfo linkInfo = textInfo.linkInfo[linkIndex];
+            TMP_LinkInfo linkInfo =
+                textInfo.linkInfo[linkIndex];
 
-            if (!int.TryParse(linkInfo.GetLinkID(), out int wordId))
-                continue;
-            if (wordId < 0 || wordId >= words.Count)
-                continue;
-
-            DocumentWord word = words[wordId];
-            if (word.isRedacted || !word.CanBeRevealedBy(RevealMethod.Ultraviolet))
-                continue;
-
-            int first = linkInfo.linkTextfirstCharacterIndex;
-            int last = first + linkInfo.linkTextLength;
-
-            for (int characterIndex = first; characterIndex < last; characterIndex++)
+            if (!int.TryParse(
+                    linkInfo.GetLinkID(),
+                    out int wordId))
             {
-                if (characterIndex < 0 || characterIndex >= textInfo.characterCount)
-                    continue;
+                continue;
+            }
 
-                TMP_CharacterInfo characterInfo = textInfo.characterInfo[characterIndex];
+            if (wordId < 0 ||
+                wordId >= words.Count)
+            {
+                continue;
+            }
+
+            DocumentWord word =
+                words[wordId];
+
+            if (word.isRedacted ||
+                !word.CanBeRevealedBy(
+                    RevealMethod.Ultraviolet))
+            {
+                continue;
+            }
+
+            int first =
+                linkInfo.linkTextfirstCharacterIndex;
+
+            int last =
+                first + linkInfo.linkTextLength;
+
+            for (int characterIndex = first;
+                 characterIndex < last;
+                 characterIndex++)
+            {
+                if (characterIndex < 0 ||
+                    characterIndex >= textInfo.characterCount)
+                {
+                    continue;
+                }
+
+                TMP_CharacterInfo characterInfo =
+                    textInfo.characterInfo[
+                        characterIndex
+                    ];
+
                 if (!characterInfo.isVisible)
                     continue;
 
-                if (!IsCharacterInsideCircle(characterInfo, lampScreenPosition, ultravioletRevealRadius))
+                if (!IsCharacterInsideCircle(
+                        characterInfo,
+                        lampScreenPosition,
+                        ultravioletRevealRadius))
+                {
                     continue;
+                }
 
-                ColorCharacter(characterInfo, textInfo, ultravioletSecretTextColor);
+                ColorCharacter(
+                    characterInfo,
+                    textInfo,
+                    ultravioletSecretTextColor
+                );
             }
         }
 
-        documentText.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
+        documentText.UpdateVertexData(
+            TMP_VertexDataUpdateFlags.Colors32
+        );
     }
 
-    private void ColorCharacter(TMP_CharacterInfo characterInfo, TMP_TextInfo textInfo, Color32 color)
+    private void ColorCharacter(
+        TMP_CharacterInfo characterInfo,
+        TMP_TextInfo textInfo,
+        Color32 color)
     {
-        int materialIndex = characterInfo.materialReferenceIndex;
-        int vertexIndex = characterInfo.vertexIndex;
+        int materialIndex =
+            characterInfo.materialReferenceIndex;
 
-        if (materialIndex < 0 || materialIndex >= textInfo.meshInfo.Length)
-            return;
+        int vertexIndex =
+            characterInfo.vertexIndex;
 
-        Color32[] colors = textInfo.meshInfo[materialIndex].colors32;
-        if (colors == null || vertexIndex < 0 || vertexIndex + 3 >= colors.Length)
+        if (materialIndex < 0 ||
+            materialIndex >= textInfo.meshInfo.Length)
+        {
             return;
+        }
+
+        Color32[] colors =
+            textInfo.meshInfo[
+                materialIndex
+            ].colors32;
+
+        if (colors == null ||
+            vertexIndex < 0 ||
+            vertexIndex + 3 >= colors.Length)
+        {
+            return;
+        }
 
         colors[vertexIndex + 0] = color;
         colors[vertexIndex + 1] = color;
@@ -226,25 +309,74 @@ public sealed class UltravioletTool : MonoBehaviour
         colors[vertexIndex + 3] = color;
     }
 
-    private bool IsCharacterInsideCircle(TMP_CharacterInfo characterInfo, Vector2 circleCenter, float radius)
+    private bool IsCharacterInsideCircle(
+        TMP_CharacterInfo characterInfo,
+        Vector2 circleCenter,
+        float radius)
     {
-        Vector3 bottomLeftWorld = documentText.transform.TransformPoint(characterInfo.bottomLeft);
-        Vector3 topRightWorld = documentText.transform.TransformPoint(characterInfo.topRight);
+        Vector3 bottomLeftWorld =
+            documentText.transform.TransformPoint(
+                characterInfo.bottomLeft
+            );
 
-        Vector2 bottomLeftScreen = RectTransformUtility.WorldToScreenPoint(GetDocumentCanvasCamera(), bottomLeftWorld);
-        Vector2 topRightScreen = RectTransformUtility.WorldToScreenPoint(GetDocumentCanvasCamera(), topRightWorld);
+        Vector3 topRightWorld =
+            documentText.transform.TransformPoint(
+                characterInfo.topRight
+            );
 
-        float minX = Mathf.Min(bottomLeftScreen.x, topRightScreen.x);
-        float maxX = Mathf.Max(bottomLeftScreen.x, topRightScreen.x);
-        float minY = Mathf.Min(bottomLeftScreen.y, topRightScreen.y);
-        float maxY = Mathf.Max(bottomLeftScreen.y, topRightScreen.y);
+        Vector2 bottomLeftScreen =
+            RectTransformUtility.WorldToScreenPoint(
+                GetDocumentCanvasCamera(),
+                bottomLeftWorld
+            );
 
-        Vector2 closestPoint = new Vector2(
-            Mathf.Clamp(circleCenter.x, minX, maxX),
-            Mathf.Clamp(circleCenter.y, minY, maxY)
-        );
+        Vector2 topRightScreen =
+            RectTransformUtility.WorldToScreenPoint(
+                GetDocumentCanvasCamera(),
+                topRightWorld
+            );
 
-        return Vector2.SqrMagnitude(circleCenter - closestPoint) <= radius * radius;
+        float minX =
+            Mathf.Min(
+                bottomLeftScreen.x,
+                topRightScreen.x
+            );
+
+        float maxX =
+            Mathf.Max(
+                bottomLeftScreen.x,
+                topRightScreen.x
+            );
+
+        float minY =
+            Mathf.Min(
+                bottomLeftScreen.y,
+                topRightScreen.y
+            );
+
+        float maxY =
+            Mathf.Max(
+                bottomLeftScreen.y,
+                topRightScreen.y
+            );
+
+        Vector2 closestPoint =
+            new Vector2(
+                Mathf.Clamp(
+                    circleCenter.x,
+                    minX,
+                    maxX
+                ),
+                Mathf.Clamp(
+                    circleCenter.y,
+                    minY,
+                    maxY
+                )
+            );
+
+        return Vector2.SqrMagnitude(
+            circleCenter - closestPoint
+        ) <= radius * radius;
     }
 
     private void RestoreTextMesh()
@@ -253,32 +385,51 @@ public sealed class UltravioletTool : MonoBehaviour
             return;
 
         documentText.ForceMeshUpdate();
-        documentText.UpdateVertexData(TMP_VertexDataUpdateFlags.Colors32);
+
+        documentText.UpdateVertexData(
+            TMP_VertexDataUpdateFlags.Colors32
+        );
     }
 
     private void ClearRevealState()
     {
         foreach (DocumentWord word in words)
-            word.isUltravioletRevealed = false;
+        {
+            word.isUltravioletRevealed =
+                false;
+        }
     }
 
     private Camera GetDocumentCanvasCamera()
     {
-        if (documentText == null || documentText.canvas == null)
+        if (documentText == null ||
+            documentText.canvas == null)
+        {
             return null;
+        }
 
-        Canvas canvas = documentText.canvas;
-        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+        Canvas canvas =
+            documentText.canvas;
+
+        if (canvas.renderMode ==
+            RenderMode.ScreenSpaceOverlay)
+        {
             return null;
+        }
 
         return canvas.worldCamera;
     }
 
-    private string Localize(LocalizedString localizedString)
+    private string Localize(
+        LocalizedString localizedString)
     {
-        if (localizedString == null || localizedString.IsEmpty)
+        if (localizedString == null ||
+            localizedString.IsEmpty)
+        {
             return string.Empty;
+        }
 
-        return localizedString.GetLocalizedString();
+        return localizedString
+            .GetLocalizedString();
     }
 }

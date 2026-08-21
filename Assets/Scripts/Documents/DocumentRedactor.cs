@@ -1447,10 +1447,6 @@ public class DocumentRedactor :
 
     private void UpdateDynamicButtonTexts()
     {
-        ultravioletTool.RefreshLocalizedText();
-        magnifierTool.RefreshLocalizedText();
-        decoderTool.RefreshLocalizedText();
-        pencilTool.RefreshLocalizedText();
         UpdateNextDocumentButtonText();
     }
     private void UpdateNextDocumentButtonText()
