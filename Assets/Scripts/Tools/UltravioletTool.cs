@@ -71,8 +71,6 @@ public sealed class UltravioletTool : MonoBehaviour
         bool valid = true;
 
         if (documentText == null) { Debug.LogError("UltravioletTool: не назначен Document Text.", this); valid = false; }
-        if (ultravioletButtonText == null) { Debug.LogError("UltravioletTool: не назначен Button Text.", this); valid = false; }
-        if (toolButton == null) { Debug.LogError("UltravioletTool: не назначен Tool Button.", this); valid = false; }
         if (ultravioletCursor == null) { Debug.LogError("UltravioletTool: не назначен Ultraviolet Cursor.", this); valid = false; }
         if (words == null) { Debug.LogError("UltravioletTool: не передан список слов.", this); valid = false; }
         if (refreshDocument == null || stopDragging == null || isDocumentFinished == null || setStatus == null)

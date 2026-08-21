@@ -130,26 +130,6 @@ public sealed class DecoderTool : MonoBehaviour
             referencesAreValid = false;
         }
 
-        if (decoderButtonText == null)
-        {
-            Debug.LogError(
-                "DecoderTool: не назначен Decoder Button Text.",
-                this
-            );
-
-            referencesAreValid = false;
-        }
-
-        if (toolButton == null)
-        {
-            Debug.LogError(
-                "DecoderTool: не назначен Tool Button.",
-                this
-            );
-
-            referencesAreValid = false;
-        }
-
         if (decoderCursor == null)
         {
             Debug.LogError(

@@ -70,26 +70,6 @@ public sealed class PencilTool : MonoBehaviour
     {
         bool referencesAreValid = true;
 
-        if (pencilButtonText == null)
-        {
-            Debug.LogError(
-                "PencilTool: не назначен Pencil Button Text.",
-                this
-            );
-
-            referencesAreValid = false;
-        }
-
-        if (toolButton == null)
-        {
-            Debug.LogError(
-                "PencilTool: не назначен Tool Button.",
-                this
-            );
-
-            referencesAreValid = false;
-        }
-
         if (stopDragging == null ||
             isDocumentFinished == null)
         {

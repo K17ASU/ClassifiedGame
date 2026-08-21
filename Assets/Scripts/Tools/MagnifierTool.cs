@@ -71,8 +71,6 @@ public sealed class MagnifierTool : MonoBehaviour
         bool valid = true;
 
         if (documentText == null) { Debug.LogError("MagnifierTool: не назначен Document Text.", this); valid = false; }
-        if (magnifierButtonText == null) { Debug.LogError("MagnifierTool: не назначен Magnifier Button Text.", this); valid = false; }
-        if (toolButton == null) { Debug.LogError("MagnifierTool: не назначен Tool Button.", this); valid = false; }
         if (magnifierCursor == null) { Debug.LogError("MagnifierTool: не назначен Magnifier Cursor.", this); valid = false; }
         if (words == null) { Debug.LogError("MagnifierTool: не передан список слов.", this); valid = false; }
         if (stopDragging == null || isDocumentFinished == null || setStatus == null)
