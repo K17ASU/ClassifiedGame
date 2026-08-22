@@ -1092,6 +1092,8 @@ public class DocumentRedactor :
 
         StopDragging();
 
+        GameFlowSfxController.PlaySubmit();
+
         DocumentEvaluationResult evaluation =
             documentEvaluator.Evaluate(words);
 
@@ -1221,6 +1223,10 @@ public class DocumentRedactor :
 
         submitButton.SetActive(false);
         winPanel.SetActive(true);
+
+        GameFlowSfxController.PlayResult(
+    documentPassed
+);
 
         bool hasNextDocument =
             currentDocumentIndex <

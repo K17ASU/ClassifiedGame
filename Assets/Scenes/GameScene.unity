@@ -9028,6 +9028,7 @@ GameObject:
   - component: {fileID: 1714615941}
   - component: {fileID: 1714615944}
   - component: {fileID: 1714615945}
+  - component: {fileID: 1714615946}
   m_Layer: 0
   m_Name: SFX
   m_TagString: Untagged
@@ -9212,6 +9213,24 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 7c2ac46f682654344862dfabc47bc9ae, type: 3}
   soundVolume: 0.7
   minimumInterval: 0.06
+--- !u!114 &1714615946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714615940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72c2a1da309797d4f8417059614792b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameFlowSfxController
+  submitSound: {fileID: 8300000, guid: 107861d275af5814d8e48f77d04f0160, type: 3}
+  acceptedSound: {fileID: 8300000, guid: c57424e75a24fac4eb6a69713f46d285, type: 3}
+  failedSound: {fileID: 8300000, guid: 37361f18a487f574ca54b081bfe1ac5f, type: 3}
+  submitVolume: 0.8
+  resultVolume: 0.8
+  resultDelay: 0.25
 --- !u!1 &1720914166
 GameObject:
   m_ObjectHideFlags: 0
