@@ -39,6 +39,21 @@ public sealed class CodexUIController : MonoBehaviour
     [SerializeField]
     private Button nextButton;
 
+    [Header("Sounds")]
+
+    [SerializeField]
+    private AudioClip openSound;
+
+    [SerializeField]
+    private AudioClip closeSound;
+
+    [SerializeField]
+    private AudioClip pageTurnSound;
+
+    [SerializeField]
+    [Range(0f, 1f)]
+    private float soundVolume = 1f;
+
     private int currentIndex;
 
     private void OnEnable()
@@ -92,12 +107,22 @@ public sealed class CodexUIController : MonoBehaviour
 
         codexPanel.SetActive(true);
         RefreshPage();
+
+        SfxPlayer.Play(
+            openSound,
+            soundVolume
+        );
     }
 
     public void CloseCodex()
     {
         codexPanel.SetActive(false);
         RefreshButtonState();
+
+        SfxPlayer.Play(
+            closeSound,
+            soundVolume
+        );
     }
 
     public void ShowPreviousEntry()
@@ -118,6 +143,11 @@ public sealed class CodexUIController : MonoBehaviour
         }
 
         RefreshPage();
+
+        SfxPlayer.Play(
+            pageTurnSound,
+            soundVolume
+        );
     }
 
     public void ShowNextEntry()
@@ -138,6 +168,11 @@ public sealed class CodexUIController : MonoBehaviour
         }
 
         RefreshPage();
+
+        SfxPlayer.Play(
+            pageTurnSound,
+            soundVolume
+        );
     }
 
     private void RefreshPage()
