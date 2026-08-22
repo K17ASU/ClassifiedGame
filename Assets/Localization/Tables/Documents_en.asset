@@ -54,9 +54,13 @@ MonoBehaviour:
       processing.
 
 
-      Redact the name of the facility you will be assigned to,
-      then submit the document for review by clicking the "SUBMIT DOCUMENT" button
-      in the bottom-right corner.'
+      To put down an instrument you currently hold and return
+      to marker, press the right mouse button.
+
+
+      Redact the name of the facility
+      you will be assigned to, then submit the document for review by clicking the
+      "SUBMIT DOCUMENT" button in the bottom-right corner.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915525
@@ -402,6 +406,41 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 1745272116396032
     m_Localized: DOCUMENT No. 002
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5560500129705984
+    m_Localized: DOCUMENT No. 1337
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5560500150677504
+    m_Localized: FOR YOUR EYES ONLY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5560500150677505
+    m_Localized: '[uv]Light this up with UV lamp[/]
+
+
+      [magnifier]Look here
+      with Lense[/]
+
+
+      [decoder=so cool]Decode this with Decoder[/]
+
+
+      [uv,magnifier,decoder=much
+      wow]Here combine all the tools[/]
+
+
+      [redact]delete dis[/]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5560500150677506
+    m_Localized: "Redact:\n \n\u2022 Last line\n\nAlso here is alot of text for testing
+      briefing size\nAlso here is alot of text for testing briefing size\nAlso here
+      is alot of text for testing briefing size\nAlso here is alot of text for testing
+      briefing size\nAlso here is alot of text for testing briefing size\nAlso here
+      is alot of text for testing briefing size\nAlso here is alot of text for testing
+      briefing size"
     m_Metadata:
       m_Items: []
   references:

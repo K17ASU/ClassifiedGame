@@ -17,40 +17,41 @@ MonoBehaviour:
   documentText: 
   isTutorial: 0
   unlocksAfterCompletion: 0
-  localizationId: 
+  codexEntriesToUnlock: []
+  localizationId: test_document
   localizedDocumentNumber:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 192010200334336
-      m_Key: 
+      m_KeyId: 0
+      m_Key: test_document_number
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentTitle:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 192083919421440
-      m_Key: 
+      m_KeyId: 0
+      m_Key: test_document_title
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentText:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 192118518235136
-      m_Key: 
+      m_KeyId: 0
+      m_Key: test_document_text
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedBriefing:
     m_TableReference:
-      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
+      m_TableCollectionName: Documents
     m_TableEntryReference:
-      m_KeyId: 192144309010432
-      m_Key: 
+      m_KeyId: 0
+      m_Key: test_document_briefing
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []

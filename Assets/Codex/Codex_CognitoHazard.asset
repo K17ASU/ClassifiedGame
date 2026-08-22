@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Codex_CognitoHazard
   m_EditorClassIdentifier: Assembly-CSharp::CodexEntry
   entryId: coginto_hazard
-  order: 20
+  order: 25
   localizedTitle:
     m_TableReference:
       m_TableCollectionName: GUID:36c33b865f5279f4cbc27f93046778b6

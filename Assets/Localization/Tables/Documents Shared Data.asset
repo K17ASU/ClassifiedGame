@@ -191,6 +191,22 @@ MonoBehaviour:
     m_Key: document_promo_briefing
     m_Metadata:
       m_Items: []
+  - m_Id: 5560500129705984
+    m_Key: test_document_number
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5560500150677504
+    m_Key: test_document_title
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5560500150677505
+    m_Key: test_document_text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 5560500150677506
+    m_Key: test_document_briefing
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
