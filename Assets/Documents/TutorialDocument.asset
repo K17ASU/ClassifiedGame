@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3ef4614fdfd89049bb2af4a160e869c, type: 3}
   m_Name: TutorialDocument
   m_EditorClassIdentifier: Assembly-CSharp::DocumentData
+  documentId: TUT_001
   documentNumber: "\u0412\u0412\u041E\u0414\u041D\u0410\u042F \u0427\u0410\u0421\u0422\u042C"
   documentTitle: "\u041E\u0431\u0443\u0447\u0435\u043D\u0438\u0435"
   documentText: "\u0421\u041B\u0423\u0416\u0415\u0411\u041D\u0410\u042F \u0417\u0410\u041F\u0418\u0421\u041A\u0410\r\n\r\n\u0412\u044B

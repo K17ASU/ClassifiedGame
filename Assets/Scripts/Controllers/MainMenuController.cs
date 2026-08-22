@@ -106,7 +106,8 @@ public class MainMenuController : MonoBehaviour
     }
 
     /// <summary>
-    /// Сохраняет имя игрока и загружает игровую сцену.
+    /// Сохраняет имя игрока, очищает старую кампанию
+    /// и загружает игровую сцену.
     /// </summary>
     public void StartNewGame()
     {
@@ -140,6 +141,14 @@ public class MainMenuController : MonoBehaviour
         }
 
         PlayerProfile.SetPlayerName(playerName);
+
+        if (!SaveManager.DeleteSave())
+        {
+            Debug.LogError(
+                "MainMenuController: не удалось очистить старое сохранение."
+            );
+            return;
+        }
 
         SceneManager.LoadScene(gameSceneName);
     }

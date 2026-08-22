@@ -105,6 +105,11 @@ public class DocumentRedactor :
     private List<DocumentData> documents =
         new List<DocumentData>();
 
+    [Header("Сохранения")]
+
+    [SerializeField]
+    private CodexManager codexManager;
+
     [Header("Проверки")]
 
     [SerializeField]
@@ -299,6 +304,16 @@ public class DocumentRedactor :
         unlockedTools = RevealMethod.None;
 
         LoadCurrentDocument();
+
+        CampaignProgress.StartNewCampaign(
+            CurrentDocument != null
+                ? CurrentDocument.DocumentId
+                : string.Empty,
+            (int)unlockedTools,
+            codexManager.GetUnlockedEntryIds(),
+            codexManager.GetReadEntryIds()
+        );
+
         isInitialized = true;
     }
 
@@ -520,6 +535,15 @@ public class DocumentRedactor :
         {
             Debug.LogError(
                 "Не назначено поле Pencil Button."
+            );
+
+            referencesAreValid = false;
+        }
+       
+        if (codexManager == null)
+        {
+            Debug.LogError(
+                "Не назначено поле Codex Manager."
             );
 
             referencesAreValid = false;
@@ -1317,7 +1341,96 @@ public class DocumentRedactor :
             );
         }
 
+        SaveCheckpointAfterCurrentDocument(
+            documentPassed,
+            documentScore
+        );
+
         ClearInspectionStatus();
+    }
+
+    private void SaveCheckpointAfterCurrentDocument(
+        bool documentPassed,
+        int documentScore
+    )
+    {
+        if (CurrentDocument == null)
+        {
+            return;
+        }
+
+        DocumentData nextDocument = null;
+
+        if (currentDocumentIndex <
+            documents.Count - 1)
+        {
+            nextDocument =
+                documents[
+                    currentDocumentIndex + 1
+                ];
+        }
+
+        string nextDocumentId =
+            nextDocument != null
+                ? nextDocument.DocumentId
+                : string.Empty;
+
+        int inspectionsUsed =
+            IsCurrentDocumentTutorial()
+                ? 0
+                : Mathf.Clamp(
+                    maximumInspections -
+                    inspectionsRemaining,
+                    0,
+                    maximumInspections
+                );
+
+        RevealMethod toolsForNextDocument =
+            unlockedTools |
+            CurrentDocument.UnlocksAfterCompletion;
+
+        List<string> unlockedCodexIds =
+            codexManager.GetUnlockedEntryIds();
+
+        List<string> readCodexIds =
+            codexManager.GetReadEntryIds();
+
+        if (nextDocument != null)
+        {
+            foreach (
+                CodexEntry entry
+                in nextDocument.CodexEntriesToUnlock
+            )
+            {
+                if (entry == null ||
+                    string.IsNullOrWhiteSpace(
+                        entry.EntryId
+                    ))
+                {
+                    continue;
+                }
+
+                if (!unlockedCodexIds.Contains(
+                        entry.EntryId))
+                {
+                    unlockedCodexIds.Add(
+                        entry.EntryId
+                    );
+                }
+            }
+        }
+
+        CampaignProgress.RecordDocumentCompletion(
+            CurrentDocument.DocumentId,
+            documentScore,
+            documentPassed,
+            inspectionsUsed,
+            nextDocumentId,
+            totalScore,
+            (int)toolsForNextDocument,
+            unlockedCodexIds,
+            readCodexIds
+        );
     }
 
     private int GetMaximumTotalScore()
@@ -1336,6 +1449,9 @@ public class DocumentRedactor :
         UnlockToolsFromCurrentDocument();
 
         currentDocumentIndex++;
+
+        UnlockCodexEntriesForCurrentDocument();
+
         LoadCurrentDocument();
     }
 
@@ -1348,7 +1464,18 @@ public class DocumentRedactor :
         documentFinished = false;
         unlockedTools = RevealMethod.None;
 
+        codexManager.ResetProgress();
+
         LoadCurrentDocument();
+
+        CampaignProgress.StartNewCampaign(
+            CurrentDocument != null
+                ? CurrentDocument.DocumentId
+                : string.Empty,
+            (int)unlockedTools,
+            codexManager.GetUnlockedEntryIds(),
+            codexManager.GetReadEntryIds()
+        );
     }
 
     private int GetPlayableDocumentCount()
@@ -1596,5 +1723,17 @@ public class DocumentRedactor :
 
         unlockedTools |=
             CurrentDocument.UnlocksAfterCompletion;
+    }
+    private void UnlockCodexEntriesForCurrentDocument()
+    {
+        if (CurrentDocument == null ||
+            codexManager == null)
+        {
+            return;
+        }
+
+        codexManager.UnlockEntries(
+            CurrentDocument.CodexEntriesToUnlock
+        );
     }
 }

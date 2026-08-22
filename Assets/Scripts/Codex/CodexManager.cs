@@ -107,6 +107,76 @@ public sealed class CodexManager : MonoBehaviour
                readIds.Contains(entry.EntryId);
     }
 
+    /// <summary>
+    /// Возвращает копию ID всех открытых записей.
+    /// Копия безопасна для записи в save-data.
+    /// </summary>
+    public List<string> GetUnlockedEntryIds()
+    {
+        return new List<string>(unlockedIds);
+    }
+
+    /// <summary>
+    /// Возвращает копию ID всех прочитанных записей.
+    /// Копия безопасна для записи в save-data.
+    /// </summary>
+    public List<string> GetReadEntryIds()
+    {
+        return new List<string>(readIds);
+    }
+
+    /// <summary>
+    /// Полностью восстанавливает состояние кодекса по ID.
+    /// Неизвестные ID игнорируются.
+    /// Прочитанной может быть только уже открытая запись.
+    /// </summary>
+    public void RestoreProgress(
+        IReadOnlyList<string> unlockedEntryIds,
+        IReadOnlyList<string> readEntryIds
+    )
+    {
+        unlockedIds.Clear();
+        readIds.Clear();
+
+        HashSet<string> validEntryIds =
+            BuildValidEntryIdSet();
+
+        if (unlockedEntryIds != null)
+        {
+            foreach (string entryId in unlockedEntryIds)
+            {
+                if (string.IsNullOrWhiteSpace(entryId))
+                {
+                    continue;
+                }
+
+                if (validEntryIds.Contains(entryId))
+                {
+                    unlockedIds.Add(entryId);
+                }
+            }
+        }
+
+        if (readEntryIds != null)
+        {
+            foreach (string entryId in readEntryIds)
+            {
+                if (string.IsNullOrWhiteSpace(entryId))
+                {
+                    continue;
+                }
+
+                if (unlockedIds.Contains(entryId))
+                {
+                    readIds.Add(entryId);
+                }
+            }
+        }
+
+        RebuildUnlockedEntries();
+        EntriesChanged?.Invoke();
+    }
+
     public void ResetProgress()
     {
         unlockedIds.Clear();
@@ -114,6 +184,25 @@ public sealed class CodexManager : MonoBehaviour
         unlockedEntries.Clear();
 
         EntriesChanged?.Invoke();
+    }
+
+    private HashSet<string> BuildValidEntryIdSet()
+    {
+        HashSet<string> validEntryIds =
+            new HashSet<string>();
+
+        foreach (CodexEntry entry in allEntries)
+        {
+            if (entry == null ||
+                string.IsNullOrWhiteSpace(entry.EntryId))
+            {
+                continue;
+            }
+
+            validEntryIds.Add(entry.EntryId);
+        }
+
+        return validEntryIds;
     }
 
     private void RebuildUnlockedEntries()

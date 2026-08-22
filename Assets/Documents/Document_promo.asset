@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3ef4614fdfd89049bb2af4a160e869c, type: 3}
   m_Name: Document_promo
   m_EditorClassIdentifier: Assembly-CSharp::DocumentData
+  documentId: DOC_008
   documentNumber: "\u0414\u041E\u041A\u041B\u0410\u0414 \u2116 002"
   documentTitle: "\u041E\u0437\u0435\u0440\u043D\u043E\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u043E"
   documentText: 
   isTutorial: 0
+  unlocksAfterCompletion: 0
+  codexEntriesToUnlock: []
   localizationId: document_promo
   localizedDocumentNumber:
     m_TableReference:

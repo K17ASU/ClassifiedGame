@@ -8,6 +8,11 @@ using UnityEngine.Localization;
 )]
 public class DocumentData : ScriptableObject
 {
+    [Header("Save")]
+
+    [SerializeField]
+    private string documentId;
+
     [Header("Document")]
 
     [SerializeField]
@@ -51,6 +56,8 @@ public class DocumentData : ScriptableObject
 
     [SerializeField]
     private LocalizedString localizedBriefing;
+
+    public string DocumentId => documentId;
 
     public string DocumentNumber => documentNumber;
     public string DocumentTitle => documentTitle;
@@ -123,6 +130,14 @@ public class DocumentData : ScriptableObject
             $"Localization привязана: {localizationId}",
             this
         );
+    }
+
+    private void OnValidate()
+    {
+        if (documentId != null)
+        {
+            documentId = documentId.Trim();
+        }
     }
 
     private void BindLocalizedString(
