@@ -9026,6 +9026,8 @@ GameObject:
   - component: {fileID: 1714615943}
   - component: {fileID: 1714615942}
   - component: {fileID: 1714615941}
+  - component: {fileID: 1714615944}
+  - component: {fileID: 1714615945}
   m_Layer: 0
   m_Name: SFX
   m_TagString: Untagged
@@ -9157,6 +9159,59 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1714615944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714615940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e51d25fd396730340b86207a1493e95e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ToolSfxController
+  ultravioletTool: {fileID: 677106339}
+  magnifierTool: {fileID: 677106340}
+  decoderTool: {fileID: 677106341}
+  pencilTool: {fileID: 1976329495}
+  ultravioletOnSound: {fileID: 8300000, guid: a858958e772c08d489c3cfd3e3014c81, type: 3}
+  ultravioletOffSound: {fileID: 8300000, guid: d01ffa0835ade834ea8c8cf57511a313, type: 3}
+  magnifierOnSound: {fileID: 8300000, guid: 57bdca344ad72f4408e6d40d8b1e7425, type: 3}
+  magnifierOffSound: {fileID: 8300000, guid: bb9ab66684869c94d927b0e53d200bd9, type: 3}
+  decoderOnSound: {fileID: 8300000, guid: 3e59ed49e1fb0aa4faba6f9b2f0f83ab, type: 3}
+  decoderOffSound: {fileID: 8300000, guid: 2b2213e2fd92d754fb3d92abdd7f591b, type: 3}
+  pencilOnSound: {fileID: 8300000, guid: cdcbbd3e730c25d43a4d6447b2271d97, type: 3}
+  pencilOffSound: {fileID: 8300000, guid: 750420b7db3a1fd4abe7eab4ef33e7c7, type: 3}
+  soundVolume: 0.8
+--- !u!114 &1714615945
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1714615940}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31ebf1a66d3d70741b688ed7eadda355, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DocumentSfxController
+  redactSounds:
+  - {fileID: 8300000, guid: aa5432682a83a8c4e9fe9d359452103e, type: 3}
+  - {fileID: 8300000, guid: 9b674b2bbd27e504799de6ca5e4a2365, type: 3}
+  - {fileID: 8300000, guid: 1cdbe0384ff2e2841b34cd0d1847f4b1, type: 3}
+  unredactSounds:
+  - {fileID: 8300000, guid: 8193195c4284c6e46b200728701e3344, type: 3}
+  - {fileID: 8300000, guid: b1cd87a05a2a1314cb0c20f787272724, type: 3}
+  pencilMarkSounds:
+  - {fileID: 8300000, guid: 59896b6584ebbfe4a8b1bb66469afe8e, type: 3}
+  - {fileID: 8300000, guid: 0d34648aaa9b1bd41b2b714199ec873a, type: 3}
+  - {fileID: 8300000, guid: 3c2470a195ba6ea4d9834a1e6f466407, type: 3}
+  pencilEraseSounds:
+  - {fileID: 8300000, guid: f7938df3f0f7b5c4d9d8b335901d1d35, type: 3}
+  - {fileID: 8300000, guid: 7c2ac46f682654344862dfabc47bc9ae, type: 3}
+  soundVolume: 0.7
+  minimumInterval: 0.06
 --- !u!1 &1720914166
 GameObject:
   m_ObjectHideFlags: 0
@@ -10803,7 +10858,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RandomMusicPlayer
   tracks:
-  - {fileID: 8300000, guid: 79e92490578cdd0418c84f7a8fdf8275, type: 3}
   - {fileID: 8300000, guid: 4f63da348ee96f848ac50fc86221216b, type: 3}
   - {fileID: 8300000, guid: 54da86f855110514ba9d045a55e2b1ee, type: 3}
   volume: 0.5

@@ -818,6 +818,9 @@ public class DocumentRedactor :
 
             word.isStruckThrough =
                 dragStrikeThroughState;
+            DocumentSfxController.PlayPencil(
+    dragStrikeThroughState
+);
         }
         else
         {
@@ -829,6 +832,9 @@ public class DocumentRedactor :
 
             word.isRedacted =
                 dragRedactionState;
+            DocumentSfxController.PlayRedaction(
+    dragRedactionState
+    );
         }
 
         RefreshDocument();
