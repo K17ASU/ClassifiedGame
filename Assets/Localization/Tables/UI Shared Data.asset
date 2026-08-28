@@ -249,6 +249,10 @@ MonoBehaviour:
     m_Key: codex_button
     m_Metadata:
       m_Items: []
+  - m_Id: 7934970119139328
+    m_Key: menu_continue
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

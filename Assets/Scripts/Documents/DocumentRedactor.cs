@@ -298,21 +298,44 @@ public class DocumentRedactor :
             yield break;
         }
 
-        currentDocumentIndex = 0;
-        totalScore = 0;
+        GameSessionStartMode startMode =
+            GameSessionRequest.Consume();
 
-        unlockedTools = RevealMethod.None;
+        if (startMode ==
+            GameSessionStartMode.Continue)
+        {
+            if (!CampaignProgress.TryLoadLatestCheckpoint(
+                    out CheckpointSaveData checkpoint) ||
+                !RestoreCheckpoint(checkpoint))
+            {
+                Debug.LogError(
+                    "Не удалось продолжить сохранённую кампанию."
+                );
 
-        LoadCurrentDocument();
+                enabled = false;
+                yield break;
+            }
+        }
+        else
+        {
+            currentDocumentIndex = 0;
+            totalScore = 0;
 
-        CampaignProgress.StartNewCampaign(
-            CurrentDocument != null
-                ? CurrentDocument.DocumentId
-                : string.Empty,
-            (int)unlockedTools,
-            codexManager.GetUnlockedEntryIds(),
-            codexManager.GetReadEntryIds()
-        );
+            unlockedTools = RevealMethod.None;
+
+            codexManager.ResetProgress();
+
+            LoadCurrentDocument();
+
+            CampaignProgress.StartNewCampaign(
+                CurrentDocument != null
+                    ? CurrentDocument.DocumentId
+                    : string.Empty,
+                (int)unlockedTools,
+                codexManager.GetUnlockedEntryIds(),
+                codexManager.GetReadEntryIds()
+            );
+        }
 
         isInitialized = true;
     }
@@ -564,6 +587,87 @@ public class DocumentRedactor :
                CurrentDocument.IsTutorial;
     }
 
+    private bool RestoreCheckpoint(
+     CheckpointSaveData checkpoint)
+    {
+        if (checkpoint == null ||
+            string.IsNullOrWhiteSpace(
+                checkpoint.currentDocumentId))
+        {
+            return false;
+        }
+
+        int documentIndex =
+            FindDocumentIndexById(
+                checkpoint.currentDocumentId
+            );
+
+        if (documentIndex < 0)
+        {
+            Debug.LogError(
+                $"Не найден документ с Document Id: " +
+                $"{checkpoint.currentDocumentId}"
+            );
+
+            return false;
+        }
+
+        currentDocumentIndex =
+            documentIndex;
+
+        totalScore =
+            Mathf.Max(
+                0,
+                checkpoint.totalScore
+            );
+
+        unlockedTools =
+            (RevealMethod)
+            checkpoint.unlockedToolsMask;
+
+        documentFinished = false;
+
+        codexManager.RestoreProgress(
+            checkpoint.unlockedCodexEntryIds,
+            checkpoint.readCodexEntryIds
+        );
+
+        LoadCurrentDocument();
+
+        Debug.Log(
+            $"Checkpoint восстановлен. " +
+            $"Документ: {checkpoint.currentDocumentId}, " +
+            $"счёт: {totalScore}."
+        );
+
+        return true;
+    }
+
+    private int FindDocumentIndexById(
+        string documentId)
+    {
+        if (string.IsNullOrWhiteSpace(documentId))
+        {
+            return -1;
+        }
+
+        for (int i = 0;
+             i < documents.Count;
+             i++)
+        {
+            DocumentData document =
+                documents[i];
+
+            if (document != null &&
+                document.DocumentId ==
+                documentId)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
     private void LoadCurrentDocument()
     {
         if (!IsValidDocumentIndex(currentDocumentIndex))

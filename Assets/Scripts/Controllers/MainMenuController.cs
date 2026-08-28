@@ -21,6 +21,11 @@ public class MainMenuController : MonoBehaviour
     [SerializeField]
     private Button startGameButton;
 
+    [Header("Сохранения")]
+
+    [SerializeField]
+    private Button continueGameButton;
+
     private bool isUpdatingInput;
 
     private void Start()
@@ -48,6 +53,7 @@ public class MainMenuController : MonoBehaviour
         );
 
         RefreshStartButton();
+        RefreshContinueButton();
     }
 
     private void OnDestroy()
@@ -105,9 +111,20 @@ public class MainMenuController : MonoBehaviour
             !string.IsNullOrWhiteSpace(playerName);
     }
 
+    private void RefreshContinueButton()
+    {
+        if (continueGameButton == null)
+        {
+            return;
+        }
+
+        continueGameButton.interactable =
+            CampaignProgress.CanContinue();
+    }
+
     /// <summary>
     /// Сохраняет имя игрока, очищает старую кампанию
-    /// и загружает игровую сцену.
+    /// и загружает игровую сцену как новую игру.
     /// </summary>
     public void StartNewGame()
     {
@@ -149,6 +166,38 @@ public class MainMenuController : MonoBehaviour
             );
             return;
         }
+
+        GameSessionRequest.RequestNewGame();
+
+        SceneManager.LoadScene(gameSceneName);
+    }
+
+    /// <summary>
+    /// Загружает игровую сцену и просит её восстановить
+    /// последний доступный checkpoint.
+    /// </summary>
+    public void ContinueGame()
+    {
+        if (string.IsNullOrWhiteSpace(gameSceneName))
+        {
+            Debug.LogError(
+                "Название игровой сцены не указано."
+            );
+
+            return;
+        }
+
+        if (!CampaignProgress.CanContinue())
+        {
+            Debug.LogWarning(
+                "MainMenuController: продолжать нечего."
+            );
+
+            RefreshContinueButton();
+            return;
+        }
+
+        GameSessionRequest.RequestContinue();
 
         SceneManager.LoadScene(gameSceneName);
     }
