@@ -21,11 +21,6 @@ public class MainMenuController : MonoBehaviour
     [SerializeField]
     private Button startGameButton;
 
-    [Header("Сохранения")]
-
-    [SerializeField]
-    private Button continueGameButton;
-
     private bool isUpdatingInput;
 
     private void Start()
@@ -53,7 +48,6 @@ public class MainMenuController : MonoBehaviour
         );
 
         RefreshStartButton();
-        RefreshContinueButton();
     }
 
     private void OnDestroy()
@@ -109,17 +103,6 @@ public class MainMenuController : MonoBehaviour
 
         startGameButton.interactable =
             !string.IsNullOrWhiteSpace(playerName);
-    }
-
-    private void RefreshContinueButton()
-    {
-        if (continueGameButton == null)
-        {
-            return;
-        }
-
-        continueGameButton.interactable =
-            CampaignProgress.CanContinue();
     }
 
     public void StartNewGame()
@@ -185,7 +168,6 @@ public class MainMenuController : MonoBehaviour
                 "MainMenuController: продолжать нечего."
             );
 
-            RefreshContinueButton();
             return;
         }
 
@@ -195,7 +177,7 @@ public class MainMenuController : MonoBehaviour
     }
 
     public void LoadCheckpoint(
-        int checkpointIndex)
+        int checkpointId)
     {
         if (string.IsNullOrWhiteSpace(gameSceneName))
         {
@@ -207,7 +189,7 @@ public class MainMenuController : MonoBehaviour
         }
 
         if (!CampaignProgress.SelectCheckpoint(
-                checkpointIndex))
+                checkpointId))
         {
             return;
         }
