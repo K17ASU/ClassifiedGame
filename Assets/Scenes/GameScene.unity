@@ -3622,7 +3622,7 @@ MonoBehaviour:
     m_TableReference:
       m_TableCollectionName: GUID:2c2b578ca7617c94fb50efa1bab2db63
     m_TableEntryReference:
-      m_KeyId: 14625563787264
+      m_KeyId: 472035934211
       m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
@@ -5947,9 +5947,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 677106338}
-        m_TargetAssemblyTypeName: DocumentRedactor, Assembly-CSharp
-        m_MethodName: RestartGame
+      - m_Target: {fileID: 1038908987}
+        m_TargetAssemblyTypeName: GameSceneController, Assembly-CSharp
+        m_MethodName: ReturnToMainMenu
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

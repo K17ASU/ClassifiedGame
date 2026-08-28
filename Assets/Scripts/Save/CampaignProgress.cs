@@ -151,6 +151,107 @@ public static class CampaignProgress
         return true;
     }
 
+    /// <summary>
+    /// Удаляет выбранный checkpoint и всех его потомков.
+    /// Корневой checkpoint новой игры удалить нельзя.
+    /// Если удаляемая ветка содержит активный checkpoint,
+    /// активным становится родитель удалённой ветки.
+    /// </summary>
+    public static bool DeleteBranch(
+        int branchRootCheckpointId,
+        out int deletedCheckpointCount)
+    {
+        deletedCheckpointCount = 0;
+
+        CampaignSaveData campaign =
+            LoadAndUpgradeCampaign();
+
+        if (!IsValidCampaign(campaign))
+        {
+            return false;
+        }
+
+        CheckpointSaveData branchRoot =
+            FindCheckpointById(
+                campaign,
+                branchRootCheckpointId
+            );
+
+        if (branchRoot == null)
+        {
+            Debug.LogError(
+                $"CampaignProgress: checkpoint #{branchRootCheckpointId} не существует."
+            );
+            return false;
+        }
+
+        if (branchRoot.parentCheckpointId < 0)
+        {
+            Debug.LogWarning(
+                "CampaignProgress: корневой checkpoint удалить нельзя."
+            );
+            return false;
+        }
+
+        HashSet<int> idsToDelete =
+            CollectBranchCheckpointIds(
+                campaign,
+                branchRootCheckpointId
+            );
+
+        if (idsToDelete.Count == 0)
+        {
+            return false;
+        }
+
+        bool activeCheckpointWillBeDeleted =
+            idsToDelete.Contains(
+                campaign.activeCheckpointId
+            );
+
+        if (activeCheckpointWillBeDeleted)
+        {
+            campaign.activeCheckpointId =
+                branchRoot.parentCheckpointId;
+        }
+
+        for (int i =
+                 campaign.checkpoints.Count - 1;
+             i >= 0;
+             i--)
+        {
+            CheckpointSaveData checkpoint =
+                campaign.checkpoints[i];
+
+            if (checkpoint != null &&
+                idsToDelete.Contains(
+                    checkpoint.checkpointId
+                ))
+            {
+                campaign.checkpoints.RemoveAt(i);
+                deletedCheckpointCount++;
+            }
+        }
+
+        currentCampaign =
+            campaign;
+
+        if (!SaveManager.SaveCampaign(
+                currentCampaign))
+        {
+            return false;
+        }
+
+        Debug.Log(
+            $"CampaignProgress: удалена ветка от checkpoint " +
+            $"#{branchRootCheckpointId}. " +
+            $"Удалено checkpoint'ов: {deletedCheckpointCount}. " +
+            $"Активный checkpoint: #{campaign.activeCheckpointId}."
+        );
+
+        return true;
+    }
+
     public static void StartNewCampaign(
         string firstDocumentId,
         int initialToolsMask,
@@ -349,6 +450,49 @@ public static class CampaignProgress
                 $"общий счёт: {totalScore}.{branchLabel}"
             );
         }
+    }
+
+    private static HashSet<int>
+        CollectBranchCheckpointIds(
+            CampaignSaveData campaign,
+            int branchRootCheckpointId)
+    {
+        HashSet<int> result =
+            new HashSet<int>();
+
+        Queue<int> queue =
+            new Queue<int>();
+
+        queue.Enqueue(
+            branchRootCheckpointId
+        );
+
+        while (queue.Count > 0)
+        {
+            int currentId =
+                queue.Dequeue();
+
+            if (!result.Add(currentId))
+            {
+                continue;
+            }
+
+            foreach (
+                CheckpointSaveData checkpoint
+                in campaign.checkpoints)
+            {
+                if (checkpoint != null &&
+                    checkpoint.parentCheckpointId ==
+                    currentId)
+                {
+                    queue.Enqueue(
+                        checkpoint.checkpointId
+                    );
+                }
+            }
+        }
+
+        return result;
     }
 
     private static CampaignSaveData

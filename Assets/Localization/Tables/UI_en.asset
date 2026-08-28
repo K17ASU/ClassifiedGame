@@ -267,6 +267,14 @@ MonoBehaviour:
     m_Localized: CAMPAIGN ARCHIVE
     m_Metadata:
       m_Items: []
+  - m_Id: 7961801513840640
+    m_Localized: DELETE BRANCH?
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7961860896796672
+    m_Localized: This branch and all later saves in it will be deleted.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

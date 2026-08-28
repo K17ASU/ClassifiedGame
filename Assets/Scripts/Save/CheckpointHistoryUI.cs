@@ -22,6 +22,17 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
     [SerializeField]
     private Button checkpointButtonTemplate;
 
+    [Header("Delete Confirmation")]
+
+    [SerializeField]
+    private GameObject deleteConfirmPanel;
+
+    [SerializeField]
+    private Button confirmDeleteButton;
+
+    [SerializeField]
+    private Button cancelDeleteButton;
+
     [Header("Data")]
 
     [SerializeField]
@@ -56,20 +67,41 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
     [SerializeField]
     private float bottomPadding = 80f;
 
-    [Header("Connectors")]
+    [Header("Normal Branch")]
+
+    [SerializeField]
+    private Color normalNodeColor =
+        new Color32(255, 255, 255, 255);
+
+    [SerializeField]
+    private Color normalConnectorColor =
+        new Color32(95, 115, 95, 255);
+
+    [Header("Active Branch")]
+
+    [SerializeField]
+    private Color activeNodeColor =
+        new Color32(175, 205, 175, 255);
+
+    [SerializeField]
+    private Color activeConnectorColor =
+        new Color32(150, 190, 150, 255);
 
     [SerializeField]
     private float connectorThickness = 2f;
 
     [SerializeField]
-    private Color connectorColor =
-        new Color(0.35f, 0.45f, 0.35f, 1f);
+    private float activeConnectorThickness = 4f;
 
     private readonly List<GameObject> spawnedObjects =
         new List<GameObject>();
 
     private readonly Dictionary<int, CheckpointSaveData>
         checkpointsById =
+            new Dictionary<int, CheckpointSaveData>();
+
+    private readonly Dictionary<int, CheckpointSaveData>
+        allCheckpointsById =
             new Dictionary<int, CheckpointSaveData>();
 
     private readonly Dictionary<int, List<CheckpointSaveData>>
@@ -83,14 +115,39 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
     private readonly HashSet<int> layoutVisited =
         new HashSet<int>();
 
+    private readonly HashSet<int> activePathIds =
+        new HashSet<int>();
+
     private int nextLeafRow;
     private int maxDepth;
+
+    private int pendingDeleteCheckpointId =
+        -1;
 
     private void Start()
     {
         if (historyPanel != null)
         {
             historyPanel.SetActive(false);
+        }
+
+        if (deleteConfirmPanel != null)
+        {
+            deleteConfirmPanel.SetActive(false);
+        }
+
+        if (confirmDeleteButton != null)
+        {
+            confirmDeleteButton.onClick.AddListener(
+                ConfirmDeleteBranch
+            );
+        }
+
+        if (cancelDeleteButton != null)
+        {
+            cancelDeleteButton.onClick.AddListener(
+                CancelDeleteBranch
+            );
         }
 
         RefreshOpenButton();
@@ -103,6 +160,20 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
     {
         LocalizationSettings.SelectedLocaleChanged -=
             OnSelectedLocaleChanged;
+
+        if (confirmDeleteButton != null)
+        {
+            confirmDeleteButton.onClick.RemoveListener(
+                ConfirmDeleteBranch
+            );
+        }
+
+        if (cancelDeleteButton != null)
+        {
+            cancelDeleteButton.onClick.RemoveListener(
+                CancelDeleteBranch
+            );
+        }
     }
 
     public void OpenHistory()
@@ -118,9 +189,77 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
 
     public void CloseHistory()
     {
+        CancelDeleteBranch();
+
         if (historyPanel != null)
         {
             historyPanel.SetActive(false);
+        }
+    }
+
+    private void RequestDeleteBranch(
+        int checkpointId)
+    {
+        if (checkpointId <= 0)
+        {
+            return;
+        }
+
+        pendingDeleteCheckpointId =
+            checkpointId;
+
+        if (deleteConfirmPanel != null)
+        {
+            deleteConfirmPanel.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning(
+                "CheckpointHistoryUI: Delete Confirm Panel не назначен."
+            );
+        }
+    }
+
+    private void ConfirmDeleteBranch()
+    {
+        if (pendingDeleteCheckpointId < 0)
+        {
+            return;
+        }
+
+        int checkpointId =
+            pendingDeleteCheckpointId;
+
+        pendingDeleteCheckpointId =
+            -1;
+
+        if (deleteConfirmPanel != null)
+        {
+            deleteConfirmPanel.SetActive(false);
+        }
+
+        if (CampaignProgress.DeleteBranch(
+                checkpointId,
+                out int deletedCount))
+        {
+            Debug.Log(
+                $"CheckpointHistoryUI: удалена ветка. " +
+                $"Checkpoint'ов удалено: {deletedCount}."
+            );
+
+            RefreshOpenButton();
+            RebuildCheckpointTree();
+        }
+    }
+
+    private void CancelDeleteBranch()
+    {
+        pendingDeleteCheckpointId =
+            -1;
+
+        if (deleteConfirmPanel != null)
+        {
+            deleteConfirmPanel.SetActive(false);
         }
     }
 
@@ -180,6 +319,7 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
         }
 
         BuildCheckpointGraph(campaign);
+        BuildActivePath(campaign);
 
         List<CheckpointSaveData> roots =
             FindRoots();
@@ -225,20 +365,28 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
         CampaignSaveData campaign)
     {
         checkpointsById.Clear();
+        allCheckpointsById.Clear();
         childrenByParentId.Clear();
 
         foreach (
             CheckpointSaveData checkpoint
             in campaign.checkpoints)
         {
-            if (!IsVisibleCheckpoint(checkpoint))
+            if (checkpoint == null)
             {
                 continue;
             }
 
-            checkpointsById[
+            allCheckpointsById[
                 checkpoint.checkpointId
             ] = checkpoint;
+
+            if (IsVisibleCheckpoint(checkpoint))
+            {
+                checkpointsById[
+                    checkpoint.checkpointId
+                ] = checkpoint;
+            }
         }
 
         foreach (
@@ -270,6 +418,47 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
                         b.checkpointId
                     )
             );
+        }
+    }
+
+    private void BuildActivePath(
+        CampaignSaveData campaign)
+    {
+        activePathIds.Clear();
+
+        int currentId =
+            campaign.activeCheckpointId;
+
+        int safetyCounter = 0;
+
+        while (
+            allCheckpointsById.TryGetValue(
+                currentId,
+                out CheckpointSaveData checkpoint
+            ))
+        {
+            activePathIds.Add(
+                checkpoint.checkpointId
+            );
+
+            if (checkpoint.parentCheckpointId < 0)
+            {
+                break;
+            }
+
+            currentId =
+                checkpoint.parentCheckpointId;
+
+            safetyCounter++;
+
+            if (safetyCounter >
+                allCheckpointsById.Count)
+            {
+                Debug.LogError(
+                    "CheckpointHistoryUI: обнаружен цикл в дереве checkpoint'ов."
+                );
+                break;
+            }
         }
     }
 
@@ -453,10 +642,24 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
                     ];
             }
 
+            ApplyNodeColors(
+                button,
+                activePathIds.Contains(
+                    checkpointId
+                )
+            );
+
+            CheckpointNodeView nodeView =
+                button.GetComponent<
+                    CheckpointNodeView
+                >();
+
             TMP_Text label =
-                button.GetComponentInChildren<TMP_Text>(
-                    true
-                );
+                nodeView != null
+                    ? nodeView.Label
+                    : button.GetComponentInChildren<
+                        TMP_Text
+                    >(true);
 
             if (label != null)
             {
@@ -478,10 +681,92 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
                     )
             );
 
+            bool campaignEnd =
+    string.IsNullOrWhiteSpace(
+        checkpoint.currentDocumentId
+    );
+
+            button.interactable =
+                !campaignEnd;
+
+            if (!campaignEnd)
+            {
+                button.onClick.AddListener(
+                    () =>
+                        mainMenuController.LoadCheckpoint(
+                            capturedCheckpointId
+                        )
+                );
+            }
+
+            if (nodeView != null &&
+                nodeView.DeleteButton != null)
+            {
+                Button deleteButton =
+                    nodeView.DeleteButton;
+
+                deleteButton.gameObject.SetActive(
+                    checkpoint.parentCheckpointId >= 0
+                );
+
+                deleteButton.onClick.RemoveAllListeners();
+
+                if (checkpoint.parentCheckpointId >= 0)
+                {
+                    deleteButton.onClick.AddListener(
+                        () =>
+                            RequestDeleteBranch(
+                                capturedCheckpointId
+                            )
+                    );
+                }
+            }
+
             spawnedObjects.Add(
                 button.gameObject
             );
         }
+    }
+
+    private void ApplyNodeColors(
+        Button button,
+        bool isActivePath)
+    {
+        if (button == null)
+        {
+            return;
+        }
+
+        Color baseColor =
+            isActivePath
+                ? activeNodeColor
+                : normalNodeColor;
+
+        ColorBlock colors =
+            button.colors;
+
+        colors.normalColor =
+            baseColor;
+
+        colors.selectedColor =
+            baseColor;
+
+        colors.highlightedColor =
+            Color.Lerp(
+                baseColor,
+                Color.white,
+                0.15f
+            );
+
+        colors.pressedColor =
+            Color.Lerp(
+                baseColor,
+                Color.black,
+                0.15f
+            );
+
+        button.colors =
+            colors;
     }
 
     private void CreateConnectors()
@@ -509,16 +794,26 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
                 continue;
             }
 
+            bool isActiveConnector =
+                activePathIds.Contains(
+                    checkpoint.parentCheckpointId
+                ) &&
+                activePathIds.Contains(
+                    checkpoint.checkpointId
+                );
+
             CreateConnector(
                 parentPosition,
-                childPosition
+                childPosition,
+                isActiveConnector
             );
         }
     }
 
     private void CreateConnector(
         Vector2 from,
-        Vector2 to)
+        Vector2 to,
+        bool isActive)
     {
         GameObject connector =
             new GameObject(
@@ -554,7 +849,9 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
         rect.sizeDelta =
             new Vector2(
                 delta.magnitude,
-                connectorThickness
+                isActive
+                    ? activeConnectorThickness
+                    : connectorThickness
             );
 
         rect.localRotation =
@@ -572,7 +869,9 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
             connector.GetComponent<Image>();
 
         image.color =
-            connectorColor;
+            isActive
+                ? activeConnectorColor
+                : normalConnectorColor;
 
         image.raycastTarget =
             false;
@@ -631,11 +930,7 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
     private bool IsVisibleCheckpoint(
         CheckpointSaveData checkpoint)
     {
-        return
-            checkpoint != null &&
-            !string.IsNullOrWhiteSpace(
-                checkpoint.currentDocumentId
-            );
+        return checkpoint != null;
     }
 
     private string GetCheckpointLabel(
