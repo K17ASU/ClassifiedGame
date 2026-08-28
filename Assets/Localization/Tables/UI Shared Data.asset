@@ -253,6 +253,10 @@ MonoBehaviour:
     m_Key: menu_continue
     m_Metadata:
       m_Items: []
+  - m_Id: 7949492024324096
+    m_Key: menu_history_title
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

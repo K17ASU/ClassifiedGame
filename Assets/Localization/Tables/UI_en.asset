@@ -263,6 +263,10 @@ MonoBehaviour:
     m_Localized: CONTINUE
     m_Metadata:
       m_Items: []
+  - m_Id: 7949492024324096
+    m_Localized: CAMPAIGN ARCHIVE
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
     RefIds:

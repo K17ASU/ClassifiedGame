@@ -122,10 +122,6 @@ public class MainMenuController : MonoBehaviour
             CampaignProgress.CanContinue();
     }
 
-    /// <summary>
-    /// Сохраняет имя игрока, очищает старую кампанию
-    /// и загружает игровую сцену как новую игру.
-    /// </summary>
     public void StartNewGame()
     {
         if (playerNameInput == null)
@@ -172,10 +168,6 @@ public class MainMenuController : MonoBehaviour
         SceneManager.LoadScene(gameSceneName);
     }
 
-    /// <summary>
-    /// Загружает игровую сцену и просит её восстановить
-    /// последний доступный checkpoint.
-    /// </summary>
     public void ContinueGame()
     {
         if (string.IsNullOrWhiteSpace(gameSceneName))
@@ -202,10 +194,29 @@ public class MainMenuController : MonoBehaviour
         SceneManager.LoadScene(gameSceneName);
     }
 
-    /// <summary>
-    /// Закрывает игру.
-    /// В редакторе Unity останавливает режим Play.
-    /// </summary>
+    public void LoadCheckpoint(
+        int checkpointIndex)
+    {
+        if (string.IsNullOrWhiteSpace(gameSceneName))
+        {
+            Debug.LogError(
+                "Название игровой сцены не указано."
+            );
+
+            return;
+        }
+
+        if (!CampaignProgress.SelectCheckpoint(
+                checkpointIndex))
+        {
+            return;
+        }
+
+        GameSessionRequest.RequestContinue();
+
+        SceneManager.LoadScene(gameSceneName);
+    }
+
     public void QuitGame()
     {
 #if UNITY_EDITOR
