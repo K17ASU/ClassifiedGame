@@ -126,13 +126,10 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
             return;
         }
 
-        for (int i = 0;
-             i < campaign.checkpoints.Count;
-             i++)
+        foreach (
+            CheckpointSaveData checkpoint
+            in campaign.checkpoints)
         {
-            CheckpointSaveData checkpoint =
-                campaign.checkpoints[i];
-
             if (checkpoint == null ||
                 string.IsNullOrWhiteSpace(
                     checkpoint.currentDocumentId))
@@ -141,15 +138,13 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
             }
 
             CreateCheckpointButton(
-                checkpoint,
-                i
+                checkpoint
             );
         }
     }
 
     private void CreateCheckpointButton(
-        CheckpointSaveData checkpoint,
-        int checkpointIndex)
+        CheckpointSaveData checkpoint)
     {
         Button button =
             Instantiate(
@@ -172,13 +167,13 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
 
         button.onClick.RemoveAllListeners();
 
-        int capturedIndex =
-            checkpointIndex;
+        int capturedCheckpointId =
+            checkpoint.checkpointId;
 
         button.onClick.AddListener(
             () =>
                 mainMenuController.LoadCheckpoint(
-                    capturedIndex
+                    capturedCheckpointId
                 )
         );
 
@@ -193,40 +188,43 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
                 checkpoint.currentDocumentId
             );
 
-        if (document == null)
+        string documentLabel =
+            checkpoint.currentDocumentId;
+
+        if (document != null)
         {
-            return checkpoint.currentDocumentId;
+            string number =
+                GetLocalizedText(
+                    document.LocalizedDocumentNumber,
+                    document.DocumentNumber
+                );
+
+            string title =
+                GetLocalizedText(
+                    document.LocalizedDocumentTitle,
+                    document.DocumentTitle
+                );
+
+            if (!string.IsNullOrWhiteSpace(number) &&
+                !string.IsNullOrWhiteSpace(title))
+            {
+                documentLabel =
+                    $"{number} — {title}";
+            }
+            else if (!string.IsNullOrWhiteSpace(title))
+            {
+                documentLabel =
+                    title;
+            }
+            else if (!string.IsNullOrWhiteSpace(number))
+            {
+                documentLabel =
+                    number;
+            }
         }
 
-        string number =
-            GetLocalizedText(
-                document.LocalizedDocumentNumber,
-                document.DocumentNumber
-            );
-
-        string title =
-            GetLocalizedText(
-                document.LocalizedDocumentTitle,
-                document.DocumentTitle
-            );
-
-        if (!string.IsNullOrWhiteSpace(number) &&
-            !string.IsNullOrWhiteSpace(title))
-        {
-            return $"{number} — {title}";
-        }
-
-        if (!string.IsNullOrWhiteSpace(title))
-        {
-            return title;
-        }
-
-        if (!string.IsNullOrWhiteSpace(number))
-        {
-            return number;
-        }
-
-        return checkpoint.currentDocumentId;
+        return
+            $"{documentLabel}   |   {checkpoint.totalScore}";
     }
 
     private string GetLocalizedText(
@@ -249,11 +247,15 @@ public sealed class CheckpointHistoryUI : MonoBehaviour
 
     private void ClearSpawnedButtons()
     {
-        foreach (Button button in spawnedButtons)
+        foreach (
+            Button button
+            in spawnedButtons)
         {
             if (button != null)
             {
-                Destroy(button.gameObject);
+                Destroy(
+                    button.gameObject
+                );
             }
         }
 

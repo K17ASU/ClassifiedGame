@@ -2,11 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// Хранит текущую историю checkpoint'ов в памяти
-/// и передаёт её SaveManager для записи в JSON.
+/// Управляет историей checkpoint'ов кампании.
+/// Начиная с saveVersion 2 старые ветки не удаляются:
+/// переигрывание создаёт новый дочерний checkpoint.
 /// </summary>
 public static class CampaignProgress
 {
+    private const int CurrentSaveVersion = 2;
+
     private static CampaignSaveData currentCampaign;
 
     public static bool IsInitialized =>
@@ -15,18 +18,18 @@ public static class CampaignProgress
     public static bool CanContinue()
     {
         CampaignSaveData campaign =
-            SaveManager.LoadCampaign();
+            LoadAndUpgradeCampaign();
 
         if (!IsValidCampaign(campaign))
         {
             return false;
         }
 
-        int activeIndex =
-            GetSafeActiveCheckpointIndex(campaign);
-
         CheckpointSaveData checkpoint =
-            campaign.checkpoints[activeIndex];
+            FindCheckpointById(
+                campaign,
+                campaign.activeCheckpointId
+            );
 
         return checkpoint != null &&
                !string.IsNullOrWhiteSpace(
@@ -34,40 +37,30 @@ public static class CampaignProgress
                );
     }
 
-    /// <summary>
-    /// Загружает активный checkpoint.
-    /// Для обычного прохождения активным является последний.
-    /// После выбора старого checkpoint'а — выбранный.
-    /// </summary>
     public static bool TryLoadActiveCheckpoint(
         out CheckpointSaveData checkpoint)
     {
         checkpoint = null;
 
         CampaignSaveData loadedCampaign =
-            SaveManager.LoadCampaign();
+            LoadAndUpgradeCampaign();
 
         if (!IsValidCampaign(loadedCampaign))
         {
             return false;
         }
 
-        int activeIndex =
-            GetSafeActiveCheckpointIndex(
-                loadedCampaign
-            );
-
         CheckpointSaveData activeCheckpoint =
-            loadedCampaign.checkpoints[
-                activeIndex
-            ];
+            FindCheckpointById(
+                loadedCampaign,
+                loadedCampaign.activeCheckpointId
+            );
 
         if (activeCheckpoint == null)
         {
             Debug.LogError(
-                "CampaignProgress: активный checkpoint повреждён."
+                "CampaignProgress: активный checkpoint не найден."
             );
-
             return false;
         }
 
@@ -75,17 +68,10 @@ public static class CampaignProgress
                 activeCheckpoint.currentDocumentId))
         {
             Debug.Log(
-                "CampaignProgress: кампания уже завершена."
+                "CampaignProgress: выбранная ветка кампании завершена."
             );
-
             return false;
         }
-
-        loadedCampaign.hasActiveCheckpointSelection =
-            true;
-
-        loadedCampaign.activeCheckpointIndex =
-            activeIndex;
 
         currentCampaign =
             loadedCampaign;
@@ -95,18 +81,13 @@ public static class CampaignProgress
 
         Debug.Log(
             $"CampaignProgress: загружен checkpoint " +
-            $"#{checkpoint.checkpointIndex} перед документом " +
+            $"#{checkpoint.checkpointId} перед документом " +
             $"{checkpoint.currentDocumentId}."
         );
 
         return true;
     }
 
-    /// <summary>
-    /// Оставлено для совместимости с уже добавленным
-    /// DocumentRedactor. Теперь метод загружает активный,
-    /// а не обязательно последний checkpoint.
-    /// </summary>
     public static bool TryLoadLatestCheckpoint(
         out CheckpointSaveData checkpoint)
     {
@@ -115,55 +96,43 @@ public static class CampaignProgress
         );
     }
 
-    /// <summary>
-    /// Выбирает любой существующий checkpoint как активный.
-    /// Будущие checkpoint'ы НЕ удаляются в этот момент.
-    /// Они будут удалены только после завершения
-    /// переигрываемого документа.
-    /// </summary>
     public static bool SelectCheckpoint(
-        int checkpointIndex)
+        int checkpointId)
     {
         CampaignSaveData campaign =
-            SaveManager.LoadCampaign();
+            LoadAndUpgradeCampaign();
 
         if (!IsValidCampaign(campaign))
         {
             return false;
         }
 
-        if (checkpointIndex < 0 ||
-            checkpointIndex >=
-            campaign.checkpoints.Count)
-        {
-            Debug.LogError(
-                $"CampaignProgress: checkpoint #{checkpointIndex} не существует."
+        CheckpointSaveData checkpoint =
+            FindCheckpointById(
+                campaign,
+                checkpointId
             );
 
+        if (checkpoint == null)
+        {
+            Debug.LogError(
+                $"CampaignProgress: checkpoint #{checkpointId} не существует."
+            );
             return false;
         }
 
-        CheckpointSaveData checkpoint =
-            campaign.checkpoints[
-                checkpointIndex
-            ];
-
-        if (checkpoint == null ||
-            string.IsNullOrWhiteSpace(
+        if (string.IsNullOrWhiteSpace(
                 checkpoint.currentDocumentId))
         {
             Debug.LogError(
-                $"CampaignProgress: checkpoint #{checkpointIndex} нельзя загрузить."
+                $"CampaignProgress: checkpoint #{checkpointId} " +
+                $"является концом ветки."
             );
-
             return false;
         }
 
-        campaign.hasActiveCheckpointSelection =
-            true;
-
-        campaign.activeCheckpointIndex =
-            checkpointIndex;
+        campaign.activeCheckpointId =
+            checkpointId;
 
         currentCampaign =
             campaign;
@@ -175,9 +144,8 @@ public static class CampaignProgress
         }
 
         Debug.Log(
-            $"CampaignProgress: выбран checkpoint #{checkpointIndex} " +
-            $"перед документом {checkpoint.currentDocumentId}. " +
-            $"Будущие checkpoint'ы пока сохранены."
+            $"CampaignProgress: выбран checkpoint #{checkpointId}. " +
+            $"Существующие ветки сохранены."
         );
 
         return true;
@@ -200,6 +168,12 @@ public static class CampaignProgress
         currentCampaign =
             new CampaignSaveData
             {
+                saveVersion =
+                    CurrentSaveVersion,
+
+                activeCheckpointId = 0,
+                nextCheckpointId = 1,
+
                 hasActiveCheckpointSelection = true,
                 activeCheckpointIndex = 0
             };
@@ -207,6 +181,8 @@ public static class CampaignProgress
         CheckpointSaveData initialCheckpoint =
             new CheckpointSaveData
             {
+                checkpointId = 0,
+                parentCheckpointId = -1,
                 checkpointIndex = 0,
                 currentDocumentId = firstDocumentId,
                 totalScore = 0,
@@ -224,7 +200,8 @@ public static class CampaignProgress
         if (SaveManager.SaveCampaign(currentCampaign))
         {
             Debug.Log(
-                $"CampaignProgress: создан checkpoint #0 перед документом {firstDocumentId}."
+                $"CampaignProgress: создан корневой checkpoint #0 " +
+                $"перед документом {firstDocumentId}."
             );
         }
     }
@@ -243,7 +220,7 @@ public static class CampaignProgress
         if (currentCampaign == null)
         {
             currentCampaign =
-                SaveManager.LoadCampaign();
+                LoadAndUpgradeCampaign();
         }
 
         if (!IsValidCampaign(currentCampaign))
@@ -254,7 +231,8 @@ public static class CampaignProgress
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(completedDocumentId))
+        if (string.IsNullOrWhiteSpace(
+                completedDocumentId))
         {
             Debug.LogError(
                 "CampaignProgress: у завершённого документа отсутствует Document Id."
@@ -262,54 +240,48 @@ public static class CampaignProgress
             return;
         }
 
-        int activeIndex =
-            GetSafeActiveCheckpointIndex(
-                currentCampaign
-            );
-
         CheckpointSaveData activeCheckpoint =
-            currentCampaign.checkpoints[
-                activeIndex
-            ];
+            FindCheckpointById(
+                currentCampaign,
+                currentCampaign.activeCheckpointId
+            );
 
         if (activeCheckpoint == null)
         {
             Debug.LogError(
-                "CampaignProgress: активный checkpoint повреждён."
+                "CampaignProgress: активный checkpoint не найден."
             );
             return;
         }
 
-        // Если игрок вернулся назад, старое будущее
-        // удаляется только ПОСЛЕ завершения документа.
-        int firstFutureIndex =
-            activeIndex + 1;
-
-        if (firstFutureIndex <
-            currentCampaign.checkpoints.Count)
-        {
-            currentCampaign.checkpoints.RemoveRange(
-                firstFutureIndex,
-                currentCampaign.checkpoints.Count -
-                firstFutureIndex
+        bool createsBranch =
+            HasChildCheckpoint(
+                currentCampaign,
+                activeCheckpoint.checkpointId
             );
 
-            Debug.Log(
-                $"CampaignProgress: старые будущие checkpoint'ы " +
-                $"после #{activeIndex} удалены."
-            );
-        }
+        int newCheckpointId =
+            currentCampaign.nextCheckpointId;
+
+        currentCampaign.nextCheckpointId++;
 
         CheckpointSaveData nextCheckpoint =
             new CheckpointSaveData
             {
+                checkpointId =
+                    newCheckpointId,
+
+                parentCheckpointId =
+                    activeCheckpoint.checkpointId,
+
                 checkpointIndex =
-                    currentCampaign.checkpoints.Count,
+                    newCheckpointId,
 
                 currentDocumentId =
                     nextDocumentId ?? string.Empty,
 
-                totalScore = totalScore,
+                totalScore =
+                    totalScore,
 
                 unlockedToolsMask =
                     unlockedToolsMask,
@@ -333,11 +305,20 @@ public static class CampaignProgress
         nextCheckpoint.completedDocuments.Add(
             new DocumentResultSaveData
             {
-                documentId = completedDocumentId,
-                score = documentScore,
-                passed = passed,
+                documentId =
+                    completedDocumentId,
+
+                score =
+                    documentScore,
+
+                passed =
+                    passed,
+
                 inspectionsUsed =
-                    Mathf.Max(0, inspectionsUsed)
+                    Mathf.Max(
+                        0,
+                        inspectionsUsed
+                    )
             }
         );
 
@@ -345,24 +326,179 @@ public static class CampaignProgress
             nextCheckpoint
         );
 
-        currentCampaign.hasActiveCheckpointSelection =
-            true;
+        currentCampaign.activeCheckpointId =
+            newCheckpointId;
 
-        currentCampaign.activeCheckpointIndex =
-            nextCheckpoint.checkpointIndex;
-
-        if (SaveManager.SaveCampaign(currentCampaign))
+        if (SaveManager.SaveCampaign(
+                currentCampaign))
         {
             string nextLabel =
                 string.IsNullOrWhiteSpace(nextDocumentId)
                     ? "CAMPAIGN_END"
                     : nextDocumentId;
 
+            string branchLabel =
+                createsBranch
+                    ? " Создана новая ветка."
+                    : string.Empty;
+
             Debug.Log(
-                $"CampaignProgress: создан checkpoint #{nextCheckpoint.checkpointIndex}. " +
+                $"CampaignProgress: создан checkpoint " +
+                $"#{newCheckpointId} от #{activeCheckpoint.checkpointId}. " +
                 $"Завершён {completedDocumentId}, следующий: {nextLabel}, " +
-                $"общий счёт: {totalScore}."
+                $"общий счёт: {totalScore}.{branchLabel}"
             );
+        }
+    }
+
+    private static CampaignSaveData
+        LoadAndUpgradeCampaign()
+    {
+        CampaignSaveData campaign =
+            SaveManager.LoadCampaign();
+
+        if (campaign == null)
+        {
+            return null;
+        }
+
+        if (campaign.saveVersion == 1)
+        {
+            UpgradeVersion1ToVersion2(
+                campaign
+            );
+        }
+        else if (campaign.saveVersion ==
+                 CurrentSaveVersion)
+        {
+            RepairVersion2Metadata(
+                campaign
+            );
+        }
+
+        return campaign;
+    }
+
+    private static void UpgradeVersion1ToVersion2(
+        CampaignSaveData campaign)
+    {
+        if (campaign.checkpoints == null)
+        {
+            campaign.checkpoints =
+                new List<CheckpointSaveData>();
+        }
+
+        for (int i = 0;
+             i < campaign.checkpoints.Count;
+             i++)
+        {
+            CheckpointSaveData checkpoint =
+                campaign.checkpoints[i];
+
+            if (checkpoint == null)
+            {
+                continue;
+            }
+
+            checkpoint.checkpointId = i;
+
+            checkpoint.parentCheckpointId =
+                i == 0
+                    ? -1
+                    : i - 1;
+
+            checkpoint.checkpointIndex = i;
+        }
+
+        int activeListIndex;
+
+        if (campaign.hasActiveCheckpointSelection)
+        {
+            activeListIndex =
+                Mathf.Clamp(
+                    campaign.activeCheckpointIndex,
+                    0,
+                    Mathf.Max(
+                        0,
+                        campaign.checkpoints.Count - 1
+                    )
+                );
+        }
+        else
+        {
+            activeListIndex =
+                Mathf.Max(
+                    0,
+                    campaign.checkpoints.Count - 1
+                );
+        }
+
+        campaign.activeCheckpointId =
+            activeListIndex;
+
+        campaign.nextCheckpointId =
+            campaign.checkpoints.Count;
+
+        campaign.saveVersion =
+            CurrentSaveVersion;
+
+        campaign.hasActiveCheckpointSelection =
+            true;
+
+        campaign.activeCheckpointIndex =
+            activeListIndex;
+
+        SaveManager.SaveCampaign(campaign);
+
+        Debug.Log(
+            "CampaignProgress: сохранение автоматически " +
+            "обновлено с версии 1 до версии 2. " +
+            "Старая история сохранена как одна ветка."
+        );
+    }
+
+    private static void RepairVersion2Metadata(
+        CampaignSaveData campaign)
+    {
+        if (campaign.checkpoints == null ||
+            campaign.checkpoints.Count == 0)
+        {
+            return;
+        }
+
+        int maxId = -1;
+
+        foreach (
+            CheckpointSaveData checkpoint
+            in campaign.checkpoints)
+        {
+            if (checkpoint == null)
+            {
+                continue;
+            }
+
+            if (checkpoint.checkpointId >
+                maxId)
+            {
+                maxId =
+                    checkpoint.checkpointId;
+            }
+        }
+
+        if (campaign.nextCheckpointId <=
+            maxId)
+        {
+            campaign.nextCheckpointId =
+                maxId + 1;
+        }
+
+        if (FindCheckpointById(
+                campaign,
+                campaign.activeCheckpointId) ==
+            null)
+        {
+            campaign.activeCheckpointId =
+                maxId;
         }
     }
 
@@ -374,13 +510,13 @@ public static class CampaignProgress
             return false;
         }
 
-        if (campaign.saveVersion != 1)
+        if (campaign.saveVersion !=
+            CurrentSaveVersion)
         {
             Debug.LogError(
                 $"CampaignProgress: неподдерживаемая версия сохранения: " +
                 $"{campaign.saveVersion}."
             );
-
             return false;
         }
 
@@ -393,26 +529,55 @@ public static class CampaignProgress
         return true;
     }
 
-    private static int GetSafeActiveCheckpointIndex(
-        CampaignSaveData campaign)
+    private static CheckpointSaveData
+        FindCheckpointById(
+            CampaignSaveData campaign,
+            int checkpointId)
     {
         if (campaign == null ||
-            campaign.checkpoints == null ||
-            campaign.checkpoints.Count == 0)
+            campaign.checkpoints == null)
         {
-            return 0;
+            return null;
         }
 
-        if (!campaign.hasActiveCheckpointSelection)
+        foreach (
+            CheckpointSaveData checkpoint
+            in campaign.checkpoints)
         {
-            return campaign.checkpoints.Count - 1;
+            if (checkpoint != null &&
+                checkpoint.checkpointId ==
+                checkpointId)
+            {
+                return checkpoint;
+            }
         }
 
-        return Mathf.Clamp(
-            campaign.activeCheckpointIndex,
-            0,
-            campaign.checkpoints.Count - 1
-        );
+        return null;
+    }
+
+    private static bool HasChildCheckpoint(
+        CampaignSaveData campaign,
+        int parentCheckpointId)
+    {
+        if (campaign == null ||
+            campaign.checkpoints == null)
+        {
+            return false;
+        }
+
+        foreach (
+            CheckpointSaveData checkpoint
+            in campaign.checkpoints)
+        {
+            if (checkpoint != null &&
+                checkpoint.parentCheckpointId ==
+                parentCheckpointId)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static List<DocumentResultSaveData>
@@ -427,7 +592,9 @@ public static class CampaignProgress
             return result;
         }
 
-        foreach (DocumentResultSaveData item in source)
+        foreach (
+            DocumentResultSaveData item
+            in source)
         {
             if (item == null)
             {
@@ -466,11 +633,15 @@ public static class CampaignProgress
             return result;
         }
 
-        for (int i = 0; i < source.Count; i++)
+        for (int i = 0;
+             i < source.Count;
+             i++)
         {
-            string value = source[i];
+            string value =
+                source[i];
 
-            if (string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrWhiteSpace(
+                    value))
             {
                 continue;
             }
