@@ -14,34 +14,32 @@ public static class CampaignProgress
 
     public static bool CanContinue()
     {
-        if (!SaveManager.HasSave)
-        {
-            return false;
-        }
-
         CampaignSaveData campaign =
             SaveManager.LoadCampaign();
 
-        if (campaign == null ||
-            campaign.saveVersion != 1 ||
-            campaign.checkpoints == null ||
-            campaign.checkpoints.Count == 0)
+        if (!IsValidCampaign(campaign))
         {
             return false;
         }
 
-        CheckpointSaveData latestCheckpoint =
-            campaign.checkpoints[
-                campaign.checkpoints.Count - 1
-            ];
+        int activeIndex =
+            GetSafeActiveCheckpointIndex(campaign);
 
-        return latestCheckpoint != null &&
+        CheckpointSaveData checkpoint =
+            campaign.checkpoints[activeIndex];
+
+        return checkpoint != null &&
                !string.IsNullOrWhiteSpace(
-                   latestCheckpoint.currentDocumentId
+                   checkpoint.currentDocumentId
                );
     }
 
-    public static bool TryLoadLatestCheckpoint(
+    /// <summary>
+    /// Загружает активный checkpoint.
+    /// Для обычного прохождения активным является последний.
+    /// После выбора старого checkpoint'а — выбранный.
+    /// </summary>
+    public static bool TryLoadActiveCheckpoint(
         out CheckpointSaveData checkpoint)
     {
         checkpoint = null;
@@ -49,47 +47,32 @@ public static class CampaignProgress
         CampaignSaveData loadedCampaign =
             SaveManager.LoadCampaign();
 
-        if (loadedCampaign == null)
+        if (!IsValidCampaign(loadedCampaign))
         {
             return false;
         }
 
-        if (loadedCampaign.saveVersion != 1)
-        {
-            Debug.LogError(
-                $"CampaignProgress: неподдерживаемая версия сохранения: " +
-                $"{loadedCampaign.saveVersion}."
+        int activeIndex =
+            GetSafeActiveCheckpointIndex(
+                loadedCampaign
             );
 
-            return false;
-        }
-
-        if (loadedCampaign.checkpoints == null ||
-            loadedCampaign.checkpoints.Count == 0)
-        {
-            Debug.LogError(
-                "CampaignProgress: в сохранении нет checkpoint'ов."
-            );
-
-            return false;
-        }
-
-        CheckpointSaveData latestCheckpoint =
+        CheckpointSaveData activeCheckpoint =
             loadedCampaign.checkpoints[
-                loadedCampaign.checkpoints.Count - 1
+                activeIndex
             ];
 
-        if (latestCheckpoint == null)
+        if (activeCheckpoint == null)
         {
             Debug.LogError(
-                "CampaignProgress: последний checkpoint повреждён."
+                "CampaignProgress: активный checkpoint повреждён."
             );
 
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(
-                latestCheckpoint.currentDocumentId))
+                activeCheckpoint.currentDocumentId))
         {
             Debug.Log(
                 "CampaignProgress: кампания уже завершена."
@@ -98,16 +81,103 @@ public static class CampaignProgress
             return false;
         }
 
+        loadedCampaign.hasActiveCheckpointSelection =
+            true;
+
+        loadedCampaign.activeCheckpointIndex =
+            activeIndex;
+
         currentCampaign =
             loadedCampaign;
 
         checkpoint =
-            latestCheckpoint;
+            activeCheckpoint;
 
         Debug.Log(
             $"CampaignProgress: загружен checkpoint " +
             $"#{checkpoint.checkpointIndex} перед документом " +
             $"{checkpoint.currentDocumentId}."
+        );
+
+        return true;
+    }
+
+    /// <summary>
+    /// Оставлено для совместимости с уже добавленным
+    /// DocumentRedactor. Теперь метод загружает активный,
+    /// а не обязательно последний checkpoint.
+    /// </summary>
+    public static bool TryLoadLatestCheckpoint(
+        out CheckpointSaveData checkpoint)
+    {
+        return TryLoadActiveCheckpoint(
+            out checkpoint
+        );
+    }
+
+    /// <summary>
+    /// Выбирает любой существующий checkpoint как активный.
+    /// Будущие checkpoint'ы НЕ удаляются в этот момент.
+    /// Они будут удалены только после завершения
+    /// переигрываемого документа.
+    /// </summary>
+    public static bool SelectCheckpoint(
+        int checkpointIndex)
+    {
+        CampaignSaveData campaign =
+            SaveManager.LoadCampaign();
+
+        if (!IsValidCampaign(campaign))
+        {
+            return false;
+        }
+
+        if (checkpointIndex < 0 ||
+            checkpointIndex >=
+            campaign.checkpoints.Count)
+        {
+            Debug.LogError(
+                $"CampaignProgress: checkpoint #{checkpointIndex} не существует."
+            );
+
+            return false;
+        }
+
+        CheckpointSaveData checkpoint =
+            campaign.checkpoints[
+                checkpointIndex
+            ];
+
+        if (checkpoint == null ||
+            string.IsNullOrWhiteSpace(
+                checkpoint.currentDocumentId))
+        {
+            Debug.LogError(
+                $"CampaignProgress: checkpoint #{checkpointIndex} нельзя загрузить."
+            );
+
+            return false;
+        }
+
+        campaign.hasActiveCheckpointSelection =
+            true;
+
+        campaign.activeCheckpointIndex =
+            checkpointIndex;
+
+        currentCampaign =
+            campaign;
+
+        if (!SaveManager.SaveCampaign(
+                currentCampaign))
+        {
+            return false;
+        }
+
+        Debug.Log(
+            $"CampaignProgress: выбран checkpoint #{checkpointIndex} " +
+            $"перед документом {checkpoint.currentDocumentId}. " +
+            $"Будущие checkpoint'ы пока сохранены."
         );
 
         return true;
@@ -128,7 +198,11 @@ public static class CampaignProgress
         }
 
         currentCampaign =
-            new CampaignSaveData();
+            new CampaignSaveData
+            {
+                hasActiveCheckpointSelection = true,
+                activeCheckpointIndex = 0
+            };
 
         CheckpointSaveData initialCheckpoint =
             new CheckpointSaveData
@@ -166,9 +240,13 @@ public static class CampaignProgress
         IReadOnlyList<string> unlockedCodexEntryIds,
         IReadOnlyList<string> readCodexEntryIds)
     {
-        if (currentCampaign == null ||
-            currentCampaign.checkpoints == null ||
-            currentCampaign.checkpoints.Count == 0)
+        if (currentCampaign == null)
+        {
+            currentCampaign =
+                SaveManager.LoadCampaign();
+        }
+
+        if (!IsValidCampaign(currentCampaign))
         {
             Debug.LogError(
                 "CampaignProgress: кампания не инициализирована."
@@ -184,10 +262,43 @@ public static class CampaignProgress
             return;
         }
 
-        CheckpointSaveData previousCheckpoint =
+        int activeIndex =
+            GetSafeActiveCheckpointIndex(
+                currentCampaign
+            );
+
+        CheckpointSaveData activeCheckpoint =
             currentCampaign.checkpoints[
-                currentCampaign.checkpoints.Count - 1
+                activeIndex
             ];
+
+        if (activeCheckpoint == null)
+        {
+            Debug.LogError(
+                "CampaignProgress: активный checkpoint повреждён."
+            );
+            return;
+        }
+
+        // Если игрок вернулся назад, старое будущее
+        // удаляется только ПОСЛЕ завершения документа.
+        int firstFutureIndex =
+            activeIndex + 1;
+
+        if (firstFutureIndex <
+            currentCampaign.checkpoints.Count)
+        {
+            currentCampaign.checkpoints.RemoveRange(
+                firstFutureIndex,
+                currentCampaign.checkpoints.Count -
+                firstFutureIndex
+            );
+
+            Debug.Log(
+                $"CampaignProgress: старые будущие checkpoint'ы " +
+                $"после #{activeIndex} удалены."
+            );
+        }
 
         CheckpointSaveData nextCheckpoint =
             new CheckpointSaveData
@@ -205,7 +316,7 @@ public static class CampaignProgress
 
                 completedDocuments =
                     CloneDocumentResults(
-                        previousCheckpoint.completedDocuments
+                        activeCheckpoint.completedDocuments
                     ),
 
                 unlockedCodexEntryIds =
@@ -234,6 +345,12 @@ public static class CampaignProgress
             nextCheckpoint
         );
 
+        currentCampaign.hasActiveCheckpointSelection =
+            true;
+
+        currentCampaign.activeCheckpointIndex =
+            nextCheckpoint.checkpointIndex;
+
         if (SaveManager.SaveCampaign(currentCampaign))
         {
             string nextLabel =
@@ -247,6 +364,55 @@ public static class CampaignProgress
                 $"общий счёт: {totalScore}."
             );
         }
+    }
+
+    private static bool IsValidCampaign(
+        CampaignSaveData campaign)
+    {
+        if (campaign == null)
+        {
+            return false;
+        }
+
+        if (campaign.saveVersion != 1)
+        {
+            Debug.LogError(
+                $"CampaignProgress: неподдерживаемая версия сохранения: " +
+                $"{campaign.saveVersion}."
+            );
+
+            return false;
+        }
+
+        if (campaign.checkpoints == null ||
+            campaign.checkpoints.Count == 0)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static int GetSafeActiveCheckpointIndex(
+        CampaignSaveData campaign)
+    {
+        if (campaign == null ||
+            campaign.checkpoints == null ||
+            campaign.checkpoints.Count == 0)
+        {
+            return 0;
+        }
+
+        if (!campaign.hasActiveCheckpointSelection)
+        {
+            return campaign.checkpoints.Count - 1;
+        }
+
+        return Mathf.Clamp(
+            campaign.activeCheckpointIndex,
+            0,
+            campaign.checkpoints.Count - 1
+        );
     }
 
     private static List<DocumentResultSaveData>
