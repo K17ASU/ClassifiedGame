@@ -3,8 +3,12 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// Единый источник позиции указателя для desktop и mobile.
-/// Touch имеет приоритет, затем мышь, затем перо.
-/// На touch-устройствах запоминает последнюю позицию пальца.
+///
+/// Важный момент:
+/// на мобильных устройствах после отпускания пальца нельзя
+/// переключаться на Mouse.current — Android может держать
+/// виртуальную мышь в позиции (0, 0), из-за чего инструмент
+/// улетает в нижний левый угол.
 /// </summary>
 public static class ScreenPointer
 {
@@ -46,9 +50,7 @@ public static class ScreenPointer
     {
         if (Touchscreen.current == null)
         {
-            screenPosition =
-                Vector2.zero;
-
+            screenPosition = Vector2.zero;
             return false;
         }
 
@@ -90,6 +92,19 @@ public static class ScreenPointer
 
                 return true;
             }
+
+            // На реальном mobile после отпускания пальца
+            // сохраняем последнюю touch-позицию.
+            // Не падаем в Mouse.current, который на Android
+            // может находиться в (0, 0).
+            if (Application.isMobilePlatform &&
+                hasLastTouchPosition)
+            {
+                screenPosition =
+                    lastTouchPosition;
+
+                return true;
+            }
         }
 
         if (Mouse.current != null)
@@ -108,8 +123,7 @@ public static class ScreenPointer
             return true;
         }
 
-        if (Touchscreen.current != null &&
-            hasLastTouchPosition)
+        if (hasLastTouchPosition)
         {
             screenPosition =
                 lastTouchPosition;

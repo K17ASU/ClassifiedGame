@@ -114,6 +114,12 @@ public sealed class UltravioletTool : MonoBehaviour
             return;
         }
 
+        pointerPosition =
+    MobileToolPointerOffset.Apply(
+        documentText,
+        pointerPosition
+    );
+
         ultravioletCursor.position =
             pointerPosition;
 

@@ -114,6 +114,12 @@ public sealed class MagnifierTool : MonoBehaviour
             return;
         }
 
+        pointerPosition =
+    MobileToolPointerOffset.Apply(
+        documentText,
+        pointerPosition
+    );
+
         magnifierCursor.position =
             pointerPosition;
 

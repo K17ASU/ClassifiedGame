@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// Визуально заменяет системный курсор на карандаш,
 /// пока PencilTool активен.
+/// На мобильных устройствах визуальный карандаш не показывается.
 /// Саму механику карандаша не изменяет.
 /// </summary>
 public sealed class PencilCursorController : MonoBehaviour
@@ -59,15 +60,19 @@ public sealed class PencilCursorController : MonoBehaviour
             return;
         }
 
-        bool isPencilActive = pencilTool.IsActive;
+        bool isPencilActive =
+            pencilTool.IsActive;
 
         if (!stateInitialized ||
             isPencilActive != lastActiveState)
         {
-            ApplyCursorState(isPencilActive);
+            ApplyCursorState(
+                isPencilActive
+            );
         }
 
-        if (isPencilActive)
+        if (isPencilActive &&
+            !Application.isMobilePlatform)
         {
             UpdateCursorPosition();
         }
@@ -120,17 +125,42 @@ public sealed class PencilCursorController : MonoBehaviour
         return referencesAreValid;
     }
 
-    private void ApplyCursorState(bool isPencilActive)
+    private void ApplyCursorState(
+        bool isPencilActive)
     {
-        lastActiveState = isPencilActive;
-        stateInitialized = true;
+        lastActiveState =
+            isPencilActive;
 
-        deskPencil.SetActive(!isPencilActive);
-        pencilCursorRoot.gameObject.SetActive(isPencilActive);
+        stateInitialized =
+            true;
 
-        Cursor.visible = !isPencilActive;
+        // Физический карандаш на столе исчезает,
+        // когда игрок его взял, на обеих платформах.
+        deskPencil.SetActive(
+            !isPencilActive
+        );
 
-        if (isPencilActive)
+        // На мобильном устройстве большой карандаш-курсор
+        // вообще не показываем.
+        bool showPencilCursor =
+            isPencilActive &&
+            !Application.isMobilePlatform;
+
+        pencilCursorRoot.gameObject.SetActive(
+            showPencilCursor
+        );
+
+        if (!Application.isMobilePlatform)
+        {
+            Cursor.visible =
+                !isPencilActive;
+        }
+        else
+        {
+            Cursor.visible = true;
+        }
+
+        if (showPencilCursor)
         {
             UpdateCursorPosition();
         }
@@ -146,15 +176,19 @@ public sealed class PencilCursorController : MonoBehaviour
         Vector2 screenPosition =
             Mouse.current.position.ReadValue();
 
-        Camera eventCamera = null;
+        Camera eventCamera =
+            null;
 
         if (rootCanvas != null &&
-            rootCanvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            rootCanvas.renderMode !=
+            RenderMode.ScreenSpaceOverlay)
         {
-            eventCamera = rootCanvas.worldCamera;
+            eventCamera =
+                rootCanvas.worldCamera;
         }
 
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        if (RectTransformUtility
+            .ScreenPointToLocalPointInRectangle(
                 cursorOverlay,
                 screenPosition,
                 eventCamera,
@@ -171,7 +205,9 @@ public sealed class PencilCursorController : MonoBehaviour
 
         if (pencilCursorRoot != null)
         {
-            pencilCursorRoot.gameObject.SetActive(false);
+            pencilCursorRoot.gameObject.SetActive(
+                false
+            );
         }
     }
 }

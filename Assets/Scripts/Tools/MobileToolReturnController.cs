@@ -1,46 +1,56 @@
 using UnityEngine;
 
 /// <summary>
-/// Mobile-only логика возврата аналитических инструментов на стол.
+/// Управляет мобильным возвратом инструментов на стол.
 ///
-/// Если активный инструмент перетащить пальцем обратно
-/// на его физическое место и отпустить, инструмент выключается.
-///
-/// Обычный тап по инструменту не считается "возвратом":
-/// это оставлено стандартному Button.onClick.
+/// Return Zone — это отдельный GameObject с RectTransform + Image.
+/// В сцене Return Zone можно держать выключенными.
+/// На мобильном устройстве нужная зона автоматически включается,
+/// пока соответствующий инструмент активен.
+/// На PC зоны всегда выключены.
 /// </summary>
-public sealed class MobileToolReturnController :
-    MonoBehaviour
+public sealed class MobileToolReturnController : MonoBehaviour
 {
+    private enum ActiveTool
+    {
+        None,
+        Ultraviolet,
+        Magnifier,
+        Decoder,
+        Pencil
+    }
+
     [Header("UV")]
-
-    [SerializeField]
-    private UltravioletTool ultravioletTool;
-
-    [SerializeField]
-    private RectTransform ultravioletReturnArea;
+    [SerializeField] private UltravioletTool ultravioletTool;
+    [SerializeField] private RectTransform ultravioletReturnArea;
 
     [Header("Лупа")]
-
-    [SerializeField]
-    private MagnifierTool magnifierTool;
-
-    [SerializeField]
-    private RectTransform magnifierReturnArea;
+    [SerializeField] private MagnifierTool magnifierTool;
+    [SerializeField] private RectTransform magnifierReturnArea;
 
     [Header("Декодер")]
+    [SerializeField] private DecoderTool decoderTool;
+    [SerializeField] private RectTransform decoderReturnArea;
 
-    [SerializeField]
-    private DecoderTool decoderTool;
-
-    [SerializeField]
-    private RectTransform decoderReturnArea;
+    [Header("Карандаш")]
+    [SerializeField] private PencilTool pencilTool;
+    [SerializeField] private RectTransform pencilReturnArea;
 
     private Vector2 touchStartPosition;
     private bool hasTouchStart;
 
+    private ActiveTool activeToolAtTouchStart =
+        ActiveTool.None;
+
+    private void Awake()
+    {
+        HideAllReturnAreas();
+    }
+
     private void Update()
     {
+        RefreshReturnAreas();
+
         if (ScreenPointer.TouchWasPressedThisFrame &&
             ScreenPointer.TryGetTouchPosition(
                 out Vector2 startPosition))
@@ -50,6 +60,9 @@ public sealed class MobileToolReturnController :
 
             hasTouchStart =
                 true;
+
+            activeToolAtTouchStart =
+                GetActiveTool();
         }
 
         if (!ScreenPointer.TouchWasReleasedThisFrame)
@@ -60,47 +73,121 @@ public sealed class MobileToolReturnController :
         if (!ScreenPointer.TryGetTouchPosition(
                 out Vector2 releasePosition))
         {
-            hasTouchStart =
-                false;
-
+            ResetTouchTracking();
             return;
         }
 
+        Vector2 ultravioletReleasePosition =
+    MobileToolPointerOffset.Apply(
+        ultravioletReturnArea,
+        releasePosition
+    );
+
+        Vector2 magnifierReleasePosition =
+            MobileToolPointerOffset.Apply(
+                magnifierReturnArea,
+                releasePosition
+            );
+
+        Vector2 decoderReleasePosition =
+            MobileToolPointerOffset.Apply(
+                decoderReturnArea,
+                releasePosition
+            );
+
+
+
         TryReturnUltraviolet(
-            releasePosition
+            ultravioletReleasePosition
         );
 
         TryReturnMagnifier(
-            releasePosition
+            magnifierReleasePosition
         );
 
         TryReturnDecoder(
+            decoderReleasePosition
+        );
+        TryReturnPencil(
             releasePosition
         );
 
-        hasTouchStart =
-            false;
+        ResetTouchTracking();
+        RefreshReturnAreas();
+    }
+
+    private void RefreshReturnAreas()
+    {
+        bool mobile =
+            Application.isMobilePlatform;
+
+        SetReturnAreaVisible(
+            ultravioletReturnArea,
+            mobile &&
+            ultravioletTool != null &&
+            ultravioletTool.IsActive
+        );
+
+        SetReturnAreaVisible(
+            magnifierReturnArea,
+            mobile &&
+            magnifierTool != null &&
+            magnifierTool.IsActive
+        );
+
+        SetReturnAreaVisible(
+            decoderReturnArea,
+            mobile &&
+            decoderTool != null &&
+            decoderTool.IsActive
+        );
+
+        SetReturnAreaVisible(
+            pencilReturnArea,
+            mobile &&
+            pencilTool != null &&
+            pencilTool.IsActive
+        );
+    }
+
+    private void HideAllReturnAreas()
+    {
+        SetReturnAreaVisible(ultravioletReturnArea, false);
+        SetReturnAreaVisible(magnifierReturnArea, false);
+        SetReturnAreaVisible(decoderReturnArea, false);
+        SetReturnAreaVisible(pencilReturnArea, false);
+    }
+
+    private void SetReturnAreaVisible(
+        RectTransform returnArea,
+        bool visible)
+    {
+        if (returnArea == null)
+        {
+            return;
+        }
+
+        if (returnArea.gameObject.activeSelf != visible)
+        {
+            returnArea.gameObject.SetActive(
+                visible
+            );
+        }
     }
 
     private void TryReturnUltraviolet(
         Vector2 releasePosition)
     {
         if (ultravioletTool == null ||
-            !ultravioletTool.IsActive ||
-            ultravioletReturnArea == null)
+            !ultravioletTool.IsActive)
         {
             return;
         }
 
-        if (!IsInside(
+        if (!ShouldReturnTool(
+                ActiveTool.Ultraviolet,
                 ultravioletReturnArea,
                 releasePosition))
-        {
-            return;
-        }
-
-        if (TouchStartedInside(
-                ultravioletReturnArea))
         {
             return;
         }
@@ -112,21 +199,15 @@ public sealed class MobileToolReturnController :
         Vector2 releasePosition)
     {
         if (magnifierTool == null ||
-            !magnifierTool.IsActive ||
-            magnifierReturnArea == null)
+            !magnifierTool.IsActive)
         {
             return;
         }
 
-        if (!IsInside(
+        if (!ShouldReturnTool(
+                ActiveTool.Magnifier,
                 magnifierReturnArea,
                 releasePosition))
-        {
-            return;
-        }
-
-        if (TouchStartedInside(
-                magnifierReturnArea))
         {
             return;
         }
@@ -138,26 +219,93 @@ public sealed class MobileToolReturnController :
         Vector2 releasePosition)
     {
         if (decoderTool == null ||
-            !decoderTool.IsActive ||
-            decoderReturnArea == null)
+            !decoderTool.IsActive)
         {
             return;
         }
 
-        if (!IsInside(
+        if (!ShouldReturnTool(
+                ActiveTool.Decoder,
                 decoderReturnArea,
                 releasePosition))
         {
             return;
         }
 
-        if (TouchStartedInside(
-                decoderReturnArea))
+        decoderTool.DisableMode();
+    }
+
+    private void TryReturnPencil(
+        Vector2 releasePosition)
+    {
+        if (pencilTool == null ||
+            !pencilTool.IsActive)
         {
             return;
         }
 
-        decoderTool.DisableMode();
+        if (!ShouldReturnTool(
+                ActiveTool.Pencil,
+                pencilReturnArea,
+                releasePosition))
+        {
+            return;
+        }
+
+        pencilTool.DisableMode();
+    }
+
+    private bool ShouldReturnTool(
+        ActiveTool tool,
+        RectTransform returnArea,
+        Vector2 releasePosition)
+    {
+        if (returnArea == null ||
+            !returnArea.gameObject.activeInHierarchy ||
+            !IsInside(
+                returnArea,
+                releasePosition))
+        {
+            return false;
+        }
+
+        if (activeToolAtTouchStart == tool)
+        {
+            return true;
+        }
+
+        return !TouchStartedInside(
+            returnArea
+        );
+    }
+
+    private ActiveTool GetActiveTool()
+    {
+        if (ultravioletTool != null &&
+            ultravioletTool.IsActive)
+        {
+            return ActiveTool.Ultraviolet;
+        }
+
+        if (magnifierTool != null &&
+            magnifierTool.IsActive)
+        {
+            return ActiveTool.Magnifier;
+        }
+
+        if (decoderTool != null &&
+            decoderTool.IsActive)
+        {
+            return ActiveTool.Decoder;
+        }
+
+        if (pencilTool != null &&
+            pencilTool.IsActive)
+        {
+            return ActiveTool.Pencil;
+        }
+
+        return ActiveTool.None;
     }
 
     private bool TouchStartedInside(
@@ -174,11 +322,6 @@ public sealed class MobileToolReturnController :
         RectTransform area,
         Vector2 screenPosition)
     {
-        if (area == null)
-        {
-            return false;
-        }
-
         Canvas canvas =
             area.GetComponentInParent<Canvas>();
 
@@ -199,5 +342,14 @@ public sealed class MobileToolReturnController :
                 screenPosition,
                 eventCamera
             );
+    }
+
+    private void ResetTouchTracking()
+    {
+        hasTouchStart =
+            false;
+
+        activeToolAtTouchStart =
+            ActiveTool.None;
     }
 }

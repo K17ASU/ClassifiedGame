@@ -127,6 +127,12 @@ public sealed class DecoderTool : MonoBehaviour
             return;
         }
 
+        pointerPosition =
+    MobileToolPointerOffset.Apply(
+        documentText,
+        pointerPosition
+    );
+
         decoderCursor.position =
             pointerPosition;
 
