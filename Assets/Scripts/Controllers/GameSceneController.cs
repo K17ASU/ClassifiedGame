@@ -1,18 +1,25 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 /// <summary>
-/// Управляет окном подтверждения выхода
-/// и возвращением в главное меню.
+/// РЈРїСЂР°РІР»СЏРµС‚ РѕРєРЅРѕРј РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ РІС‹С…РѕРґР°
+/// Рё РІРѕР·РІСЂР°С‚РѕРј РІ РіР»Р°РІРЅРѕРµ РјРµРЅСЋ.
+/// РўР°РєР¶Рµ РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚ Android Back / Escape.
 /// </summary>
 public class GameSceneController : MonoBehaviour
 {
-    [Header("Окно подтверждения")]
+    [Header("РћРєРЅРѕ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ")]
 
     [SerializeField]
     private GameObject exitConfirmPanel;
 
-    [Header("Главное меню")]
+    [Header("РљРѕРґРµРєСЃ")]
+
+    [SerializeField]
+    private CodexUIController codexUIController;
+
+    [Header("Р“Р»Р°РІРЅРѕРµ РјРµРЅСЋ")]
 
     [SerializeField]
     private string mainMenuSceneName = "MainMenu";
@@ -25,15 +32,45 @@ public class GameSceneController : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (Keyboard.current == null ||
+            !Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            return;
+        }
+
+        HandleBackAction();
+    }
+
+    private void HandleBackAction()
+    {
+        if (exitConfirmPanel != null &&
+            exitConfirmPanel.activeSelf)
+        {
+            CloseExitConfirmation();
+            return;
+        }
+
+        if (codexUIController != null &&
+            codexUIController.IsOpen)
+        {
+            codexUIController.CloseCodex();
+            return;
+        }
+
+        OpenExitConfirmation();
+    }
+
     /// <summary>
-    /// Открывает окно подтверждения.
+    /// РћС‚РєСЂС‹РІР°РµС‚ РѕРєРЅРѕ РїРѕРґС‚РІРµСЂР¶РґРµРЅРёСЏ РІС‹С…РѕРґР°.
     /// </summary>
     public void OpenExitConfirmation()
     {
         if (exitConfirmPanel == null)
         {
             Debug.LogError(
-                "Не назначено поле Exit Confirm Panel."
+                "РќРµ РЅР°Р·РЅР°С‡РµРЅРѕ РїРѕР»Рµ Exit Confirm Panel."
             );
 
             return;
@@ -43,7 +80,7 @@ public class GameSceneController : MonoBehaviour
     }
 
     /// <summary>
-    /// Закрывает окно и возвращает игрока к документу.
+    /// Р—Р°РєСЂС‹РІР°РµС‚ РѕРєРЅРѕ Рё РІРѕР·РІСЂР°С‰Р°РµС‚ РёРіСЂРѕРєР° Рє РґРѕРєСѓРјРµРЅС‚Сѓ.
     /// </summary>
     public void CloseExitConfirmation()
     {
@@ -54,14 +91,14 @@ public class GameSceneController : MonoBehaviour
     }
 
     /// <summary>
-    /// Загружает сцену главного меню.
+    /// Р—Р°РіСЂСѓР¶Р°РµС‚ СЃС†РµРЅСѓ РіР»Р°РІРЅРѕРіРѕ РјРµРЅСЋ.
     /// </summary>
     public void ReturnToMainMenu()
     {
         if (string.IsNullOrWhiteSpace(mainMenuSceneName))
         {
             Debug.LogError(
-                "Название сцены главного меню не указано."
+                "РќР°Р·РІР°РЅРёРµ СЃС†РµРЅС‹ РіР»Р°РІРЅРѕРіРѕ РјРµРЅСЋ РЅРµ СѓРєР°Р·Р°РЅРѕ."
             );
 
             return;

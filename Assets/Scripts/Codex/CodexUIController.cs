@@ -54,6 +54,15 @@ public sealed class CodexUIController : MonoBehaviour
     [Range(0f, 1f)]
     private float soundVolume = 1f;
 
+    public bool IsOpen
+    {
+        get
+        {
+            return codexPanel != null &&
+                   codexPanel.activeSelf;
+        }
+    }
+
     private int currentIndex;
 
     private void OnEnable()
