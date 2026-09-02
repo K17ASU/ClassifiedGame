@@ -115,10 +115,10 @@ public sealed class MagnifierTool : MonoBehaviour
         }
 
         pointerPosition =
-    MobileToolPointerOffset.Apply(
-        documentText,
-        pointerPosition
-    );
+            MobileToolPointerOffset.Apply(
+                documentText,
+                pointerPosition
+            );
 
         magnifierCursor.position =
             pointerPosition;
@@ -148,6 +148,12 @@ public sealed class MagnifierTool : MonoBehaviour
             if (ScreenPointer.TryGetPosition(
                     out Vector2 pointerPosition))
             {
+                pointerPosition =
+                    MobileToolPointerOffset.Apply(
+                        documentText,
+                        pointerPosition
+                    );
+
                 magnifierCursor.position =
                     pointerPosition;
             }
@@ -180,8 +186,6 @@ public sealed class MagnifierTool : MonoBehaviour
         );
     }
 
-    // Оставлено временно для совместимости с DocumentRedactor.
-    // Старым UI кнопок этот метод больше не управляет.
     public void RefreshLocalizedText()
     {
     }
@@ -195,10 +199,10 @@ public sealed class MagnifierTool : MonoBehaviour
             documentText.textInfo;
 
         float scaledRevealRadius =
-    ToolInfluenceScale.ToScreenPixels(
-        documentText,
-        revealRadius
-    );
+            ToolInfluenceScale.ToScreenPixels(
+                documentText,
+                revealRadius
+            );
 
         float time =
             Time.unscaledTime *

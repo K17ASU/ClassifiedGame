@@ -128,10 +128,10 @@ public sealed class DecoderTool : MonoBehaviour
         }
 
         pointerPosition =
-    MobileToolPointerOffset.Apply(
-        documentText,
-        pointerPosition
-    );
+            MobileToolPointerOffset.Apply(
+                documentText,
+                pointerPosition
+            );
 
         decoderCursor.position =
             pointerPosition;
@@ -166,6 +166,12 @@ public sealed class DecoderTool : MonoBehaviour
             if (ScreenPointer.TryGetPosition(
                     out Vector2 pointerPosition))
             {
+                pointerPosition =
+                    MobileToolPointerOffset.Apply(
+                        documentText,
+                        pointerPosition
+                    );
+
                 decoderCursor.position =
                     pointerPosition;
             }

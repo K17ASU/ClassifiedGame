@@ -115,10 +115,10 @@ public sealed class UltravioletTool : MonoBehaviour
         }
 
         pointerPosition =
-    MobileToolPointerOffset.Apply(
-        documentText,
-        pointerPosition
-    );
+            MobileToolPointerOffset.Apply(
+                documentText,
+                pointerPosition
+            );
 
         ultravioletCursor.position =
             pointerPosition;
@@ -148,6 +148,12 @@ public sealed class UltravioletTool : MonoBehaviour
             if (ScreenPointer.TryGetPosition(
                     out Vector2 pointerPosition))
             {
+                pointerPosition =
+                    MobileToolPointerOffset.Apply(
+                        documentText,
+                        pointerPosition
+                    );
+
                 ultravioletCursor.position =
                     pointerPosition;
             }
@@ -182,14 +188,10 @@ public sealed class UltravioletTool : MonoBehaviour
         );
     }
 
-    // Оставлено временно для совместимости с DocumentRedactor.
-    // Старым UI кнопок этот метод больше не управляет.
     public void RefreshLocalizedText()
     {
     }
 
-    // Оставлен для совместимости с текущим DocumentRedactor.
-    // Новая UV-визуализация работает напрямую через TMP mesh.
     public string CreateRevealedWordMarkup(
         string originalText)
     {
@@ -205,10 +207,10 @@ public sealed class UltravioletTool : MonoBehaviour
             documentText.textInfo;
 
         float scaledRevealRadius =
-    ToolInfluenceScale.ToScreenPixels(
-        documentText,
-        ultravioletRevealRadius
-    );
+            ToolInfluenceScale.ToScreenPixels(
+                documentText,
+                ultravioletRevealRadius
+            );
 
         for (int linkIndex = 0;
              linkIndex < textInfo.linkCount;
