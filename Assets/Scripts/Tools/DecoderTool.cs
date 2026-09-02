@@ -5,11 +5,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Localization;
 
-/// <summary>
-/// Декодер показывает скрытое значение кодового слова,
-/// когда его область анализа находится над таким словом.
-/// Результат отображается рядом с курсором декодера.
-/// </summary>
 public sealed class DecoderTool : MonoBehaviour
 {
     [Header("Интерфейс")]
@@ -50,11 +45,9 @@ public sealed class DecoderTool : MonoBehaviour
 
     private TMP_Text documentText;
     private IReadOnlyList<DocumentWord> words;
-
     private Action stopDragging;
     private Func<bool> isDocumentFinished;
     private Action<string> setStatus;
-
     private bool isInitialized;
 
     public bool Initialize(
@@ -62,33 +55,21 @@ public sealed class DecoderTool : MonoBehaviour
         IReadOnlyList<DocumentWord> words,
         Action stopDragging,
         Func<bool> isDocumentFinished,
-        Action<string> setStatus
-    )
+        Action<string> setStatus)
     {
         this.documentText = documentText;
         this.words = words;
         this.stopDragging = stopDragging;
-        this.isDocumentFinished =
-            isDocumentFinished;
+        this.isDocumentFinished = isDocumentFinished;
         this.setStatus = setStatus;
 
         if (!ValidateReferences())
-        {
             return false;
-        }
 
         IsActive = false;
-
-        decoderCursor.gameObject.SetActive(
-            false
-        );
-
-        decoderResultContainer.gameObject.SetActive(
-            false
-        );
-
+        decoderCursor.gameObject.SetActive(false);
+        decoderResultContainer.gameObject.SetActive(false);
         isInitialized = true;
-
         return true;
     }
 
@@ -98,51 +79,31 @@ public sealed class DecoderTool : MonoBehaviour
 
         if (documentText == null)
         {
-            Debug.LogError(
-                "DecoderTool: не назначен Document Text.",
-                this
-            );
-
+            Debug.LogError("DecoderTool: не назначен Document Text.", this);
             referencesAreValid = false;
         }
 
         if (decoderCursor == null)
         {
-            Debug.LogError(
-                "DecoderTool: не назначен Decoder Cursor.",
-                this
-            );
-
+            Debug.LogError("DecoderTool: не назначен Decoder Cursor.", this);
             referencesAreValid = false;
         }
 
         if (decoderResultContainer == null)
         {
-            Debug.LogError(
-                "DecoderTool: не назначен Decoder Result Container.",
-                this
-            );
-
+            Debug.LogError("DecoderTool: не назначен Decoder Result Container.", this);
             referencesAreValid = false;
         }
 
         if (decoderResultText == null)
         {
-            Debug.LogError(
-                "DecoderTool: не назначен Decoder Result Text.",
-                this
-            );
-
+            Debug.LogError("DecoderTool: не назначен Decoder Result Text.", this);
             referencesAreValid = false;
         }
 
         if (words == null)
         {
-            Debug.LogError(
-                "DecoderTool: не передан список слов.",
-                this
-            );
-
+            Debug.LogError("DecoderTool: не передан список слов.", this);
             referencesAreValid = false;
         }
 
@@ -150,11 +111,7 @@ public sealed class DecoderTool : MonoBehaviour
             isDocumentFinished == null ||
             setStatus == null)
         {
-            Debug.LogError(
-                "DecoderTool: не переданы необходимые callbacks.",
-                this
-            );
-
+            Debug.LogError("DecoderTool: не переданы необходимые callbacks.", this);
             referencesAreValid = false;
         }
 
@@ -173,19 +130,13 @@ public sealed class DecoderTool : MonoBehaviour
         Vector2 mousePosition =
             Mouse.current.position.ReadValue();
 
-        decoderCursor.position =
-            mousePosition;
+        decoderCursor.position = mousePosition;
 
-        UpdateDecodedResult(
-            mousePosition
-        );
+        UpdateDecodedResult(mousePosition);
 
-        if (decoderResultContainer
-            .gameObject.activeSelf)
+        if (decoderResultContainer.gameObject.activeSelf)
         {
-            UpdateResultPosition(
-                mousePosition
-            );
+            UpdateResultPosition(mousePosition);
         }
     }
 
@@ -198,12 +149,8 @@ public sealed class DecoderTool : MonoBehaviour
         }
 
         IsActive = !IsActive;
-
         stopDragging();
-
-        decoderCursor.gameObject.SetActive(
-            IsActive
-        );
+        decoderCursor.gameObject.SetActive(IsActive);
 
         if (IsActive)
         {
@@ -212,9 +159,7 @@ public sealed class DecoderTool : MonoBehaviour
                     ? Mouse.current.position.ReadValue()
                     : Vector2.zero;
 
-            decoderCursor.position =
-                mousePosition;
-
+            decoderCursor.position = mousePosition;
             HideResult();
         }
         else
@@ -234,30 +179,20 @@ public sealed class DecoderTool : MonoBehaviour
     public void DisableMode()
     {
         if (!isInitialized)
-        {
             return;
-        }
 
         IsActive = false;
-
         stopDragging();
-
         HideResult();
-
-        decoderCursor.gameObject.SetActive(
-            false
-        );
+        decoderCursor.gameObject.SetActive(false);
     }
 
-    // Оставлено временно для совместимости с DocumentRedactor.
-    // Старым UI кнопок этот метод больше не управляет.
     public void RefreshLocalizedText()
     {
     }
 
     private void UpdateDecodedResult(
-        Vector2 decoderScreenPosition
-    )
+        Vector2 decoderScreenPosition)
     {
         documentText.ForceMeshUpdate();
 
@@ -265,9 +200,13 @@ public sealed class DecoderTool : MonoBehaviour
             documentText.textInfo;
 
         DocumentWord closestWord = null;
+        float closestDistance = float.PositiveInfinity;
 
-        float closestDistance =
-            float.PositiveInfinity;
+        float scaledRevealRadius =
+            ToolInfluenceScale.ToScreenPixels(
+                documentText,
+                revealRadius
+            );
 
         for (int linkIndex = 0;
              linkIndex < textInfo.linkCount;
@@ -283,18 +222,13 @@ public sealed class DecoderTool : MonoBehaviour
                 continue;
             }
 
-            if (wordId < 0 ||
-                wordId >= words.Count)
-            {
+            if (wordId < 0 || wordId >= words.Count)
                 continue;
-            }
 
-            DocumentWord word =
-                words[wordId];
+            DocumentWord word = words[wordId];
 
             if (word.isRedacted ||
-                !word.CanBeRevealedBy(
-                    RevealMethod.Decoder))
+                !word.CanBeRevealedBy(RevealMethod.Decoder))
             {
                 continue;
             }
@@ -302,8 +236,7 @@ public sealed class DecoderTool : MonoBehaviour
             if (!word.TryGetAnalysisPayload(
                     RevealMethod.Decoder,
                     out string payload) ||
-                string.IsNullOrWhiteSpace(
-                    payload))
+                string.IsNullOrWhiteSpace(payload))
             {
                 continue;
             }
@@ -314,7 +247,7 @@ public sealed class DecoderTool : MonoBehaviour
                     decoderScreenPosition
                 );
 
-            if (distance > revealRadius ||
+            if (distance > scaledRevealRadius ||
                 distance >= closestDistance)
             {
                 continue;
@@ -338,9 +271,7 @@ public sealed class DecoderTool : MonoBehaviour
         ShowResult(decodedText);
     }
 
-    private void ShowResult(
-        string decodedText
-    )
+    private void ShowResult(string decodedText)
     {
         decoderResultText.text =
             string.Format(
@@ -350,11 +281,9 @@ public sealed class DecoderTool : MonoBehaviour
 
         decoderResultText.ForceMeshUpdate();
 
-        if (!decoderResultContainer
-            .gameObject.activeSelf)
+        if (!decoderResultContainer.gameObject.activeSelf)
         {
-            decoderResultContainer
-                .gameObject.SetActive(true);
+            decoderResultContainer.gameObject.SetActive(true);
         }
     }
 
@@ -362,45 +291,39 @@ public sealed class DecoderTool : MonoBehaviour
     {
         if (decoderResultContainer != null)
         {
-            decoderResultContainer
-                .gameObject.SetActive(false);
+            decoderResultContainer.gameObject.SetActive(false);
         }
     }
 
     private void UpdateResultPosition(
-        Vector2 mouseScreenPosition
-    )
+        Vector2 mouseScreenPosition)
     {
-        Vector2 desiredPosition =
-            mouseScreenPosition +
-            resultOffset;
+        float screenScale =
+            ToolInfluenceScale.GetScreenScale(
+                documentText
+            );
 
-        Rect rect =
-            decoderResultContainer.rect;
+        Vector2 scaledOffset =
+            resultOffset * screenScale;
+
+        float scaledPadding =
+            screenPadding * screenScale;
+
+        Vector2 desiredPosition =
+            mouseScreenPosition + scaledOffset;
+
+        Rect rect = decoderResultContainer.rect;
 
         float halfWidth =
-            rect.width * 0.5f;
+            rect.width * 0.5f * screenScale;
 
         float halfHeight =
-            rect.height * 0.5f;
+            rect.height * 0.5f * screenScale;
 
-        float minimumX =
-            screenPadding +
-            halfWidth;
-
-        float maximumX =
-            Screen.width -
-            screenPadding -
-            halfWidth;
-
-        float minimumY =
-            screenPadding +
-            halfHeight;
-
-        float maximumY =
-            Screen.height -
-            screenPadding -
-            halfHeight;
+        float minimumX = scaledPadding + halfWidth;
+        float maximumX = Screen.width - scaledPadding - halfWidth;
+        float minimumY = scaledPadding + halfHeight;
+        float maximumY = Screen.height - scaledPadding - halfHeight;
 
         desiredPosition.x =
             Mathf.Clamp(
@@ -416,22 +339,17 @@ public sealed class DecoderTool : MonoBehaviour
                 maximumY
             );
 
-        decoderResultContainer.position =
-            desiredPosition;
+        decoderResultContainer.position = desiredPosition;
     }
 
     private float GetDistanceToLink(
         TMP_LinkInfo linkInfo,
-        Vector2 screenPosition
-    )
+        Vector2 screenPosition)
     {
-        TMP_TextInfo textInfo =
-            documentText.textInfo;
+        TMP_TextInfo textInfo = documentText.textInfo;
 
         if (linkInfo.linkTextLength <= 0)
-        {
             return float.PositiveInfinity;
-        }
 
         Vector2 minimum =
             new Vector2(
@@ -452,28 +370,21 @@ public sealed class DecoderTool : MonoBehaviour
             firstCharacterIndex +
             linkInfo.linkTextLength;
 
-        for (int characterIndex =
-                 firstCharacterIndex;
-             characterIndex <
-                 lastCharacterIndex;
+        for (int characterIndex = firstCharacterIndex;
+             characterIndex < lastCharacterIndex;
              characterIndex++)
         {
             if (characterIndex < 0 ||
-                characterIndex >=
-                textInfo.characterCount)
+                characterIndex >= textInfo.characterCount)
             {
                 continue;
             }
 
             TMP_CharacterInfo characterInfo =
-                textInfo.characterInfo[
-                    characterIndex
-                ];
+                textInfo.characterInfo[characterIndex];
 
             if (!characterInfo.isVisible)
-            {
                 continue;
-            }
 
             Vector3 bottomLeftWorld =
                 documentText.transform.TransformPoint(
@@ -486,37 +397,23 @@ public sealed class DecoderTool : MonoBehaviour
                 );
 
             Vector2 bottomLeftScreen =
-                RectTransformUtility
-                    .WorldToScreenPoint(
-                        GetDocumentCanvasCamera(),
-                        bottomLeftWorld
-                    );
+                RectTransformUtility.WorldToScreenPoint(
+                    GetDocumentCanvasCamera(),
+                    bottomLeftWorld
+                );
 
             Vector2 topRightScreen =
-                RectTransformUtility
-                    .WorldToScreenPoint(
-                        GetDocumentCanvasCamera(),
-                        topRightWorld
-                    );
-
-            minimum =
-                Vector2.Min(
-                    minimum,
-                    bottomLeftScreen
+                RectTransformUtility.WorldToScreenPoint(
+                    GetDocumentCanvasCamera(),
+                    topRightWorld
                 );
 
-            maximum =
-                Vector2.Max(
-                    maximum,
-                    topRightScreen
-                );
+            minimum = Vector2.Min(minimum, bottomLeftScreen);
+            maximum = Vector2.Max(maximum, topRightScreen);
         }
 
-        if (float.IsInfinity(
-                minimum.x))
-        {
+        if (float.IsInfinity(minimum.x))
             return float.PositiveInfinity;
-        }
 
         Vector2 closestPoint =
             new Vector2(
@@ -546,21 +443,16 @@ public sealed class DecoderTool : MonoBehaviour
             return null;
         }
 
-        Canvas canvas =
-            documentText.canvas;
+        Canvas canvas = documentText.canvas;
 
-        if (canvas.renderMode ==
-            RenderMode.ScreenSpaceOverlay)
-        {
+        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
             return null;
-        }
 
         return canvas.worldCamera;
     }
 
     private string Localize(
-        LocalizedString localizedString
-    )
+        LocalizedString localizedString)
     {
         if (localizedString == null ||
             localizedString.IsEmpty)
@@ -568,7 +460,6 @@ public sealed class DecoderTool : MonoBehaviour
             return string.Empty;
         }
 
-        return localizedString
-            .GetLocalizedString();
+        return localizedString.GetLocalizedString();
     }
 }

@@ -189,6 +189,12 @@ public sealed class MagnifierTool : MonoBehaviour
         TMP_TextInfo textInfo =
             documentText.textInfo;
 
+        float scaledRevealRadius =
+    ToolInfluenceScale.ToScreenPixels(
+        documentText,
+        revealRadius
+    );
+
         float time =
             Time.unscaledTime *
             shakeSpeed;
@@ -251,7 +257,7 @@ public sealed class MagnifierTool : MonoBehaviour
                 if (!IsCharacterInsideCircle(
                         characterInfo,
                         magnifierScreenPosition,
-                        revealRadius))
+                        scaledRevealRadius))
                 {
                     continue;
                 }

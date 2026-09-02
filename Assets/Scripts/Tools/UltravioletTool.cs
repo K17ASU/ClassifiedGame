@@ -199,6 +199,12 @@ public sealed class UltravioletTool : MonoBehaviour
         TMP_TextInfo textInfo =
             documentText.textInfo;
 
+        float scaledRevealRadius =
+    ToolInfluenceScale.ToScreenPixels(
+        documentText,
+        ultravioletRevealRadius
+    );
+
         for (int linkIndex = 0;
              linkIndex < textInfo.linkCount;
              linkIndex++)
@@ -256,7 +262,7 @@ public sealed class UltravioletTool : MonoBehaviour
                 if (!IsCharacterInsideCircle(
                         characterInfo,
                         lampScreenPosition,
-                        ultravioletRevealRadius))
+                        scaledRevealRadius))
                 {
                     continue;
                 }
