@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Localization;
 
 public sealed class DecoderTool : MonoBehaviour
@@ -122,21 +121,25 @@ public sealed class DecoderTool : MonoBehaviour
     {
         if (!isInitialized ||
             !IsActive ||
-            Mouse.current == null)
+            !ScreenPointer.TryGetPosition(
+                out Vector2 pointerPosition))
         {
             return;
         }
 
-        Vector2 mousePosition =
-            Mouse.current.position.ReadValue();
+        decoderCursor.position =
+            pointerPosition;
 
-        decoderCursor.position = mousePosition;
+        UpdateDecodedResult(
+            pointerPosition
+        );
 
-        UpdateDecodedResult(mousePosition);
-
-        if (decoderResultContainer.gameObject.activeSelf)
+        if (decoderResultContainer
+            .gameObject.activeSelf)
         {
-            UpdateResultPosition(mousePosition);
+            UpdateResultPosition(
+                pointerPosition
+            );
         }
     }
 
@@ -154,12 +157,13 @@ public sealed class DecoderTool : MonoBehaviour
 
         if (IsActive)
         {
-            Vector2 mousePosition =
-                Mouse.current != null
-                    ? Mouse.current.position.ReadValue()
-                    : Vector2.zero;
+            if (ScreenPointer.TryGetPosition(
+                    out Vector2 pointerPosition))
+            {
+                decoderCursor.position =
+                    pointerPosition;
+            }
 
-            decoderCursor.position = mousePosition;
             HideResult();
         }
         else

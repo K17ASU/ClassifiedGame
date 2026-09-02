@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Localization;
 
 /// <summary>
@@ -109,19 +108,17 @@ public sealed class MagnifierTool : MonoBehaviour
     {
         if (!isInitialized ||
             !IsActive ||
-            Mouse.current == null)
+            !ScreenPointer.TryGetPosition(
+                out Vector2 pointerPosition))
         {
             return;
         }
 
-        Vector2 mousePosition =
-            Mouse.current.position.ReadValue();
-
         magnifierCursor.position =
-            mousePosition;
+            pointerPosition;
 
         ApplyMagnifierEffect(
-            mousePosition
+            pointerPosition
         );
     }
 
@@ -142,10 +139,12 @@ public sealed class MagnifierTool : MonoBehaviour
 
         if (IsActive)
         {
-            magnifierCursor.position =
-                Mouse.current != null
-                    ? Mouse.current.position.ReadValue()
-                    : Vector2.zero;
+            if (ScreenPointer.TryGetPosition(
+                    out Vector2 pointerPosition))
+            {
+                magnifierCursor.position =
+                    pointerPosition;
+            }
         }
         else
         {
