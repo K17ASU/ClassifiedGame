@@ -11,6 +11,64 @@ public static class ScreenPointer
     private static bool hasLastTouchPosition;
     private static Vector2 lastTouchPosition;
 
+    public static bool TouchWasPressedThisFrame
+    {
+        get
+        {
+            return Touchscreen.current != null &&
+                   Touchscreen.current.primaryTouch.press
+                       .wasPressedThisFrame;
+        }
+    }
+
+    public static bool TouchWasReleasedThisFrame
+    {
+        get
+        {
+            return Touchscreen.current != null &&
+                   Touchscreen.current.primaryTouch.press
+                       .wasReleasedThisFrame;
+        }
+    }
+
+    public static bool IsTouchPressed
+    {
+        get
+        {
+            return Touchscreen.current != null &&
+                   Touchscreen.current.primaryTouch.press
+                       .isPressed;
+        }
+    }
+
+    public static bool TryGetTouchPosition(
+        out Vector2 screenPosition)
+    {
+        if (Touchscreen.current == null)
+        {
+            screenPosition =
+                Vector2.zero;
+
+            return false;
+        }
+
+        screenPosition =
+            Touchscreen.current.primaryTouch.position
+                .ReadValue();
+
+        if (Touchscreen.current.primaryTouch.press
+            .isPressed)
+        {
+            lastTouchPosition =
+                screenPosition;
+
+            hasLastTouchPosition =
+                true;
+        }
+
+        return true;
+    }
+
     public static bool TryGetPosition(
         out Vector2 screenPosition)
     {
@@ -24,7 +82,8 @@ public static class ScreenPointer
                 lastTouchPosition =
                     primaryTouch.position.ReadValue();
 
-                hasLastTouchPosition = true;
+                hasLastTouchPosition =
+                    true;
 
                 screenPosition =
                     lastTouchPosition;
