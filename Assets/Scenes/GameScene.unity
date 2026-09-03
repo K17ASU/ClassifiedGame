@@ -2373,6 +2373,7 @@ GameObject:
   - component: {fileID: 677106340}
   - component: {fileID: 677106341}
   - component: {fileID: 677106342}
+  - component: {fileID: 677106343}
   m_Layer: 5
   m_Name: DocumentText
   m_TagString: Untagged
@@ -2840,6 +2841,20 @@ MonoBehaviour:
   horizontalPadding: 2
   barHeightMultiplier: 0.8
   verticalOffset: 0
+--- !u!114 &677106343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 677106334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a7813c6ac832640abc0d60e29b9702, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StoryBranchingController
+  storyGraph: {fileID: 11400000, guid: 0f293c0749b9cd9489da6a3267c948b2, type: 2}
+  documentCatalog: {fileID: 11400000, guid: 7546b7f1547d7ed4a9ce9eebf897be05, type: 2}
 --- !u!1 &683720866
 GameObject:
   m_ObjectHideFlags: 0

@@ -325,7 +325,11 @@ public class DocumentRedactor :
 
             codexManager.ResetProgress();
 
+            GetComponent<StoryBranchingController>()
+                ?.ResetForNewCampaign();
+
             LoadCurrentDocument();
+
 
             CampaignProgress.StartNewCampaign(
                 CurrentDocument != null
@@ -687,6 +691,9 @@ public class DocumentRedactor :
             );
             return;
         }
+
+        GetComponent<StoryBranchingController>()
+           ?.ClearResolvedRoute();
 
         StopDragging();
         ultravioletTool.DisableMode();
@@ -1356,15 +1363,35 @@ public class DocumentRedactor :
     documentPassed
 );
 
+        string linearFallbackNextDocumentId =
+           GetLinearNextDocumentId();
+
+        StoryBranchingController storyBranching =
+            GetComponent<StoryBranchingController>();
+
+        StoryRouteResult routeResult =
+            storyBranching != null
+                ? storyBranching.ResolveAfterDocument(
+                    CurrentDocument,
+                    documentPassed,
+                    documentScore,
+                    totalScore,
+                    maximumDocumentScore,
+                    linearFallbackNextDocumentId
+                )
+                : new StoryRouteResult(
+                    linearFallbackNextDocumentId
+                );
+
         bool hasNextDocument =
-            currentDocumentIndex <
-            documents.Count - 1;
+            !routeResult.EndsCampaign;
 
         bool isLastDocument =
-            currentDocumentIndex ==
-            documents.Count - 1;
+            routeResult.EndsCampaign;
+
         bool isTutorial =
             IsCurrentDocumentTutorial();
+
 
         if (documentPassed)
         {
@@ -1463,21 +1490,14 @@ public class DocumentRedactor :
             return;
         }
 
-        DocumentData nextDocument = null;
-
-        if (currentDocumentIndex <
-            documents.Count - 1)
-        {
-            nextDocument =
-                documents[
-                    currentDocumentIndex + 1
-                ];
-        }
-
         string nextDocumentId =
-            nextDocument != null
-                ? nextDocument.DocumentId
-                : string.Empty;
+            GetPendingNextDocumentId();
+
+        DocumentData nextDocument =
+            FindDocumentById(
+                nextDocumentId
+            );
+
 
         int inspectionsUsed =
             IsCurrentDocumentTutorial()
@@ -1539,25 +1559,58 @@ public class DocumentRedactor :
 
     private int GetMaximumTotalScore()
     {
+        StoryBranchingController storyBranching =
+            GetComponent<StoryBranchingController>();
+
+        if (storyBranching != null &&
+            storyBranching.HasResolvedRoute &&
+            storyBranching.LastResolvedMaximumScore > 0)
+        {
+            return
+                storyBranching
+                    .LastResolvedMaximumScore;
+        }
+
         return GetPlayableDocumentCount() *
                maximumDocumentScore;
     }
+
     public void NextDocument()
     {
-        if (currentDocumentIndex >=
-            documents.Count - 1)
+        string nextDocumentId =
+            GetPendingNextDocumentId();
+
+        if (string.IsNullOrWhiteSpace(
+                nextDocumentId))
         {
+            return;
+        }
+
+        int nextDocumentIndex =
+            FindDocumentIndexById(
+                nextDocumentId
+            );
+
+        if (nextDocumentIndex < 0)
+        {
+            Debug.LogError(
+                $"Не найден следующий документ: " +
+                $"{nextDocumentId}"
+            );
+
             return;
         }
 
         UnlockToolsFromCurrentDocument();
 
-        currentDocumentIndex++;
+        currentDocumentIndex =
+            nextDocumentIndex;
 
         UnlockCodexEntriesForCurrentDocument();
 
         LoadCurrentDocument();
     }
+
 
     public void RestartGame()
     {
@@ -1569,6 +1622,9 @@ public class DocumentRedactor :
         unlockedTools = RevealMethod.None;
 
         codexManager.ResetProgress();
+
+        GetComponent<StoryBranchingController>()
+            ?.ResetForNewCampaign();
 
         LoadCurrentDocument();
 
@@ -1583,7 +1639,20 @@ public class DocumentRedactor :
     }
 
     private int GetPlayableDocumentCount()
+    
     {
+
+        StoryBranchingController storyBranching =
+    GetComponent<StoryBranchingController>();
+
+        if (storyBranching != null &&
+            storyBranching.CampaignPlayableDocumentCount > 0)
+        {
+            return
+                storyBranching
+                    .CampaignPlayableDocumentCount;
+        }
+
         int count = 0;
 
         foreach (DocumentData document in documents)
@@ -1600,6 +1669,18 @@ public class DocumentRedactor :
 
     private int GetCurrentPlayableDocumentNumber()
     {
+
+        StoryBranchingController storyBranching =
+    GetComponent<StoryBranchingController>();
+
+        if (storyBranching != null)
+        {
+            return storyBranching
+                .GetCurrentPlayableDocumentNumber(
+                    documentFinished
+                );
+        }
+
         int number = 0;
 
         for (int i = 0;
@@ -1618,6 +1699,55 @@ public class DocumentRedactor :
 
         return number;
     }
+
+    private string GetLinearNextDocumentId()
+    {
+        int nextIndex =
+            currentDocumentIndex + 1;
+
+        if (!IsValidDocumentIndex(
+                nextIndex))
+        {
+            return string.Empty;
+        }
+
+        DocumentData nextDocument =
+            documents[nextIndex];
+
+        return nextDocument != null
+            ? nextDocument.DocumentId
+            : string.Empty;
+    }
+
+    private string GetPendingNextDocumentId()
+    {
+        StoryBranchingController storyBranching =
+            GetComponent<StoryBranchingController>();
+
+        if (storyBranching != null &&
+            storyBranching.HasResolvedRoute)
+        {
+            return
+                storyBranching
+                    .PendingNextDocumentId;
+        }
+
+        return GetLinearNextDocumentId();
+    }
+
+    private DocumentData FindDocumentById(
+        string documentId)
+    {
+        int index =
+            FindDocumentIndexById(
+                documentId
+            );
+
+        return IsValidDocumentIndex(index)
+            ? documents[index]
+            : null;
+    }
+
 
     public void ToggleUltravioletMode()
     {
