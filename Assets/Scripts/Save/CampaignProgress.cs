@@ -3,12 +3,16 @@ using UnityEngine;
 
 /// <summary>
 /// Управляет историей checkpoint'ов кампании.
-/// Начиная с saveVersion 2 старые ветки не удаляются:
-/// переигрывание создаёт новый дочерний checkpoint.
+///
+/// saveVersion 2:
+/// checkpoint'ы образуют дерево.
+///
+/// saveVersion 3:
+/// каждый checkpoint хранит StoryState своей ветки.
 /// </summary>
 public static class CampaignProgress
 {
-    private const int CurrentSaveVersion = 2;
+    private const int CurrentSaveVersion = 3;
 
     private static CampaignSaveData currentCampaign;
 
@@ -151,12 +155,6 @@ public static class CampaignProgress
         return true;
     }
 
-    /// <summary>
-    /// Удаляет выбранный checkpoint и всех его потомков.
-    /// Корневой checkpoint новой игры удалить нельзя.
-    /// Если удаляемая ветка содержит активный checkpoint,
-    /// активным становится родитель удалённой ветки.
-    /// </summary>
     public static bool DeleteBranch(
         int branchRootCheckpointId,
         out int deletedCheckpointCount)
@@ -288,23 +286,59 @@ public static class CampaignProgress
                 currentDocumentId = firstDocumentId,
                 totalScore = 0,
                 unlockedToolsMask = initialToolsMask,
+
                 unlockedCodexEntryIds =
-                    CloneStrings(unlockedCodexEntryIds),
+                    CloneStrings(
+                        unlockedCodexEntryIds
+                    ),
+
                 readCodexEntryIds =
-                    CloneStrings(readCodexEntryIds)
+                    CloneStrings(
+                        readCodexEntryIds
+                    ),
+
+                storyState =
+                    new List<StoryStateSaveData>()
             };
 
         currentCampaign.checkpoints.Add(
             initialCheckpoint
         );
 
-        if (SaveManager.SaveCampaign(currentCampaign))
+        if (SaveManager.SaveCampaign(
+                currentCampaign))
         {
             Debug.Log(
                 $"CampaignProgress: создан корневой checkpoint #0 " +
                 $"перед документом {firstDocumentId}."
             );
         }
+    }
+
+    // Старый overload оставлен для совместимости.
+    public static void RecordDocumentCompletion(
+        string completedDocumentId,
+        int documentScore,
+        bool passed,
+        int inspectionsUsed,
+        string nextDocumentId,
+        int totalScore,
+        int unlockedToolsMask,
+        IReadOnlyList<string> unlockedCodexEntryIds,
+        IReadOnlyList<string> readCodexEntryIds)
+    {
+        RecordDocumentCompletion(
+            completedDocumentId,
+            documentScore,
+            passed,
+            inspectionsUsed,
+            nextDocumentId,
+            totalScore,
+            unlockedToolsMask,
+            unlockedCodexEntryIds,
+            readCodexEntryIds,
+            null
+        );
     }
 
     public static void RecordDocumentCompletion(
@@ -316,7 +350,8 @@ public static class CampaignProgress
         int totalScore,
         int unlockedToolsMask,
         IReadOnlyList<string> unlockedCodexEntryIds,
-        IReadOnlyList<string> readCodexEntryIds)
+        IReadOnlyList<string> readCodexEntryIds,
+        IReadOnlyList<StoryStateSaveData> storyState)
     {
         if (currentCampaign == null)
         {
@@ -366,6 +401,13 @@ public static class CampaignProgress
 
         currentCampaign.nextCheckpointId++;
 
+        List<StoryStateSaveData> nextStoryState =
+            storyState != null
+                ? CloneStoryState(storyState)
+                : CloneStoryState(
+                    activeCheckpoint.storyState
+                );
+
         CheckpointSaveData nextCheckpoint =
             new CheckpointSaveData
             {
@@ -400,7 +442,10 @@ public static class CampaignProgress
                 readCodexEntryIds =
                     CloneStrings(
                         readCodexEntryIds
-                    )
+                    ),
+
+                storyState =
+                    nextStoryState
             };
 
         nextCheckpoint.completedDocuments.Add(
@@ -434,7 +479,8 @@ public static class CampaignProgress
                 currentCampaign))
         {
             string nextLabel =
-                string.IsNullOrWhiteSpace(nextDocumentId)
+                string.IsNullOrWhiteSpace(
+                    nextDocumentId)
                     ? "CAMPAIGN_END"
                     : nextDocumentId;
 
@@ -447,7 +493,8 @@ public static class CampaignProgress
                 $"CampaignProgress: создан checkpoint " +
                 $"#{newCheckpointId} от #{activeCheckpoint.checkpointId}. " +
                 $"Завершён {completedDocumentId}, следующий: {nextLabel}, " +
-                $"общий счёт: {totalScore}.{branchLabel}"
+                $"общий счёт: {totalScore}, " +
+                $"StoryState: {nextStoryState.Count}.{branchLabel}"
             );
         }
     }
@@ -506,17 +553,46 @@ public static class CampaignProgress
             return null;
         }
 
+        bool saveWasUpgraded =
+            false;
+
         if (campaign.saveVersion == 1)
         {
             UpgradeVersion1ToVersion2(
                 campaign
             );
+
+            saveWasUpgraded =
+                true;
         }
-        else if (campaign.saveVersion ==
-                 CurrentSaveVersion)
+
+        if (campaign.saveVersion == 2)
         {
-            RepairVersion2Metadata(
+            UpgradeVersion2ToVersion3(
                 campaign
+            );
+
+            saveWasUpgraded =
+                true;
+        }
+
+        if (campaign.saveVersion ==
+            CurrentSaveVersion)
+        {
+            RepairVersion3Metadata(
+                campaign
+            );
+        }
+
+        if (saveWasUpgraded)
+        {
+            SaveManager.SaveCampaign(
+                campaign
+            );
+
+            Debug.Log(
+                $"CampaignProgress: сохранение обновлено " +
+                $"до версии {CurrentSaveVersion}."
             );
         }
 
@@ -544,14 +620,16 @@ public static class CampaignProgress
                 continue;
             }
 
-            checkpoint.checkpointId = i;
+            checkpoint.checkpointId =
+                i;
 
             checkpoint.parentCheckpointId =
                 i == 0
                     ? -1
                     : i - 1;
 
-            checkpoint.checkpointIndex = i;
+            checkpoint.checkpointIndex =
+                i;
         }
 
         int activeListIndex;
@@ -584,33 +662,57 @@ public static class CampaignProgress
             campaign.checkpoints.Count;
 
         campaign.saveVersion =
-            CurrentSaveVersion;
+            2;
 
         campaign.hasActiveCheckpointSelection =
             true;
 
         campaign.activeCheckpointIndex =
             activeListIndex;
-
-        SaveManager.SaveCampaign(campaign);
-
-        Debug.Log(
-            "CampaignProgress: сохранение автоматически " +
-            "обновлено с версии 1 до версии 2. " +
-            "Старая история сохранена как одна ветка."
-        );
     }
 
-    private static void RepairVersion2Metadata(
+    private static void UpgradeVersion2ToVersion3(
         CampaignSaveData campaign)
     {
-        if (campaign.checkpoints == null ||
-            campaign.checkpoints.Count == 0)
+        if (campaign.checkpoints == null)
         {
+            campaign.checkpoints =
+                new List<CheckpointSaveData>();
+        }
+
+        foreach (
+            CheckpointSaveData checkpoint
+            in campaign.checkpoints)
+        {
+            if (checkpoint == null)
+            {
+                continue;
+            }
+
+            if (checkpoint.storyState == null)
+            {
+                checkpoint.storyState =
+                    new List<StoryStateSaveData>();
+            }
+        }
+
+        campaign.saveVersion =
+            3;
+    }
+
+    private static void RepairVersion3Metadata(
+        CampaignSaveData campaign)
+    {
+        if (campaign.checkpoints == null)
+        {
+            campaign.checkpoints =
+                new List<CheckpointSaveData>();
+
             return;
         }
 
-        int maxId = -1;
+        int maxId =
+            -1;
 
         foreach (
             CheckpointSaveData checkpoint
@@ -626,6 +728,30 @@ public static class CampaignProgress
             {
                 maxId =
                     checkpoint.checkpointId;
+            }
+
+            if (checkpoint.completedDocuments == null)
+            {
+                checkpoint.completedDocuments =
+                    new List<DocumentResultSaveData>();
+            }
+
+            if (checkpoint.unlockedCodexEntryIds == null)
+            {
+                checkpoint.unlockedCodexEntryIds =
+                    new List<string>();
+            }
+
+            if (checkpoint.readCodexEntryIds == null)
+            {
+                checkpoint.readCodexEntryIds =
+                    new List<string>();
+            }
+
+            if (checkpoint.storyState == null)
+            {
+                checkpoint.storyState =
+                    new List<StoryStateSaveData>();
             }
         }
 
@@ -661,6 +787,7 @@ public static class CampaignProgress
                 $"CampaignProgress: неподдерживаемая версия сохранения: " +
                 $"{campaign.saveVersion}."
             );
+
             return false;
         }
 
@@ -759,6 +886,44 @@ public static class CampaignProgress
 
                     inspectionsUsed =
                         item.inspectionsUsed
+                }
+            );
+        }
+
+        return result;
+    }
+
+    private static List<StoryStateSaveData>
+        CloneStoryState(
+            IReadOnlyList<StoryStateSaveData> source)
+    {
+        List<StoryStateSaveData> result =
+            new List<StoryStateSaveData>();
+
+        if (source == null)
+        {
+            return result;
+        }
+
+        foreach (
+            StoryStateSaveData item
+            in source)
+        {
+            if (item == null ||
+                string.IsNullOrWhiteSpace(
+                    item.fragmentId))
+            {
+                continue;
+            }
+
+            result.Add(
+                new StoryStateSaveData
+                {
+                    fragmentId =
+                        item.fragmentId,
+
+                    state =
+                        item.state
                 }
             );
         }

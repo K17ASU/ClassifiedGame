@@ -636,6 +636,11 @@ public class DocumentRedactor :
             checkpoint.readCodexEntryIds
         );
 
+        GetComponent<StoryBranchingController>()
+            ?.RestoreFromCheckpoint(
+                checkpoint
+            );
+
         LoadCurrentDocument();
 
         Debug.Log(
@@ -1545,6 +1550,14 @@ public class DocumentRedactor :
             }
         }
 
+        StoryBranchingController storyBranching =
+    GetComponent<StoryBranchingController>();
+
+        List<StoryStateSaveData> storyState =
+            storyBranching != null
+                ? storyBranching.GetStoryStateForSave()
+                : null;
+
         CampaignProgress.RecordDocumentCompletion(
             CurrentDocument.DocumentId,
             documentScore,
@@ -1554,7 +1567,8 @@ public class DocumentRedactor :
             totalScore,
             (int)toolsForNextDocument,
             unlockedCodexIds,
-            readCodexIds
+            readCodexIds,
+            storyState
         );
     }
 

@@ -29,4 +29,8 @@ public sealed class CheckpointSaveData
 
     public List<string> readCodexEntryIds =
         new List<string>();
+
+    // V3: постоянное сюжетное состояние этой ветки.
+    public List<StoryStateSaveData> storyState =
+        new List<StoryStateSaveData>();
 }

@@ -4,13 +4,11 @@ using UnityEngine;
 /// <summary>
 /// Связывает StoryGraph с текущей кампанией.
 ///
-/// Компонент должен находиться на том же GameObject,
-/// что и DocumentRedactor.
-///
-/// V2 умеет маршрутизировать по состоянию сюжетных
-/// фрагментов текущего документа.
-/// Глобальное StoryState между разными документами
-/// появится отдельным следующим этапом.
+/// V3:
+/// - FragmentRedacted / FragmentExposed проверяют текущий документ.
+/// - StoryStateRedacted / StoryStateExposed проверяют постоянное
+///   состояние текущей ветки.
+/// - StoryState сохраняется в каждом checkpoint.
 /// </summary>
 public sealed class StoryBranchingController :
     MonoBehaviour
@@ -22,6 +20,13 @@ public sealed class StoryBranchingController :
 
     [SerializeField]
     private DocumentCatalog documentCatalog;
+
+    private readonly Dictionary<
+        string,
+        StoryFragmentState> storyState =
+            new Dictionary<
+                string,
+                StoryFragmentState>();
 
     private string pendingNextDocumentId =
         string.Empty;
@@ -51,7 +56,7 @@ public sealed class StoryBranchingController :
 
     private void Awake()
     {
-        RestoreCompletedDocumentCount();
+        storyState.Clear();
         ClearResolvedRoute();
     }
 
@@ -74,10 +79,15 @@ public sealed class StoryBranchingController :
         }
 
         Dictionary<string, StoryFragmentState>
-            fragmentStates =
+            currentFragmentStates =
                 BuildFragmentStates(
                     currentWords
                 );
+
+        // Новое решение по тому же id перезаписывает старое.
+        ApplyCurrentFragmentsToStoryState(
+            currentFragmentStates
+        );
 
         StoryRouteContext context =
             new StoryRouteContext(
@@ -89,7 +99,8 @@ public sealed class StoryBranchingController :
                 totalScore,
                 completedIncludingCurrent,
                 maximumDocumentScore,
-                fragmentStates
+                currentFragmentStates,
+                storyState
             );
 
         StoryRouteResult result =
@@ -139,9 +150,104 @@ public sealed class StoryBranchingController :
             $"Score: {context.CampaignPercent:0.##}%."
         );
 
-        LogFragmentStates(
-            fragmentStates
+        LogCurrentFragmentStates(
+            currentFragmentStates
         );
+
+        return result;
+    }
+
+    public void RestoreFromCheckpoint(
+        CheckpointSaveData checkpoint)
+    {
+        storyState.Clear();
+
+        completedPlayableDocumentCount =
+            0;
+
+        if (checkpoint == null)
+        {
+            ClearResolvedRoute();
+            return;
+        }
+
+        RestoreCompletedDocumentCount(
+            checkpoint
+        );
+
+        if (checkpoint.storyState != null)
+        {
+            foreach (
+                StoryStateSaveData item
+                in checkpoint.storyState)
+            {
+                if (item == null ||
+                    string.IsNullOrWhiteSpace(
+                        item.fragmentId))
+                {
+                    continue;
+                }
+
+                StoryFragmentState state =
+                    ToStoryFragmentState(
+                        item.state
+                    );
+
+                if (state ==
+                    StoryFragmentState.NotFound)
+                {
+                    continue;
+                }
+
+                storyState[
+                    item.fragmentId.Trim()
+                ] = state;
+            }
+        }
+
+        ClearResolvedRoute();
+
+        Debug.Log(
+            $"StoryState восстановлен из checkpoint " +
+            $"#{checkpoint.checkpointId}. " +
+            $"Записей: {storyState.Count}."
+        );
+    }
+
+    public List<StoryStateSaveData>
+        GetStoryStateForSave()
+    {
+        List<string> ids =
+            new List<string>(
+                storyState.Keys
+            );
+
+        ids.Sort(
+            System.StringComparer.Ordinal
+        );
+
+        List<StoryStateSaveData> result =
+            new List<StoryStateSaveData>();
+
+        foreach (string id in ids)
+        {
+            StoryFragmentState state =
+                storyState[id];
+
+            if (state ==
+                StoryFragmentState.NotFound)
+            {
+                continue;
+            }
+
+            result.Add(
+                new StoryStateSaveData
+                {
+                    fragmentId = id,
+                    state = (int)state
+                }
+            );
+        }
 
         return result;
     }
@@ -162,6 +268,8 @@ public sealed class StoryBranchingController :
     {
         completedPlayableDocumentCount =
             0;
+
+        storyState.Clear();
 
         ClearResolvedRoute();
     }
@@ -188,7 +296,9 @@ public sealed class StoryBranchingController :
             IReadOnlyList<DocumentWord> currentWords)
     {
         Dictionary<string, StoryFragmentState> states =
-            new Dictionary<string, StoryFragmentState>();
+            new Dictionary<
+                string,
+                StoryFragmentState>();
 
         if (currentWords == null)
         {
@@ -241,13 +351,12 @@ public sealed class StoryBranchingController :
         return states;
     }
 
-    private void LogFragmentStates(
+    private void ApplyCurrentFragmentsToStoryState(
         IReadOnlyDictionary<
             string,
-            StoryFragmentState> fragmentStates)
+            StoryFragmentState> currentFragmentStates)
     {
-        if (fragmentStates == null ||
-            fragmentStates.Count == 0)
+        if (currentFragmentStates == null)
         {
             return;
         }
@@ -256,48 +365,33 @@ public sealed class StoryBranchingController :
             KeyValuePair<
                 string,
                 StoryFragmentState> item
-            in fragmentStates)
+            in currentFragmentStates)
         {
-            Debug.Log(
-                $"Story fragment: " +
-                $"{item.Key} = {item.Value}."
-            );
+            if (item.Value ==
+                StoryFragmentState.NotFound)
+            {
+                continue;
+            }
+
+            storyState[
+                item.Key
+            ] = item.Value;
         }
     }
 
-    private void RestoreCompletedDocumentCount()
+    private void RestoreCompletedDocumentCount(
+        CheckpointSaveData checkpoint)
     {
-        completedPlayableDocumentCount =
-            0;
-
-        if (documentCatalog == null)
-        {
-            return;
-        }
-
-        CampaignSaveData campaign =
-            SaveManager.LoadCampaign();
-
-        if (campaign == null ||
-            campaign.checkpoints == null)
-        {
-            return;
-        }
-
-        CheckpointSaveData activeCheckpoint =
-            FindActiveCheckpoint(
-                campaign
-            );
-
-        if (activeCheckpoint == null ||
-            activeCheckpoint.completedDocuments == null)
+        if (checkpoint == null ||
+            checkpoint.completedDocuments == null ||
+            documentCatalog == null)
         {
             return;
         }
 
         foreach (
             DocumentResultSaveData result
-            in activeCheckpoint.completedDocuments)
+            in checkpoint.completedDocuments)
         {
             if (result == null ||
                 string.IsNullOrWhiteSpace(
@@ -319,21 +413,47 @@ public sealed class StoryBranchingController :
         }
     }
 
-    private CheckpointSaveData FindActiveCheckpoint(
-        CampaignSaveData campaign)
+    private StoryFragmentState
+        ToStoryFragmentState(
+            int savedState)
     {
-        foreach (
-            CheckpointSaveData checkpoint
-            in campaign.checkpoints)
+        if (savedState ==
+            (int)StoryFragmentState.Redacted)
         {
-            if (checkpoint != null &&
-                checkpoint.checkpointId ==
-                campaign.activeCheckpointId)
-            {
-                return checkpoint;
-            }
+            return StoryFragmentState.Redacted;
         }
 
-        return null;
+        if (savedState ==
+            (int)StoryFragmentState.Exposed)
+        {
+            return StoryFragmentState.Exposed;
+        }
+
+        return StoryFragmentState.NotFound;
+    }
+
+    private void LogCurrentFragmentStates(
+        IReadOnlyDictionary<
+            string,
+            StoryFragmentState> fragmentStates)
+    {
+        if (fragmentStates == null ||
+            fragmentStates.Count == 0)
+        {
+            return;
+        }
+
+        foreach (
+            KeyValuePair<
+                string,
+                StoryFragmentState> item
+            in fragmentStates)
+        {
+            Debug.Log(
+                $"Story fragment: " +
+                $"{item.Key} = {item.Value}. " +
+                $"Состояние сохранено в StoryState."
+            );
+        }
     }
 }

@@ -2575,6 +2575,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af6876ecd49b9284eabf4623436e4778, type: 2}
   - {fileID: 11400000, guid: bc0d3c2e79f908d4381872c35f163e0f, type: 2}
   - {fileID: 11400000, guid: 3ab22d972bc6fe643953dffd78897690, type: 2}
+  - {fileID: 11400000, guid: b12d23c0cc0fe5c46ab2b69f602225c3, type: 2}
   codexManager: {fileID: 1490692728}
   maximumInspections: 3
   maximumDocumentScore: 100

@@ -10,15 +10,21 @@ public enum StoryConditionType
     DocumentScoreAtLeast,
     CampaignPercentAtLeast,
     CampaignPercentBelow,
+
+    // Состояние фрагмента только в текущем документе.
     FragmentRedacted,
-    FragmentExposed
+    FragmentExposed,
+
+    // Сохранённое состояние из текущей ветки кампании.
+    StoryStateRedacted,
+    StoryStateExposed
 }
 
 public enum StoryFragmentState
 {
-    NotFound,
-    Redacted,
-    Exposed
+    NotFound = 0,
+    Redacted = 1,
+    Exposed = 2
 }
 
 [Serializable]
@@ -65,6 +71,18 @@ public sealed class StoryCondition
 
             case StoryConditionType.FragmentExposed:
                 return context.GetFragmentState(
+                           fragmentId
+                       ) ==
+                       StoryFragmentState.Exposed;
+
+            case StoryConditionType.StoryStateRedacted:
+                return context.GetStoryState(
+                           fragmentId
+                       ) ==
+                       StoryFragmentState.Redacted;
+
+            case StoryConditionType.StoryStateExposed:
+                return context.GetStoryState(
                            fragmentId
                        ) ==
                        StoryFragmentState.Exposed;
@@ -207,6 +225,10 @@ public readonly struct StoryRouteContext
         string,
         StoryFragmentState> fragmentStates;
 
+    private readonly IReadOnlyDictionary<
+        string,
+        StoryFragmentState> storyState;
+
     public string CurrentDocumentId { get; }
 
     public bool DocumentPassed { get; }
@@ -250,7 +272,10 @@ public readonly struct StoryRouteContext
         int maximumDocumentScore,
         IReadOnlyDictionary<
             string,
-            StoryFragmentState> fragmentStates)
+            StoryFragmentState> fragmentStates,
+        IReadOnlyDictionary<
+            string,
+            StoryFragmentState> storyState)
     {
         CurrentDocumentId =
             currentDocumentId;
@@ -278,19 +303,43 @@ public readonly struct StoryRouteContext
 
         this.fragmentStates =
             fragmentStates;
+
+        this.storyState =
+            storyState;
     }
 
     public StoryFragmentState GetFragmentState(
         string fragmentId)
     {
+        return GetState(
+            fragmentStates,
+            fragmentId
+        );
+    }
+
+    public StoryFragmentState GetStoryState(
+        string fragmentId)
+    {
+        return GetState(
+            storyState,
+            fragmentId
+        );
+    }
+
+    private StoryFragmentState GetState(
+        IReadOnlyDictionary<
+            string,
+            StoryFragmentState> source,
+        string fragmentId)
+    {
         if (string.IsNullOrWhiteSpace(
                 fragmentId) ||
-            fragmentStates == null)
+            source == null)
         {
             return StoryFragmentState.NotFound;
         }
 
-        return fragmentStates.TryGetValue(
+        return source.TryGetValue(
                 fragmentId,
                 out StoryFragmentState state)
             ? state

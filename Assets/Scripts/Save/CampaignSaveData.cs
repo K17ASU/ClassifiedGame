@@ -3,13 +3,17 @@ using System.Collections.Generic;
 
 /// <summary>
 /// Корневой объект сохранения одной кампании.
-/// Начиная с saveVersion 2 checkpoint'ы образуют дерево:
-/// каждый checkpoint знает своего родителя.
+///
+/// saveVersion 2:
+/// checkpoint'ы образуют дерево.
+///
+/// saveVersion 3:
+/// каждый checkpoint дополнительно хранит StoryState.
 /// </summary>
 [Serializable]
 public sealed class CampaignSaveData
 {
-    public int saveVersion = 2;
+    public int saveVersion = 3;
 
     public int activeCheckpointId = 0;
 
