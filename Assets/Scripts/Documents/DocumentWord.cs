@@ -11,6 +11,10 @@ public sealed class DocumentWord
     // Какими инструментами слово можно обнаружить.
     public RevealMethod revealMethods;
 
+    // Сюжетный ID фрагмента.
+    // Пустая строка = слово не участвует в сюжетном ветвлении.
+    public string storyFragmentId;
+
     // Текущее состояние игрока.
     public bool isRedacted;
 
@@ -21,7 +25,7 @@ public sealed class DocumentWord
     // Временное состояние UV-визуализации.
     public bool isUltravioletRevealed;
 
-    // Дополнительное выделение текста для создания акцента
+    // Дополнительное выделение текста для создания акцента.
     public bool isBold;
 
     // Дополнительные данные для инструментов анализа.

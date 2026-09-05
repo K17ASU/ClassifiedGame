@@ -9,7 +9,16 @@ public enum StoryConditionType
     DocumentFailed,
     DocumentScoreAtLeast,
     CampaignPercentAtLeast,
-    CampaignPercentBelow
+    CampaignPercentBelow,
+    FragmentRedacted,
+    FragmentExposed
+}
+
+public enum StoryFragmentState
+{
+    NotFound,
+    Redacted,
+    Exposed
 }
 
 [Serializable]
@@ -21,6 +30,9 @@ public sealed class StoryCondition
 
     [SerializeField]
     private float value;
+
+    [SerializeField]
+    private string fragmentId;
 
     public bool IsMet(
         StoryRouteContext context)
@@ -44,6 +56,18 @@ public sealed class StoryCondition
 
             case StoryConditionType.CampaignPercentBelow:
                 return context.CampaignPercent < value;
+
+            case StoryConditionType.FragmentRedacted:
+                return context.GetFragmentState(
+                           fragmentId
+                       ) ==
+                       StoryFragmentState.Redacted;
+
+            case StoryConditionType.FragmentExposed:
+                return context.GetFragmentState(
+                           fragmentId
+                       ) ==
+                       StoryFragmentState.Exposed;
 
             default:
                 return false;
@@ -179,6 +203,10 @@ public sealed class StoryGraph : ScriptableObject
 
 public readonly struct StoryRouteContext
 {
+    private readonly IReadOnlyDictionary<
+        string,
+        StoryFragmentState> fragmentStates;
+
     public string CurrentDocumentId { get; }
 
     public bool DocumentPassed { get; }
@@ -219,7 +247,10 @@ public readonly struct StoryRouteContext
         int documentScore,
         int totalScore,
         int completedPlayableDocuments,
-        int maximumDocumentScore)
+        int maximumDocumentScore,
+        IReadOnlyDictionary<
+            string,
+            StoryFragmentState> fragmentStates)
     {
         CurrentDocumentId =
             currentDocumentId;
@@ -244,5 +275,25 @@ public readonly struct StoryRouteContext
                 1,
                 maximumDocumentScore
             );
+
+        this.fragmentStates =
+            fragmentStates;
+    }
+
+    public StoryFragmentState GetFragmentState(
+        string fragmentId)
+    {
+        if (string.IsNullOrWhiteSpace(
+                fragmentId) ||
+            fragmentStates == null)
+        {
+            return StoryFragmentState.NotFound;
+        }
+
+        return fragmentStates.TryGetValue(
+                fragmentId,
+                out StoryFragmentState state)
+            ? state
+            : StoryFragmentState.NotFound;
     }
 }

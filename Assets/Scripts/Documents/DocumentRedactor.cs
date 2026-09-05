@@ -1377,7 +1377,8 @@ public class DocumentRedactor :
                     documentScore,
                     totalScore,
                     maximumDocumentScore,
-                    linearFallbackNextDocumentId
+                    linearFallbackNextDocumentId,
+                    words
                 )
                 : new StoryRouteResult(
                     linearFallbackNextDocumentId

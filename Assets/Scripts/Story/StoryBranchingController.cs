@@ -7,9 +7,10 @@ using UnityEngine;
 /// Компонент должен находиться на том же GameObject,
 /// что и DocumentRedactor.
 ///
-/// Само сохранение менять не требуется:
-/// существующий checkpoint уже хранит nextDocumentId
-/// через поле currentDocumentId следующего checkpoint.
+/// V2 умеет маршрутизировать по состоянию сюжетных
+/// фрагментов текущего документа.
+/// Глобальное StoryState между разными документами
+/// появится отдельным следующим этапом.
 /// </summary>
 public sealed class StoryBranchingController :
     MonoBehaviour
@@ -60,7 +61,8 @@ public sealed class StoryBranchingController :
         int documentScore,
         int totalScore,
         int maximumDocumentScore,
-        string linearFallbackNextDocumentId)
+        string linearFallbackNextDocumentId,
+        IReadOnlyList<DocumentWord> currentWords)
     {
         int completedIncludingCurrent =
             completedPlayableDocumentCount;
@@ -71,6 +73,12 @@ public sealed class StoryBranchingController :
             completedIncludingCurrent++;
         }
 
+        Dictionary<string, StoryFragmentState>
+            fragmentStates =
+                BuildFragmentStates(
+                    currentWords
+                );
+
         StoryRouteContext context =
             new StoryRouteContext(
                 currentDocument != null
@@ -80,7 +88,8 @@ public sealed class StoryBranchingController :
                 documentScore,
                 totalScore,
                 completedIncludingCurrent,
-                maximumDocumentScore
+                maximumDocumentScore,
+                fragmentStates
             );
 
         StoryRouteResult result =
@@ -130,6 +139,10 @@ public sealed class StoryBranchingController :
             $"Score: {context.CampaignPercent:0.##}%."
         );
 
+        LogFragmentStates(
+            fragmentStates
+        );
+
         return result;
     }
 
@@ -168,6 +181,88 @@ public sealed class StoryBranchingController :
             1,
             completedPlayableDocumentCount + 1
         );
+    }
+
+    private Dictionary<string, StoryFragmentState>
+        BuildFragmentStates(
+            IReadOnlyList<DocumentWord> currentWords)
+    {
+        Dictionary<string, StoryFragmentState> states =
+            new Dictionary<string, StoryFragmentState>();
+
+        if (currentWords == null)
+        {
+            return states;
+        }
+
+        Dictionary<string, bool> allRedacted =
+            new Dictionary<string, bool>();
+
+        foreach (
+            DocumentWord word
+            in currentWords)
+        {
+            if (word == null ||
+                string.IsNullOrWhiteSpace(
+                    word.storyFragmentId))
+            {
+                continue;
+            }
+
+            string fragmentId =
+                word.storyFragmentId.Trim();
+
+            if (!allRedacted.ContainsKey(
+                    fragmentId))
+            {
+                allRedacted[
+                    fragmentId
+                ] = true;
+            }
+
+            if (!word.isRedacted)
+            {
+                allRedacted[
+                    fragmentId
+                ] = false;
+            }
+        }
+
+        foreach (
+            KeyValuePair<string, bool> item
+            in allRedacted)
+        {
+            states[item.Key] =
+                item.Value
+                    ? StoryFragmentState.Redacted
+                    : StoryFragmentState.Exposed;
+        }
+
+        return states;
+    }
+
+    private void LogFragmentStates(
+        IReadOnlyDictionary<
+            string,
+            StoryFragmentState> fragmentStates)
+    {
+        if (fragmentStates == null ||
+            fragmentStates.Count == 0)
+        {
+            return;
+        }
+
+        foreach (
+            KeyValuePair<
+                string,
+                StoryFragmentState> item
+            in fragmentStates)
+        {
+            Debug.Log(
+                $"Story fragment: " +
+                $"{item.Key} = {item.Value}."
+            );
+        }
     }
 
     private void RestoreCompletedDocumentCount()

@@ -16,6 +16,7 @@ public sealed class DocumentParser
         public RevealMethod revealMethods;
         public string decoderPayload;
         public bool isBold;
+        public string storyFragmentId;
     }
 
     private sealed class ActiveAnnotation
@@ -24,6 +25,7 @@ public sealed class DocumentParser
         public RevealMethod revealMethods;
         public string decoderPayload;
         public bool isBold;
+        public string storyFragmentId;
     }
 
     private sealed class ParsedSource
@@ -238,7 +240,7 @@ public sealed class DocumentParser
 
             if (token.Equals(
                     "bold",
-                     StringComparison.OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
                 parsedAnnotation.isBold = true;
                 hasKnownToken = true;
@@ -290,6 +292,32 @@ public sealed class DocumentParser
                     );
 
                 hasKnownToken = true;
+                continue;
+            }
+
+            const string storyIdPrefix =
+                "id=";
+
+            if (token.StartsWith(
+                    storyIdPrefix,
+                    StringComparison
+                        .OrdinalIgnoreCase))
+            {
+                string storyFragmentId =
+                    token.Substring(
+                            storyIdPrefix.Length
+                        )
+                        .Trim();
+
+                if (!string.IsNullOrWhiteSpace(
+                        storyFragmentId))
+                {
+                    parsedAnnotation.storyFragmentId =
+                        storyFragmentId;
+
+                    hasKnownToken = true;
+                }
+
                 continue;
             }
         }
@@ -425,7 +453,10 @@ public sealed class DocumentParser
                 annotation.decoderPayload,
 
             isBold =
-                annotation.isBold
+                annotation.isBold,
+
+            storyFragmentId =
+                annotation.storyFragmentId
         };
     }
 
@@ -465,6 +496,7 @@ public sealed class DocumentParser
                 RevealMethod.None;
 
             string decoderPayload = null;
+            string storyFragmentId = null;
             bool isBold = false;
 
             int endIndex =
@@ -483,14 +515,22 @@ public sealed class DocumentParser
 
                 revealMethods |=
                     metadata.revealMethods;
-                
-                isBold |= metadata.isBold;
+
+                isBold |=
+                    metadata.isBold;
 
                 if (!string.IsNullOrEmpty(
                         metadata.decoderPayload))
                 {
                     decoderPayload =
                         metadata.decoderPayload;
+                }
+
+                if (!string.IsNullOrWhiteSpace(
+                        metadata.storyFragmentId))
+                {
+                    storyFragmentId =
+                        metadata.storyFragmentId;
                 }
             }
 
@@ -505,6 +545,9 @@ public sealed class DocumentParser
 
                     revealMethods =
                         revealMethods,
+
+                    storyFragmentId =
+                        storyFragmentId,
 
                     isBold =
                         isBold,
