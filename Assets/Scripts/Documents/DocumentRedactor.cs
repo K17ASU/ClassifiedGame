@@ -226,6 +226,12 @@ public class DocumentRedactor :
     private bool dragUsesPencil;
     private bool isInitialized;
 
+    private const float MobileDragStartThreshold = 18f;
+
+    private int pendingMobileWordId = -1;
+    private Vector2 pendingMobileStartPosition;
+    private bool mobileDragCommitted;
+
     private bool hasInspectionStatus;
     private int lastMissedInformation;
     private int lastExtraRedactions;
@@ -700,6 +706,10 @@ public class DocumentRedactor :
         GetComponent<StoryBranchingController>()
            ?.ClearResolvedRoute();
 
+        MobileDocumentPinchZoom.ResetActiveView();
+
+        StopDragging();
+
         StopDragging();
         ultravioletTool.DisableMode();
         magnifierTool.DisableMode();
@@ -795,9 +805,16 @@ public class DocumentRedactor :
     }
 
     public void OnPointerDown(
-        PointerEventData eventData
-    )
+            PointerEventData eventData
+        )
     {
+        if (Application.isMobilePlatform &&
+            MobileDocumentGestureState.IsInputBlocked)
+        {
+            CancelMobilePointerAction();
+            return;
+        }
+
         if (documentFinished ||
             ultravioletTool.IsActive ||
             magnifierTool.IsActive ||
@@ -825,9 +842,11 @@ public class DocumentRedactor :
         isDragging = true;
         processedDragWords.Clear();
 
-        DocumentWord firstWord = words[wordId];
+        DocumentWord firstWord =
+            words[wordId];
 
-        dragUsesPencil = pencilTool.IsActive;
+        dragUsesPencil =
+            pencilTool.IsActive;
 
         if (dragUsesPencil)
         {
@@ -840,13 +859,35 @@ public class DocumentRedactor :
                 !firstWord.isRedacted;
         }
 
+        if (Application.isMobilePlatform)
+        {
+            pendingMobileWordId =
+                wordId;
+
+            pendingMobileStartPosition =
+                eventData.position;
+
+            mobileDragCommitted =
+                false;
+
+            return;
+        }
+
         ApplyDragState(wordId);
     }
 
+
     public void OnDrag(
-        PointerEventData eventData
-    )
+           PointerEventData eventData
+       )
     {
+        if (Application.isMobilePlatform &&
+            MobileDocumentGestureState.IsInputBlocked)
+        {
+            CancelMobilePointerAction();
+            return;
+        }
+
         if (documentFinished ||
             ultravioletTool.IsActive ||
             magnifierTool.IsActive ||
@@ -854,6 +895,32 @@ public class DocumentRedactor :
             !isDragging)
         {
             return;
+        }
+
+        if (Application.isMobilePlatform &&
+            !mobileDragCommitted)
+        {
+            float dragDistance =
+                Vector2.Distance(
+                    pendingMobileStartPosition,
+                    eventData.position
+                );
+
+            if (dragDistance <
+                MobileDragStartThreshold)
+            {
+                return;
+            }
+
+            mobileDragCommitted =
+                true;
+
+            if (pendingMobileWordId >= 0)
+            {
+                ApplyDragState(
+                    pendingMobileWordId
+                );
+            }
         }
 
         int wordId = GetWordIdAtPosition(
@@ -869,9 +936,10 @@ public class DocumentRedactor :
         ApplyDragState(wordId);
     }
 
+
     public void OnPointerUp(
-        PointerEventData eventData
-    )
+            PointerEventData eventData
+        )
     {
         if (eventData.button !=
             PointerEventData.InputButton.Left)
@@ -879,8 +947,28 @@ public class DocumentRedactor :
             return;
         }
 
+        if (Application.isMobilePlatform)
+        {
+            bool shouldApplyTap =
+                !MobileDocumentGestureState.IsInputBlocked &&
+                isDragging &&
+                !mobileDragCommitted &&
+                pendingMobileWordId >= 0;
+
+            if (shouldApplyTap)
+            {
+                ApplyDragState(
+                    pendingMobileWordId
+                );
+            }
+
+            CancelMobilePointerAction();
+            return;
+        }
+
         StopDragging();
     }
+
 
     private int GetWordIdAtPosition(
         Vector2 screenPosition,
@@ -985,6 +1073,19 @@ public class DocumentRedactor :
         isDragging = false;
         dragUsesPencil = false;
         processedDragWords.Clear();
+    }
+
+    private void CancelMobilePointerAction()
+    {
+        pendingMobileWordId = -1;
+
+        pendingMobileStartPosition =
+            Vector2.zero;
+
+        mobileDragCommitted =
+            false;
+
+        StopDragging();
     }
 
     private void RefreshDocument()

@@ -48,6 +48,15 @@ public static class ScreenPointer
     public static bool TryGetTouchPosition(
         out Vector2 screenPosition)
     {
+        if (Application.isMobilePlatform &&
+    MobileDocumentGestureState
+        .IsInputBlocked)
+        {
+            screenPosition =
+                Vector2.zero;
+
+            return false;
+        }
         if (Touchscreen.current == null)
         {
             screenPosition = Vector2.zero;

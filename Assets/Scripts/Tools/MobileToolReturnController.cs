@@ -51,6 +51,14 @@ public sealed class MobileToolReturnController : MonoBehaviour
     {
         RefreshReturnAreas();
 
+        if (Application.isMobilePlatform &&
+    MobileDocumentGestureState
+        .IsInputBlocked)
+        {
+            ResetTouchTracking();
+            return;
+        }
+
         if (ScreenPointer.TouchWasPressedThisFrame &&
             ScreenPointer.TryGetTouchPosition(
                 out Vector2 startPosition))
