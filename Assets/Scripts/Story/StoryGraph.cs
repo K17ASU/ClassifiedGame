@@ -61,7 +61,7 @@ public sealed class StoryCondition
                 return context.CampaignPercent >= value;
 
             case StoryConditionType.CampaignPercentBelow:
-                return context.CampaignPercent < value;
+                return context.CampaignPercent <= value;
 
             case StoryConditionType.FragmentRedacted:
                 return context.GetFragmentState(
