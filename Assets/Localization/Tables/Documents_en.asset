@@ -77,19 +77,42 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915524
-    m_Localized: "Welcome to the {{Information Control Department}}, Agent {PLAYER_NAME}.\n\nYour
+    m_Localized: 'Welcome to the {{Information Control Department}}, Agent {PLAYER_NAME}.
+
+
+      Your
       task will be to redact documents before they are processed by the {{Disinformation
-      Center}}.\n\nSome information contains [bold]\"Anomalous Fragments\"[/] that
-      can only be detected with special [bold]tools[/]. All of your tools are located
-      on the right side of the screen.\n\nDue to the growing number of such fragments
-      (including within the Organization's own documentation), every document must
-      be [redact,uv]manually edited by Organization personnel[/].\n_______________________\n\nThis
-      document contains an Anomalous Fragment \u2014 the [bold]\"Hidden Mark\"[/]
-      \u2014 which can be detected using the [bold]ultraviolet lamp (UV LAMP)[/].\n\nTo
-      turn off a tool, click its button again or press the right mouse button.\n\nHidden
-      Marks [bold]differ in color[/] from the rest of the text.\n\nRedact only the
-      information that matches the document assignment. The assignment is shown on
-      the left side of the screen."
+      Center}}.
+
+
+      Some information contains [bold]"Anomalous Fragments"[/]
+      that can only be detected with special [bold]tools[/]. All of your tools are
+      located on the right side of the screen.
+
+
+      Due to the growing number
+      of such fragments (including within the Organization''s own documentation),
+      every document must be [redact,uv]manually edited by Organization personnel[/].
+
+      _______________________
+
+
+      This
+      document contains an Anomalous Fragment - the [bold]"Hidden Mark"[/] - which
+      can be detected using the [bold]ultraviolet lamp (UV LAMP)[/].
+
+
+      To turn
+      off a tool, click its button again or press the right mouse button.
+
+
+      Hidden
+      Marks [bold]differ in color[/] from the rest of the text.
+
+
+      Redact only
+      the information that matches the document assignment. The assignment is shown
+      on the left side of the screen.'
     m_Metadata:
       m_Items: []
   - m_Id: 253372523921408
@@ -291,16 +314,33 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057959841415168
-    m_Localized: "You are performing well, Agent.\n\nDue to potential information
+    m_Localized: 'You are performing well, Agent.
+
+
+      Due to potential information
       leaks and possible activity by the Cult of the Starborn within the Organization,
-      Management has decided to use a new memagent based on Anomalous Fragment: [bold]\"CIPHER\"[/].\n\nA
-      new tool has been placed at your [redact]disposal[/] \u2014 the [bold]decoder[/],
-      which will allow you to identify ciphers and uncover their true meaning.\n\nTo
-      proceed, point the decoder at the following phrase:\n[decoder=disposal]ALL
-      SECRETS WILL COME TO LIGHT[/]\n\nThen redact the word shown in the decoded
-      message.\n\n[bold]IMPORTANT[/]: Anomalous Fragment \"CIPHER\" may be used against
-      you by the Cult of the Starborn. Remember: your assignments have the highest
-      priority."
+      Management has decided to use a new memagent based on Anomalous Fragment: [bold]"CIPHER"[/].
+
+
+      A
+      new tool has been placed at your [redact]disposal[/] - the [bold]decoder[/],
+      which will allow you to identify ciphers and uncover their true meaning.
+
+
+      To
+      proceed, point the decoder at the following phrase:
+
+      [decoder=disposal]ALL
+      SECRETS WILL COME TO LIGHT[/]
+
+
+      Then redact the word shown in the decoded
+      message.
+
+
+      [bold]IMPORTANT[/]: Anomalous Fragment "CIPHER" may be used
+      against you by the Cult of the Starborn. Remember: your assignments have the
+      highest priority.'
     m_Metadata:
       m_Items: []
   - m_Id: 1057959841415169
@@ -316,32 +356,40 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150849
-    m_Localized: "In {{2015}}, a blogger using the name \"searchandrescuewoods\"
-      on Reddit described incidents from his work in a park-ranger search-and-rescue
-      service in the United States, as well as stories told by his colleagues.\n\nIn
-      one of his posts, he wrote: \"Every time we were about {{30\u201335}} miles
-      from the base, at some point we would find a staircase in the middle of the
-      woods. It was as if someone had taken a staircase from an ordinary house, [redact,magnifier,uv]cut
+    m_Localized: 'In {{2015}}, a blogger using the name "searchandrescuewoods" on
+      Reddit described incidents from his work in a park-ranger search-and-rescue
+      service in the United States, as well as stories told by his colleagues.
+
+
+      In
+      one of his posts, he wrote: "Every time we were about {{30-35}} miles from
+      the base, at some point we would find a staircase in the middle of the woods.
+      It was as if someone had taken a staircase from an ordinary house, [redact,magnifier,uv]cut
       it out of there[/], and [redact,magnifier]placed it[/] in the woods. The first
       time I saw one, I had a lot of [redact,uv]questions[/], but I was told it was
       perfectly normal. Now I just [redact,magnifier]ignore[/] the stairs when I
-      come across them: it happens [redact,uv]very often[/].\"\n\nThe post attracted
-      the Organization's attention. [redact,decoder=YOU CAN'T HIDE]Undercover agents[/]
+      come across them: it happens [redact,uv]very often[/]."
+
+
+      The post attracted
+      the Organization''s attention. [redact,decoder=YOU CAN''T HIDE]Undercover agents[/]
       were sent to national parks in the [magnifier]United States[/] for further
       investigation. According to the information they obtained, these stairs act
-      as \"[redact,magnifier]portals[/]\" to other [redact,uv]dimensions[/]. In addition,
+      as "[redact,magnifier]portals[/]" to other [redact,uv]dimensions[/]. In addition,
       {{one}} [redact,decoder=Miles Marsh]agent[/] stationed in [uv]Yosemite[/] reported
       that his colleagues claimed that even without climbing such a staircase, simply
-      getting close enough to it would bring trouble.\n\nDuring one rescue operation,
+      getting close enough to it would bring trouble.
+
+
+      During one rescue operation,
       an agent managed to locate one of these staircases, consisting of {{5}} flights.
       While examining it, he discovered a [redact,uv,magnifier,decoder=Cult of the
       Starborn]star-shaped symbol[/] at its base and immediately reported it to the
-      Organization. Further contact with the agent could not be established."
+      Organization. Further contact with the agent could not be established.'
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150850
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
-      Anomalous Fragments\n\nDo not redact:\n\u2022 Geographical names"
+    m_Localized: 
     m_Metadata:
       m_Items: []
   - m_Id: 1737424917544960
@@ -353,13 +401,30 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1737425051762688
-    m_Localized: "You are doing well, {PLAYER_NAME}.\n\nFor your further work, a
-      new tool has been issued to you \u2014 the [bold]\"Lens\"[/].\n\nThe Lens will
-      allow you to locate a new type of Anomalous Fragment in the text \u2014 a [bold]\"Cognitive
-      Hazard\"[/].\n\nPoint the Lens at the following text:\n\"[redact,magnifier]WE
-      MOVE UNDER HIS GAZE[/]\"\n\nThis is how Cognitive Hazards will be detected.
-      Keep in mind that a Cognitive Hazard may also be used as a memagent.\n\nTo
-      continue, redact the Cognitive Hazard in this document and submit it for review."
+    m_Localized: 'You are doing well, {PLAYER_NAME}.
+
+
+      For your further work,
+      a new tool has been issued to you - the [bold]"Lens"[/].
+
+
+      The Lens will
+      allow you to locate a new type of Anomalous Fragment in the text - a [bold]"Cognitive
+      Hazard"[/].
+
+
+      Point the Lens at the following text:
+
+      "[redact,magnifier]WE
+      MOVE UNDER HIS GAZE[/]"
+
+
+      This is how Cognitive Hazards will be detected.
+      Keep in mind that a Cognitive Hazard may also be used as a memagent.
+
+
+      To
+      continue, redact the Cognitive Hazard in this document and submit it for review.'
     m_Metadata:
       m_Items: []
   - m_Id: 1737425051762689
@@ -441,6 +506,15 @@ MonoBehaviour:
       briefing size\nAlso here is alot of text for testing briefing size\nAlso here
       is alot of text for testing briefing size\nAlso here is alot of text for testing
       briefing size"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141617717248
+    m_Localized: DOCUMENT No. 000.2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300160
+    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
+      Anomalous Fragments\n\nDo not redact:\n\u2022 Geographical names"
     m_Metadata:
       m_Items: []
   references:

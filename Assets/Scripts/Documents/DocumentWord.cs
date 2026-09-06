@@ -4,33 +4,37 @@ public sealed class DocumentWord
 {
     public int id;
     public string originalText;
-
-    // Должен ли игрок засекретить это слово.
     public bool requiresRedaction;
-
-    // Какими инструментами слово можно обнаружить.
     public RevealMethod revealMethods;
-
-    // Сюжетный ID фрагмента.
-    // Пустая строка = слово не участвует в сюжетном ветвлении.
     public string storyFragmentId;
-
-    // Текущее состояние игрока.
     public bool isRedacted;
-
-    // Пометка игрока карандашом.
-    // Не влияет на проверку документа и работу инструментов анализа.
     public bool isStruckThrough;
-
-    // Временное состояние UV-визуализации.
     public bool isUltravioletRevealed;
-
-    // Дополнительное выделение текста для создания акцента.
     public bool isBold;
 
-    // Дополнительные данные для инструментов анализа.
-    // Например:
-    // RevealMethod.Decoder -> "ВОЛКОВ"
+    public int cycleGroupId = -1;
+    public List<string> cycleValues = new List<string>();
+    public float cycleIntervalMin = 0.5f;
+    public float cycleIntervalMax = 0.5f;
+    public int cycleValueIndex = -1;
+
+    public bool HasCycle =>
+        cycleGroupId >= 0 &&
+        cycleValues != null &&
+        cycleValues.Count >= 2;
+
+    public string GetDisplayText()
+    {
+        if (HasCycle &&
+            cycleValueIndex >= 0 &&
+            cycleValueIndex < cycleValues.Count)
+        {
+            return cycleValues[cycleValueIndex];
+        }
+
+        return originalText;
+    }
+
     private readonly Dictionary<RevealMethod, string>
         analysisPayloads =
             new Dictionary<RevealMethod, string>();

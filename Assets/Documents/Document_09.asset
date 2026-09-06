@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d3ef4614fdfd89049bb2af4a160e869c, type: 3}
-  m_Name: Document_05
+  m_Name: Document_09
   m_EditorClassIdentifier: Assembly-CSharp::DocumentData
-  documentId: DOC_005
+  documentId: DOC_009
   documentNumber: "\u0414\u041E\u041A\u041B\u0410\u0414 \u2116 002"
   documentTitle: "\u041E\u0437\u0435\u0440\u043D\u043E\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u043E"
   documentText: "\u041E\u0431\u044A\u0435\u043A\u0442 \u0431\u044B\u043B \u0437\u0430\u043C\u0435\u0447\u0435\u043D
@@ -41,13 +41,13 @@ MonoBehaviour:
   isTutorial: 0
   unlocksAfterCompletion: 0
   codexEntriesToUnlock: []
-  localizationId: document_05
+  localizationId: document_09
   localizedDocumentNumber:
     m_TableReference:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_05_number
+      m_Key: document_09_number
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -56,7 +56,7 @@ MonoBehaviour:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_05_title
+      m_Key: document_09_title
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -65,7 +65,7 @@ MonoBehaviour:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_05_text
+      m_Key: document_09_text
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
@@ -74,7 +74,7 @@ MonoBehaviour:
       m_TableCollectionName: Documents
     m_TableEntryReference:
       m_KeyId: 0
-      m_Key: document_05_briefing
+      m_Key: document_09_briefing
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []

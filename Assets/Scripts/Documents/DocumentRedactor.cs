@@ -212,6 +212,9 @@ public class DocumentRedactor :
     private readonly DocumentEvaluator documentEvaluator =
         new DocumentEvaluator();
 
+    private readonly DocumentCycleController cycleController =
+        new DocumentCycleController();
+
     private int currentDocumentIndex;
     private int inspectionsRemaining;
     private int totalScore;
@@ -369,12 +372,16 @@ public class DocumentRedactor :
 
     private void Update()
     {
-        if (Mouse.current == null)
+        if (!documentFinished &&
+            cycleController.Tick(
+                Time.deltaTime
+            ))
         {
-            return;
+            RefreshDocument();
         }
 
-        if (Mouse.current.rightButton.wasPressedThisFrame)
+        if (Mouse.current != null &&
+            Mouse.current.rightButton.wasPressedThisFrame)
         {
             DisableActiveTool();
         }
@@ -789,6 +796,10 @@ public class DocumentRedactor :
         words.AddRange(result.words);
         textParts.AddRange(result.textParts);
 
+        cycleController.Initialize(
+    words
+);
+
         if (result.hasUnclosedSecretMarker)
         {
             Debug.LogWarning(
@@ -1153,9 +1164,9 @@ public class DocumentRedactor :
                 visibleWord +
                 "</u>";
         }
-       
+
         if (!word.isRedacted &&
-             word.isBold)
+            word.isBold)
         {
             visibleWord =
                 "<b>" +

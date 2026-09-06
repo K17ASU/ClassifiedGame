@@ -1,14 +1,33 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 public sealed class DocumentParser
 {
+    private const float DefaultCycleInterval = 0.5f;
+    private const float MinimumCycleInterval = 0.05f;
+
     private static readonly Regex WordPattern = new Regex(
         @"[\p{L}\p{N}]+(?:[-–—'][\p{L}\p{N}]+)*",
         RegexOptions.Compiled
     );
+
+    private sealed class CycleDefinition
+    {
+        public int groupId = -1;
+
+        public readonly List<string> alternatives =
+            new List<string>();
+
+        public float intervalMin =
+            DefaultCycleInterval;
+
+        public float intervalMax =
+            DefaultCycleInterval;
+    }
 
     private sealed class CharacterMetadata
     {
@@ -17,6 +36,7 @@ public sealed class DocumentParser
         public string decoderPayload;
         public bool isBold;
         public string storyFragmentId;
+        public int cycleGroupId = -1;
     }
 
     private sealed class ActiveAnnotation
@@ -26,6 +46,7 @@ public sealed class DocumentParser
         public string decoderPayload;
         public bool isBold;
         public string storyFragmentId;
+        public int cycleGroupId = -1;
     }
 
     private sealed class ParsedSource
@@ -34,6 +55,10 @@ public sealed class DocumentParser
 
         public List<CharacterMetadata> metadata =
             new List<CharacterMetadata>();
+
+        public readonly Dictionary<int, CycleDefinition>
+            cycleDefinitions =
+                new Dictionary<int, CycleDefinition>();
 
         public bool hasUnclosedMarker;
     }
@@ -83,9 +108,9 @@ public sealed class DocumentParser
             new StringBuilder();
 
         ActiveAnnotation activeAnnotation = null;
-
         string legacyClosingMarker = null;
 
+        int nextCycleGroupId = 0;
         int position = 0;
 
         while (position < sourceText.Length)
@@ -96,8 +121,25 @@ public sealed class DocumentParser
                         sourceText,
                         position,
                         out ActiveAnnotation annotation,
-                        out int openingLength))
+                        out int openingLength,
+                        out CycleDefinition cycleDefinition))
                 {
+                    if (cycleDefinition != null)
+                    {
+                        cycleDefinition.groupId =
+                            nextCycleGroupId;
+
+                        annotation.cycleGroupId =
+                            nextCycleGroupId;
+
+                        result.cycleDefinitions.Add(
+                            nextCycleGroupId,
+                            cycleDefinition
+                        );
+
+                        nextCycleGroupId++;
+                    }
+
                     activeAnnotation = annotation;
                     legacyClosingMarker = null;
                     position += openingLength;
@@ -167,11 +209,13 @@ public sealed class DocumentParser
         string sourceText,
         int position,
         out ActiveAnnotation annotation,
-        out int openingLength
+        out int openingLength,
+        out CycleDefinition cycleDefinition
     )
     {
         annotation = null;
         openingLength = 0;
+        cycleDefinition = null;
 
         if (position >= sourceText.Length ||
             sourceText[position] != '[')
@@ -179,8 +223,6 @@ public sealed class DocumentParser
             return false;
         }
 
-        // Старый UV-маркер [[...]] должен
-        // обрабатываться legacy-парсером.
         if (StartsWith(
                 sourceText,
                 position,
@@ -220,6 +262,8 @@ public sealed class DocumentParser
             tagContent.Split(',');
 
         bool hasKnownToken = false;
+        List<string> cycleAlternatives = null;
+        string intervalTokenValue = null;
 
         foreach (string rawToken in tokens)
         {
@@ -228,12 +272,9 @@ public sealed class DocumentParser
 
             if (token.Equals(
                     "redact",
-                    StringComparison
-                        .OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
-                parsedAnnotation
-                    .requiresRedaction = true;
-
+                parsedAnnotation.requiresRedaction = true;
                 hasKnownToken = true;
                 continue;
             }
@@ -249,8 +290,7 @@ public sealed class DocumentParser
 
             if (token.Equals(
                     "uv",
-                    StringComparison
-                        .OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
                 parsedAnnotation.revealMethods |=
                     RevealMethod.Ultraviolet;
@@ -261,12 +301,10 @@ public sealed class DocumentParser
 
             if (token.Equals(
                     "magnifier",
-                    StringComparison
-                        .OrdinalIgnoreCase) ||
+                    StringComparison.OrdinalIgnoreCase) ||
                 token.Equals(
                     "mag",
-                    StringComparison
-                        .OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
                 parsedAnnotation.revealMethods |=
                     RevealMethod.Magnifier;
@@ -280,8 +318,7 @@ public sealed class DocumentParser
 
             if (token.StartsWith(
                     decoderPrefix,
-                    StringComparison
-                        .OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
                 parsedAnnotation.revealMethods |=
                     RevealMethod.Decoder;
@@ -300,8 +337,7 @@ public sealed class DocumentParser
 
             if (token.StartsWith(
                     storyIdPrefix,
-                    StringComparison
-                        .OrdinalIgnoreCase))
+                    StringComparison.OrdinalIgnoreCase))
             {
                 string storyFragmentId =
                     token.Substring(
@@ -314,10 +350,48 @@ public sealed class DocumentParser
                 {
                     parsedAnnotation.storyFragmentId =
                         storyFragmentId;
-
-                    hasKnownToken = true;
                 }
 
+                hasKnownToken = true;
+                continue;
+            }
+
+            const string cyclePrefix =
+                "cycle=";
+
+            if (token.StartsWith(
+                    cyclePrefix,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                string rawCycle =
+                    token.Substring(
+                            cyclePrefix.Length
+                        )
+                        .Trim();
+
+                cycleAlternatives =
+                    ParseCycleAlternatives(
+                        rawCycle
+                    );
+
+                hasKnownToken = true;
+                continue;
+            }
+
+            const string intervalPrefix =
+                "interval=";
+
+            if (token.StartsWith(
+                    intervalPrefix,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                intervalTokenValue =
+                    token.Substring(
+                            intervalPrefix.Length
+                        )
+                        .Trim();
+
+                hasKnownToken = true;
                 continue;
             }
         }
@@ -327,12 +401,205 @@ public sealed class DocumentParser
             return false;
         }
 
+        if (cycleAlternatives != null)
+        {
+            if (cycleAlternatives.Count < 2)
+            {
+                Debug.LogWarning(
+                    "DocumentParser: cycle= должен содержать " +
+                    "как минимум два значения через |. " +
+                    "Cycle для этого фрагмента отключён."
+                );
+            }
+            else
+            {
+                cycleDefinition =
+                    new CycleDefinition();
+
+                cycleDefinition.alternatives.AddRange(
+                    cycleAlternatives
+                );
+
+                if (!string.IsNullOrWhiteSpace(
+                        intervalTokenValue))
+                {
+                    if (!TryParseCycleInterval(
+                            intervalTokenValue,
+                            out float intervalMin,
+                            out float intervalMax))
+                    {
+                        Debug.LogWarning(
+                            $"DocumentParser: не удалось разобрать " +
+                            $"interval={intervalTokenValue}. " +
+                            $"Использую {DefaultCycleInterval:0.##} сек."
+                        );
+                    }
+                    else
+                    {
+                        cycleDefinition.intervalMin =
+                            intervalMin;
+
+                        cycleDefinition.intervalMax =
+                            intervalMax;
+                    }
+                }
+            }
+        }
+        else if (!string.IsNullOrWhiteSpace(
+                     intervalTokenValue))
+        {
+            Debug.LogWarning(
+                "DocumentParser: interval= указан без cycle=. " +
+                "Параметр проигнорирован."
+            );
+        }
+
         annotation = parsedAnnotation;
 
         openingLength =
             closingBracket - position + 1;
 
         return true;
+    }
+
+    private List<string> ParseCycleAlternatives(
+        string rawCycle)
+    {
+        List<string> result =
+            new List<string>();
+
+        if (string.IsNullOrWhiteSpace(
+                rawCycle))
+        {
+            return result;
+        }
+
+        string[] values =
+            rawCycle.Split('|');
+
+        foreach (string rawValue in values)
+        {
+            string value =
+                rawValue.Trim();
+
+            if (!string.IsNullOrWhiteSpace(
+                    value))
+            {
+                result.Add(value);
+            }
+        }
+
+        return result;
+    }
+
+    private bool TryParseCycleInterval(
+        string rawValue,
+        out float intervalMin,
+        out float intervalMax)
+    {
+        intervalMin =
+            DefaultCycleInterval;
+
+        intervalMax =
+            DefaultCycleInterval;
+
+        if (string.IsNullOrWhiteSpace(
+                rawValue))
+        {
+            return false;
+        }
+
+        string normalized =
+            rawValue.Trim();
+
+        int separatorIndex =
+            normalized.IndexOf(
+                '-',
+                1
+            );
+
+        if (separatorIndex < 0)
+        {
+            if (!TryParseInvariantFloat(
+                    normalized,
+                    out float fixedInterval))
+            {
+                return false;
+            }
+
+            fixedInterval =
+                Mathf.Max(
+                    MinimumCycleInterval,
+                    fixedInterval
+                );
+
+            intervalMin =
+                fixedInterval;
+
+            intervalMax =
+                fixedInterval;
+
+            return true;
+        }
+
+        string minText =
+            normalized.Substring(
+                    0,
+                    separatorIndex
+                )
+                .Trim();
+
+        string maxText =
+            normalized.Substring(
+                    separatorIndex + 1
+                )
+                .Trim();
+
+        if (!TryParseInvariantFloat(
+                minText,
+                out float parsedMin) ||
+            !TryParseInvariantFloat(
+                maxText,
+                out float parsedMax))
+        {
+            return false;
+        }
+
+        parsedMin =
+            Mathf.Max(
+                MinimumCycleInterval,
+                parsedMin
+            );
+
+        parsedMax =
+            Mathf.Max(
+                MinimumCycleInterval,
+                parsedMax
+            );
+
+        if (parsedMax < parsedMin)
+        {
+            float temp = parsedMin;
+            parsedMin = parsedMax;
+            parsedMax = temp;
+        }
+
+        intervalMin = parsedMin;
+        intervalMax = parsedMax;
+
+        return true;
+    }
+
+    private bool TryParseInvariantFloat(
+        string value,
+        out float result)
+    {
+        return float.TryParse(
+            value,
+            NumberStyles.Float,
+            CultureInfo.InvariantCulture,
+            out result
+        );
     }
 
     private bool TryReadLegacyOpeningMarker(
@@ -345,16 +612,12 @@ public sealed class DocumentParser
         annotation = null;
         closingMarker = null;
 
-        if (StartsWith(
-                sourceText,
-                position,
-                "[["))
+        if (StartsWith(sourceText, position, "[["))
         {
             annotation =
                 new ActiveAnnotation
                 {
                     requiresRedaction = true,
-
                     revealMethods =
                         RevealMethod.Ultraviolet
                 };
@@ -363,10 +626,7 @@ public sealed class DocumentParser
             return true;
         }
 
-        if (StartsWith(
-                sourceText,
-                position,
-                "{{"))
+        if (StartsWith(sourceText, position, "{{"))
         {
             annotation =
                 new ActiveAnnotation
@@ -378,10 +638,7 @@ public sealed class DocumentParser
             return true;
         }
 
-        if (StartsWith(
-                sourceText,
-                position,
-                "(("))
+        if (StartsWith(sourceText, position, "(("))
         {
             annotation =
                 new ActiveAnnotation
@@ -394,16 +651,12 @@ public sealed class DocumentParser
             return true;
         }
 
-        if (StartsWith(
-                sourceText,
-                position,
-                "<<"))
+        if (StartsWith(sourceText, position, "<<"))
         {
             annotation =
                 new ActiveAnnotation
                 {
                     requiresRedaction = true,
-
                     revealMethods =
                         RevealMethod.Magnifier
                 };
@@ -412,10 +665,7 @@ public sealed class DocumentParser
             return true;
         }
 
-        if (StartsWith(
-                sourceText,
-                position,
-                "##"))
+        if (StartsWith(sourceText, position, "##"))
         {
             annotation =
                 new ActiveAnnotation
@@ -456,7 +706,10 @@ public sealed class DocumentParser
                 annotation.isBold,
 
             storyFragmentId =
-                annotation.storyFragmentId
+                annotation.storyFragmentId,
+
+            cycleGroupId =
+                annotation.cycleGroupId
         };
     }
 
@@ -469,6 +722,12 @@ public sealed class DocumentParser
             WordPattern.Matches(
                 parsedSource.cleanText
             );
+
+        Dictionary<int, List<DocumentWord>>
+            cycleWordsByGroup =
+                new Dictionary<
+                    int,
+                    List<DocumentWord>>();
 
         int currentPosition = 0;
         int wordId = 0;
@@ -491,13 +750,13 @@ public sealed class DocumentParser
             }
 
             bool requiresRedaction = false;
-
             RevealMethod revealMethods =
                 RevealMethod.None;
 
             string decoderPayload = null;
             string storyFragmentId = null;
             bool isBold = false;
+            int cycleGroupId = -1;
 
             int endIndex =
                 match.Index + match.Length;
@@ -532,6 +791,12 @@ public sealed class DocumentParser
                     storyFragmentId =
                         metadata.storyFragmentId;
                 }
+
+                if (metadata.cycleGroupId >= 0)
+                {
+                    cycleGroupId =
+                        metadata.cycleGroupId;
+                }
             }
 
             DocumentWord word =
@@ -552,10 +817,11 @@ public sealed class DocumentParser
                     isBold =
                         isBold,
 
-                    isRedacted = false,
+                    cycleGroupId =
+                        cycleGroupId,
 
-                    isUltravioletRevealed =
-                        false
+                    isRedacted = false,
+                    isUltravioletRevealed = false
                 };
 
             if (!string.IsNullOrEmpty(
@@ -565,6 +831,24 @@ public sealed class DocumentParser
                     RevealMethod.Decoder,
                     decoderPayload
                 );
+            }
+
+            if (cycleGroupId >= 0)
+            {
+                if (!cycleWordsByGroup.TryGetValue(
+                        cycleGroupId,
+                        out List<DocumentWord> cycleWords))
+                {
+                    cycleWords =
+                        new List<DocumentWord>();
+
+                    cycleWordsByGroup.Add(
+                        cycleGroupId,
+                        cycleWords
+                    );
+                }
+
+                cycleWords.Add(word);
             }
 
             result.words.Add(word);
@@ -592,6 +876,148 @@ public sealed class DocumentParser
                     remainingText
                 )
             );
+        }
+
+        ApplyCycleDefinitions(
+            parsedSource,
+            cycleWordsByGroup
+        );
+    }
+
+    private void ApplyCycleDefinitions(
+        ParsedSource parsedSource,
+        Dictionary<int, List<DocumentWord>>
+            cycleWordsByGroup)
+    {
+        foreach (
+            KeyValuePair<int, CycleDefinition> pair
+            in parsedSource.cycleDefinitions)
+        {
+            int groupId = pair.Key;
+            CycleDefinition definition = pair.Value;
+
+            if (!cycleWordsByGroup.TryGetValue(
+                    groupId,
+                    out List<DocumentWord> groupWords) ||
+                groupWords.Count == 0)
+            {
+                continue;
+            }
+
+            List<List<string>>
+                tokenizedAlternatives =
+                    new List<List<string>>();
+
+            bool valid = true;
+
+            foreach (
+                string alternative
+                in definition.alternatives)
+            {
+                List<string> alternativeWords =
+                    TokenizeCycleAlternative(
+                        alternative
+                    );
+
+                if (alternativeWords.Count !=
+                    groupWords.Count)
+                {
+                    Debug.LogWarning(
+                        $"DocumentParser: cycle-фрагмент " +
+                        $"«{alternative}» содержит " +
+                        $"{alternativeWords.Count} слов, " +
+                        $"а текст между тегами — " +
+                        $"{groupWords.Count}. " +
+                        $"Все варианты cycle= должны иметь " +
+                        $"одинаковое количество слов. " +
+                        $"Cycle отключён."
+                    );
+
+                    valid = false;
+                    break;
+                }
+
+                tokenizedAlternatives.Add(
+                    alternativeWords
+                );
+            }
+
+            if (!valid ||
+                tokenizedAlternatives.Count < 2)
+            {
+                DisableCycleForGroup(
+                    groupWords
+                );
+
+                continue;
+            }
+
+            for (int wordIndex = 0;
+                 wordIndex < groupWords.Count;
+                 wordIndex++)
+            {
+                DocumentWord word =
+                    groupWords[wordIndex];
+
+                word.cycleValues.Clear();
+
+                foreach (
+                    List<string> alternativeWords
+                    in tokenizedAlternatives)
+                {
+                    word.cycleValues.Add(
+                        alternativeWords[wordIndex]
+                    );
+                }
+
+                word.cycleIntervalMin =
+                    definition.intervalMin;
+
+                word.cycleIntervalMax =
+                    definition.intervalMax;
+
+                word.cycleValueIndex = -1;
+            }
+        }
+    }
+
+    private List<string> TokenizeCycleAlternative(
+        string alternative)
+    {
+        List<string> result =
+            new List<string>();
+
+        MatchCollection matches =
+            WordPattern.Matches(
+                alternative
+            );
+
+        foreach (Match match in matches)
+        {
+            result.Add(match.Value);
+        }
+
+        return result;
+    }
+
+    private void DisableCycleForGroup(
+        IReadOnlyList<DocumentWord> words)
+    {
+        if (words == null)
+        {
+            return;
+        }
+
+        foreach (DocumentWord word in words)
+        {
+            if (word == null)
+            {
+                continue;
+            }
+
+            word.cycleGroupId = -1;
+            word.cycleValues.Clear();
+            word.cycleValueIndex = -1;
         }
     }
 
