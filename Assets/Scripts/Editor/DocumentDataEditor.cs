@@ -1,127 +1,92 @@
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Localization;
 using UnityEngine;
 
-[CustomEditor(typeof(DocumentData))]
-public class DocumentDataEditor : Editor
+[CustomEditor(typeof(DocumentCatalog))]
+public sealed class DocumentCatalogEditor : Editor
 {
-    private const string TableCollectionName = "Documents";
-
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
 
-        EditorGUILayout.Space(12);
-
-        DocumentData document =
-            (DocumentData)target;
-
-        EditorGUILayout.LabelField(
-            "Localization Tools",
-            EditorStyles.boldLabel
-        );
-
-        bool hasLocalizationId =
-            !string.IsNullOrWhiteSpace(
-                document.LocalizationId
-            );
-
-        if (!hasLocalizationId)
-        {
-            EditorGUILayout.HelpBox(
-                "Укажите Localization ID, " +
-                "например document_01.",
-                MessageType.Warning
-            );
-        }
-
-        GUI.enabled = hasLocalizationId;
+        EditorGUILayout.Space();
 
         if (GUILayout.Button(
-                "SETUP LOCALIZATION",
-                GUILayout.Height(36)
-            ))
+                "Sync All Documents"))
         {
-            SetupLocalization(document);
+            SyncDocuments();
         }
-
-        GUI.enabled = true;
     }
 
-    private void SetupLocalization(
-        DocumentData document
-    )
+    private void SyncDocuments()
     {
-        var collection =
-            LocalizationEditorSettings
-                .GetStringTableCollection(
-                    TableCollectionName
-                );
-
-        if (collection == null)
-        {
-            Debug.LogError(
-                $"Не найдена String Table Collection " +
-                $"'{TableCollectionName}'.",
-                document
+        string[] guids =
+            AssetDatabase.FindAssets(
+                "t:DocumentData",
+                new[] { "Assets/Documents" }
             );
 
-            return;
-        }
+        List<DocumentData> documents =
+            new List<DocumentData>();
 
-        string id =
-            document.LocalizationId.Trim();
-
-        List<string> requiredKeys =
-            new List<string>
-            {
-                $"{id}_number",
-                $"{id}_title",
-                $"{id}_text",
-                $"{id}_briefing"
-            };
-
-        Undo.RecordObject(
-            collection.SharedData,
-            "Setup Document Localization"
-        );
-
-        int createdCount = 0;
-
-        foreach (string key in requiredKeys)
+        foreach (string guid in guids)
         {
-            if (collection.SharedData
-                    .GetEntry(key) != null)
+            string path =
+                AssetDatabase.GUIDToAssetPath(
+                    guid
+                );
+
+            DocumentData document =
+                AssetDatabase.LoadAssetAtPath<
+                    DocumentData
+                >(path);
+
+            if (document == null ||
+                string.IsNullOrWhiteSpace(
+                    document.DocumentId))
             {
                 continue;
             }
 
-            collection.SharedData.AddKey(key);
-            createdCount++;
+            documents.Add(document);
         }
 
-        EditorUtility.SetDirty(
-            collection.SharedData
+        documents.Sort(
+            (a, b) =>
+                string.CompareOrdinal(
+                    a.DocumentId,
+                    b.DocumentId
+                )
         );
-
-        Undo.RecordObject(
-            document,
-            "Setup Document Localization"
-        );
-
-        document.AutoBindLocalization();
-
-        EditorUtility.SetDirty(document);
-
-        AssetDatabase.SaveAssets();
 
         serializedObject.Update();
 
+        SerializedProperty documentsProperty =
+            serializedObject.FindProperty(
+                "documents"
+            );
+
+        documentsProperty.arraySize =
+            documents.Count;
+
+        for (int i = 0;
+             i < documents.Count;
+             i++)
+        {
+            documentsProperty
+                .GetArrayElementAtIndex(i)
+                .objectReferenceValue =
+                    documents[i];
+        }
+
+        serializedObject.ApplyModifiedProperties();
+
+        EditorUtility.SetDirty(target);
+        AssetDatabase.SaveAssets();
+
         Debug.Log(
-            $"Localization setup завершён для '{id}'. " +
-            $"Создано новых ключей: {createdCount}.",
-            document
+            $"DocumentCatalog: добавлено " +
+            $"{documents.Count} документов."
         );
     }
 }
