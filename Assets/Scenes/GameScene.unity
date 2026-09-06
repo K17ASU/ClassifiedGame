@@ -2430,6 +2430,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 18464625ecef227489852e92d21a9039, type: 2}
   - {fileID: 11400000, guid: b109c936059e3194b8bd10a4715ee856, type: 2}
   - {fileID: 11400000, guid: c52459ef18316b448b0e5461ec7c471a, type: 2}
+  - {fileID: 11400000, guid: a17ecab0fb9d10a4292004f2cda49ddc, type: 2}
+  - {fileID: 11400000, guid: 3ab22d972bc6fe643953dffd78897690, type: 2}
+  - {fileID: 11400000, guid: 1a19a4d551f28264187c192a98fcf07d, type: 2}
+  - {fileID: 11400000, guid: 665abdfa05224ee42b10c7fa2486d91e, type: 2}
   codexManager: {fileID: 1490692728}
   maximumInspections: 3
   maximumDocumentScore: 100

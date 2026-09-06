@@ -22,37 +22,37 @@ MonoBehaviour:
   localizationId: document_16vb
   localizedDocumentNumber:
     m_TableReference:
-      m_TableCollectionName: Documents
+      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
     m_TableEntryReference:
-      m_KeyId: 0
-      m_Key: document_16vb_number
+      m_KeyId: 10913412364185610
+      m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentTitle:
     m_TableReference:
-      m_TableCollectionName: Documents
+      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
     m_TableEntryReference:
-      m_KeyId: 0
-      m_Key: document_16vb_title
+      m_KeyId: 10913412364185611
+      m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedDocumentText:
     m_TableReference:
-      m_TableCollectionName: Documents
+      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
     m_TableEntryReference:
-      m_KeyId: 0
-      m_Key: document_16vb_text
+      m_KeyId: 10913412364185612
+      m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
   localizedBriefing:
     m_TableReference:
-      m_TableCollectionName: Documents
+      m_TableCollectionName: GUID:76eedf465d0e3db4981b0591533a57cd
     m_TableEntryReference:
-      m_KeyId: 0
-      m_Key: document_16vb_briefing
+      m_KeyId: 10913412364185613
+      m_Key: 
     m_FallbackState: 0
     m_WaitForCompletion: 0
     m_LocalVariables: []
