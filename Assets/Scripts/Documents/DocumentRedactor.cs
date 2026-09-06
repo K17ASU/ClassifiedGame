@@ -1134,8 +1134,16 @@ public class DocumentRedactor :
     {
         string visibleWord;
 
+        // Для обычного слова вернёт originalText.
+        // Для cycle — текущее значение цикла.
+        string displayText =
+            word.GetDisplayText();
+
         if (word.isRedacted)
         {
+            // Для уже засекречённого слова оставляем
+            // исходный текст, чтобы цензурная плашка
+            // не меняла ширину при переключении cycle.
             visibleWord =
                 CreateRedactedWord(
                     word.originalText
@@ -1145,14 +1153,14 @@ public class DocumentRedactor :
         {
             visibleWord =
                 ultravioletTool.CreateRevealedWordMarkup(
-                    word.originalText
+                    displayText
                 );
         }
         else
         {
             visibleWord =
                 $"<color={normalTextColor}>" +
-                word.originalText +
+                displayText +
                 "</color>";
         }
 

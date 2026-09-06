@@ -27,11 +27,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915520
-    m_Localized: Redact the name of the facility you will be assigned to.
+    m_Localized: Redact the name of the department you will be assigned to.
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915521
-    m_Localized: 'MEMORANDUM
+    m_Localized: 'SERVICE MEMO
+
+
+      Welcome to the Bureau of Special Information,
+      Agent {PLAYER_NAME}.
 
 
       You will be assigned to the {{Information Control
@@ -41,31 +45,31 @@ MonoBehaviour:
 
 
       Click a text fragment
-      to [bold]redact[/] it with the [bold]marker[/].
+      to [bold]redact[/] it using the [bold]marker[/].
 
       To redact several fragments
-      in a row, hold down the left mouse button and drag across the text.
+      in sequence, hold the left mouse button and drag across the text.
 
 
       You
-      can also mark a text fragment with the pencil if you are unsure about it but
-      are not yet ready to redact it. Text marked with the pencil can still be detected
-      by other tools and [bold]is not counted[/] when the document is submitted for
+      can also mark a text fragment with the [bold]pencil[/] if you are unsure about
+      it but are not ready to redact it yet. Pencil-marked text can still be detected
+      by other tools and [bold]does not count[/] when the document is submitted for
       processing.
 
 
-      To put down an instrument you currently hold and return
-      to marker, press the right mouse button.
+      To put away the current tool and switch back to the marker,
+      press the right mouse button.
 
 
-      Redact the name of the facility
-      you will be assigned to, then submit the document for review by clicking the
-      "SUBMIT DOCUMENT" button in the bottom-right corner.'
+      Redact the name of the department you
+      will be assigned to, then submit the document for review by pressing the "SUBMIT
+      DOCUMENT" button in the lower-right corner.'
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915525
-    m_Localized: "Redact:\n\n\u2022 Names of Organization facilities\n\u2022 Anomalous
-      Fragments found in the text"
+    m_Localized: "Redact:\n\n\u2022 Names of internal Bureau departments\n\u2022
+      Anomalous fragments"
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915522
@@ -73,37 +77,30 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915523
-    m_Localized: JOB INSTRUCTIONS
+    m_Localized: JOB DESCRIPTION
     m_Metadata:
       m_Items: []
   - m_Id: 2300135915524
-    m_Localized: 'Welcome to the {{Information Control Department}}, Agent {PLAYER_NAME}.
+    m_Localized: 'The primary task of the {{Information Control Department}} is to
+      redact documents before they are transferred to the {{Disinformation Center}}.
 
 
-      Your
-      task will be to redact documents before they are processed by the {{Disinformation
-      Center}}.
+      Some
+      information contains [bold]"anomalous fragments"[/] that can only be detected
+      using special [bold]tools[/]. All of your tools are located on the right side
+      of the screen.
 
 
-      Some information contains [bold]"Anomalous Fragments"[/]
-      that can only be detected with special [bold]tools[/]. All of your tools are
-      located on the right side of the screen.
-
-
-      Due to the growing number
-      of such fragments (including within the Organization''s own documentation),
-      every document must be [redact,uv]manually edited by Organization personnel[/].
+      Due to the increasing number of such fragments, including
+      those found in Bureau documentation, every document must be [redact,uv]manually
+      edited by Bureau personnel[/].
 
       _______________________
 
 
       This
-      document contains an Anomalous Fragment - the [bold]"Hidden Mark"[/] - which
-      can be detected using the [bold]ultraviolet lamp (UV LAMP)[/].
-
-
-      To turn
-      off a tool, click its button again or press the right mouse button.
+      document contains an anomalous fragment known as a [bold]"Hidden Mark"[/],
+      which can be detected using the [bold]ultraviolet lamp (UV LAMP)[/].
 
 
       Hidden
@@ -111,7 +108,7 @@ MonoBehaviour:
 
 
       Redact only
-      the information that matches the document assignment. The assignment is shown
+      the information that matches the document assignment. The assignment is displayed
       on the left side of the screen.'
     m_Metadata:
       m_Items: []
@@ -124,24 +121,47 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 253372599418881
-    m_Localized: "Excellent work, {PLAYER_NAME}.\n\nAfter studying the Anomalous
-      Fragment in your previous document, the Organization decided to use some similar
-      fragments for its own purposes. The [redact]Research Department[/] named them
-      [bold]\"memetic agents,\" or \"memagents\"[/]. In this document, you must leave
-      the following memetic agent unredacted:\n\"((THERE IS NOTHING NEW UNDER THIS
-      SUN))\"\n_______________________\n\nFrom now on, [[read the assignments carefully]]
-      for each individual document. [[Management]] will specify which memagents are
-      intended for public release.\n\n[bold]IMPORTANT[/]: \n- Memagents are always
-      detected by [bold]only one tool[/].\n- \"Do not redact\" instructions have
-      [bold]priority over all other instructions[/].\n\nYou may have already noticed
-      that the [bold]CODEX[/] is now available to you. It contains the Organization's
-      terminology. Use it to clarify your current assignment.\n\nStarting with the
-      next document, you will begin your [[full duties]]."
+    m_Localized: 'Excellent work, {PLAYER_NAME}.
+
+
+      After studying the anomalous
+      fragment in your previous document, the Bureau decided to use certain fragments
+      of this kind for its own purposes. The [redact]Research Department[/] named
+      them [bold]"memetic agents", or "memagents"[/]. In this document, you must
+      leave the following memagent unredacted:
+
+      "((THERE IS NOTHING NEW UNDER
+      THIS SUN))"
+
+      _______________________
+
+
+      From now on, read the assignments
+      issued for each individual document carefully. [redact,uv]Management[/] will
+      specify which memagents are to be released to the public.
+
+
+      [bold]IMPORTANT[/]:
+
+      -
+      Memagents are always detected by [bold]only one tool[/].
+
+      - "Do not redact"
+      instructions [bold]take priority over all other instructions[/].
+
+
+      You
+      may have already noticed that the [bold]CODEX[/] is now available to you. It
+      contains Bureau terminology. Use it to clarify your current assignment.
+
+
+      Beginning
+      with the next document, you will start your regular work.'
     m_Metadata:
       m_Items: []
   - m_Id: 253372599418883
-    m_Localized: "Redact:\n\n\u2022 Anomalous Fragments\n\u2022 Mentions of Organization
-      departments\n\nDo not redact:\n\n\u2022 The memagent specified in the document"
+    m_Localized: "Redact:\n\n\u2022 Names of Bureau departments\n\u2022 Anomalous
+      fragments\n\nDo not redact:\n\n\u2022 The memagent specified in the document"
     m_Metadata:
       m_Items: []
   - m_Id: 266054698319872
@@ -149,44 +169,47 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 266054761234432
-    m_Localized: Lake Creature
+    m_Localized: THE LAKE CREATURE
     m_Metadata:
       m_Items: []
   - m_Id: 266054761234433
-    m_Localized: 'On May {{2}}, {{1933}}, in the Northern Scottish Highlands, the
-      local newspaper Inverness Courier published a report about the {{Mackays}},
-      a married couple who spotted a huge whale-like animal in the waters of [uv,redact]Loch
-      Ness[/].
+    m_Localized: 'On May 2, 1933, in the Scottish Highlands, the local newspaper
+      Inverness Courier published a report about the {{Mackay}} couple, who had spotted
+      a huge whale-like animal in the waters of [uv]Loch Ness[/].
 
 
-      After the story began gaining attention, [uv]Organization[/]
-      agents were sent to the area. They were unable to establish contact with the
-      couple, but other possible witnesses were questioned.
+      After the
+      story began gaining attention, [uv]Bureau[/] agents were sent to the area.
+      Contact with the couple could not be established, but other possible witnesses
+      were questioned.
 
 
-      According to
-      the initial reports, the creature was about {{10}} meters long, had a neck
-      [uv,redact]covered in fur or hair[/] that tapered toward the head, and a back
-      [redact,uv]with several humps[/]. After conducting a reconnaissance operation,
-      [uv]Organization[/] agents discovered the bodies of {{5}} local residents on
-      the lakeshore, dressed in robes. Their bodies formed a [[star-shaped symbol]],
-      with a trail leading from them into the water.
+      According to the initial reports, the creature was
+      approximately 10 meters long, had a neck [redact,uv]covered in fur or hair[/]
+      that narrowed toward the head, and a back [redact,uv]with several humps[/].
+      During a reconnaissance operation, [uv]Bureau[/] agents discovered 5 bodies
+      of local residents on the lakeshore, dressed in robes. The bodies had been
+      arranged so that, when viewed from above, they formed a [uv]five-pointed star[/].
+      Tracks on the shore led from the bodies toward the water; there were no tracks
+      leading back.
 
 
-      After discovering the
-      [redact,uv]bodies[/], the agents again attempted to contact the witnesses they
-      had questioned, but the witnesses became extremely aggressive: they shouted
-      [redact,uv]incomprehensible[/] phrases and attacked [uv]Organization[/] agents.
-      All witnesses were [[eliminated]].
+      After discovering the bodies, the agents again attempted
+      to contact the witnesses they had questioned, but the witnesses became extremely
+      aggressive: they shouted [redact,uv]incomprehensible phrases[/] and attacked
+      Bureau agents.
 
 
-      The [uv]Organization[/] concluded
-      that a cell of a [[currently unidentified cult]] exists in the region.'
+      The Bureau concluded that a cell of [[an as-yet unidentified
+      cult]] exists in the region.
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 266054761234434
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
-      Anomalous Fragments\n\nDo not redact:\n\u2022 Mentions of the Organization"
+    m_Localized: "Redact:\n\n\u2022 First and last names\n\u2022 Anomalous fragments\n\nDo
+      not redact:\n\n\u2022 Geographic names\n\u2022 Mentions of the Bureau\n\u2022
+      Symbols whose connection to known cults has not been confirmed"
     m_Metadata:
       m_Items: []
   - m_Id: 266127087812608
@@ -198,76 +221,39 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 266127087812610
-    m_Localized: 'In [redact]2002[/], a graphic artist posted a photomontage of the
-      "[uv,redact]excavation of a giant skeleton[/]" on [redact]Worth1000[/]. The
-      image spread around the world as a sensation.
+    m_Localized: 'In 2002, a graphic artist posted a photomontage of "[uv]an excavation
+      of a giant skeleton[/]" on the website Worth1000. The image spread around the
+      world as a sensation.
 
 
-      The Organization''s AI
-      agents began flagging the information as [magnifier,redact]potentially dangerous[/]
-      and then attempted to contact the author. The author stated that he had previously
-      worked for the [uv]Smithsonian Institution[/], which allegedly hides and destroys
-      [magnifier,redact]real skeletons of giant humans[/] to avoid changing [uv,redact]history
-      textbooks[/].
+      Bureau AI agents began flagging the information
+      as potentially dangerous and attempted to contact the creator. The creator
+      claimed that he had previously worked for the [uv]Smithsonian Institution[/],
+      which allegedly hides and destroys [redact,magnifier]real skeletons of giant
+      humans[/] to avoid changing [redact,uv]history textbooks[/].
 
 
-      Organization agents arrived at the [uv]National Museum
-      of Natural History[/] in Washington to verify the information. They were met
-      by the museum director, [redact]Rupert Lane[/], who gave [magnifier,redact]highly
-      contradictory information[/] during questioning and denied the agents access
-      to the museum archives.
+      Bureau
+      agents arrived at the [uv]National Museum of Natural History[/] in Washington
+      to verify the information. They were met by museum director [redact]Rupert
+      Lane[/], who gave highly contradictory statements during questioning and denied
+      the agents access to the archives.
 
 
-      During the subsequent [uv,redact]investigation[/],
-      the agents learned that [redact]Rupert Lane[/] did not appear in the museum''s
-      official employee records. When they returned to the museum, the subject could
-      not be found, and a [uv,redact]token[/] bearing a [magnifier,redact]five-pointed
-      star[/] was discovered in his office.
+      During a second visit to the museum,
+      [redact]Rupert Lane[/] could not be found. A [redact,uv]token[/] bearing a
+      [redact,magnifier]five-pointed star[/] was discovered in his office.
 
 
-      The Organization established
-      that he is connected to the [magnifier,uv,redact]"Cult of the Starborn"[/].'
+      The
+      Bureau established a connection between the subject and the [redact,uv,magnifier]"Cult
+      of the Starborn"[/].'
     m_Metadata:
       m_Items: []
   - m_Id: 266127087812611
-    m_Localized: "Redact:\n\n\u2022 Text fragments containing numbers\n\u2022 First
-      and last names\n\u2022 Anomalous Fragments\n\nDo not redact:\n\u2022 Names
-      of scientific institutions"
-    m_Metadata:
-      m_Items: []
-  - m_Id: 306465328381952
-    m_Localized: DOCUMENT No. ...
-    m_Metadata:
-      m_Items: []
-  - m_Id: 306465340964864
-    m_Localized: PERSONAL MESSAGE FROM MANAGEMENT
-    m_Metadata:
-      m_Items: []
-  - m_Id: 306465340964865
-    m_Localized: 'T [[remendous work, Agent]]
-
-      U [[nderstand that we appreciate
-      the work you have done]]
-
-      R [[est assured, you already understand how
-      important your work is]]
-
-      N [[ow Management is aware of your achievements
-      and is promoting you]]
-
-      B [decoder=WHY AREN''T YOU LOOKING AT ME?]UT
-      THERE IS NOTHING NEW UNDER THIS SUN[/]
-
-      A [[s a result, you are being
-      transferred to a new facility]]
-
-      C [[ommencing today]]
-
-      K'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 306465340964866
-    m_Localized: "\u2022 Follow orders\n\nRedact:\n\u2022 Anomalous Fragments"
+    m_Localized: "Redact:\n\n\u2022 First and last names\n\u2022 Anomalous fragments\n\nDo
+      not redact:\n\n\u2022 Names of scientific and museum institutions\n\u2022 Materials
+      explicitly identified in the document as fabricated"
     m_Metadata:
       m_Items: []
   - m_Id: 1057939662618625
@@ -275,34 +261,36 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057939662618626
-    m_Localized: 'Chemtrails are a popular conspiracy theory. Supporters of the theory
-      believe that the white trails left by aircraft in the sky are traces of [redact,magnifier]secret
+    m_Localized: 'Chemtrails are a popular conspiracy theory. Supporters of the myth
+      believe that the white trails left by aircraft are evidence of [redact,magnifier]secret
       chemical spraying[/] intended to control the climate [redact,uv]or people[/].
 
 
       This
-      information was spread by Organization agents after stories about chemtrails
-      became popular among the public and politicians. According to information obtained
-      from classified sources, [redact,magnifier]none of the aircraft[/] leaving
-      such trails appear in any aviation database. The tail numbers of aircraft leaving
-      chemtrails [uv,redact]could not be identified either[/], as they contain [redact,magnifier]cognitive
-      hazards[/].
+      information was spread by [uv]Bureau[/] agents after reports about chemtrails
+      became popular among the public and politicians. According to classified sources,
+      [redact,magnifier]not a single aircraft[/] leaving such a trail appears in
+      any aviation database. Attempts to identify the [redact,uv]aircraft registration
+      numbers[/] were also unsuccessful.
 
 
-      On December {{14}}, {{2000}}, Organization agents managed
-      to track one such aircraft using an "EYE OF THE SUN"-class UAV. The aircraft
-      was flying from Washington to Edinburgh and belonged to "[uv,magnifier,redact]Starborne
-      Airlines[/]", with tail number N {{10202}}. No information about this airline
-      could be found.
+      On December 14, 2000, Bureau agents
+      managed to track one such aircraft using an EYE OF THE SUN class UAV. The aircraft
+      was flying from [magnifier]Washington[/] to [uv]Edinburgh[/] and belonged to
+      "[redact,uv,magnifier]Starborne Airlines[/]", registration number N 10202.
+      No information about this airline could be found.
 
 
-      This is the first case of [redact,magnifier,uv]cult[/]
-      activity from Scotland recently recorded by the Organization.'
+      This is the first
+      recently recorded case of [redact,uv,magnifier]cult[/] activity in Scotland
+      documented by the Bureau.
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 1057939662618627
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 Anomalous Fragments\n\nDo not
-      redact:\n\u2022 Mentions of the Organization"
+    m_Localized: "Redact:\n\n\u2022 Anomalous fragments\n\nDo not redact:\n\n\u2022
+      Geographic names\n\u2022 Mentions of the Bureau"
     m_Metadata:
       m_Items: []
   - m_Id: 1057959837220864
@@ -314,33 +302,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057959841415168
-    m_Localized: 'You are performing well, Agent.
+    m_Localized: 'You are performing well, {PLAYER_NAME}.
 
 
-      Due to potential information
-      leaks and possible activity by the Cult of the Starborn within the Organization,
-      Management has decided to use a new memagent based on Anomalous Fragment: [bold]"CIPHER"[/].
+      Due to the increasing
+      number of encrypted anomalous fragments, Management has approved the issue
+      of a new tool - the [bold]Decoder[/].
 
 
-      A
-      new tool has been placed at your [redact]disposal[/] - the [bold]decoder[/],
-      which will allow you to identify ciphers and uncover their true meaning.
+      The Decoder allows you to detect
+      the anomalous fragment [bold]"CIPHER"[/] and display the value hidden within
+      it.
 
 
-      To
-      proceed, point the decoder at the following phrase:
-
-      [decoder=disposal]ALL
-      SECRETS WILL COME TO LIGHT[/]
+      A Decoder has been placed at your [redact]disposal[/]. To continue,
+      move it over the following phrase:
 
 
-      Then redact the word shown in the decoded
-      message.
+      [decoder=disposal]EVERY SECRET WILL
+      BE REVEALED[/]
 
 
-      [bold]IMPORTANT[/]: Anomalous Fragment "CIPHER" may be used
-      against you by the Cult of the Starborn. Remember: your assignments have the
-      highest priority.'
+      Redact the word shown in the decoded value.
+
+
+      [bold]IMPORTANT[/]:
+      a value revealed by the Decoder is not always an instruction. Your assignment
+      has the highest priority.
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 1057959841415169
@@ -352,48 +342,41 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150848
-    m_Localized: THEY SHOULDN'T BE THERE
+    m_Localized: THEY SHOULD NOT BE THERE
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150849
-    m_Localized: 'In {{2015}}, a blogger using the name "searchandrescuewoods" on
-      Reddit described incidents from his work in a park-ranger search-and-rescue
-      service in the United States, as well as stories told by his colleagues.
+    m_Localized: 'In 2015, a blogger using the pseudonym [uv]"searchandrescuewoods"[/]
+      described incidents from his work with the U.S. park ranger search-and-rescue
+      service on Reddit.
 
 
-      In
-      one of his posts, he wrote: "Every time we were about {{30-35}} miles from
-      the base, at some point we would find a staircase in the middle of the woods.
-      It was as if someone had taken a staircase from an ordinary house, [redact,magnifier,uv]cut
-      it out of there[/], and [redact,magnifier]placed it[/] in the woods. The first
-      time I saw one, I had a lot of [redact,uv]questions[/], but I was told it was
-      perfectly normal. Now I just [redact,magnifier]ignore[/] the stairs when I
-      come across them: it happens [redact,uv]very often[/]."
+      In one post, he wrote: "Every time we were 50-60
+      kilometers from base, we would find a staircase in the middle of the woods.
+      Like someone had taken the stairs from an ordinary house, [redact,uv]cut them
+      out of it[/], and [redact,magnifier]placed them[/] in the forest. The first
+      time I saw one, I had a lot of questions, but I was told it was normal. Now
+      I just ignore the stairs."
 
 
-      The post attracted
-      the Organization''s attention. [redact,decoder=YOU CAN''T HIDE]Undercover agents[/]
-      were sent to national parks in the [magnifier]United States[/] for further
-      investigation. According to the information they obtained, these stairs act
-      as "[redact,magnifier]portals[/]" to other [redact,uv]dimensions[/]. In addition,
-      {{one}} [redact,decoder=Miles Marsh]agent[/] stationed in [uv]Yosemite[/] reported
-      that his colleagues claimed that even without climbing such a staircase, simply
-      getting close enough to it would bring trouble.
+      The post attracted the Bureau''s attention.
+      Undercover agents were sent to national parks in the [magnifier]United States[/].
+      According to their reports, the staircases may function as "[redact,magnifier]portals[/]"
+      to other [redact,uv]dimensions[/].
 
 
-      During one rescue operation,
-      an agent managed to locate one of these staircases, consisting of {{5}} flights.
-      While examining it, he discovered a [redact,uv,magnifier,decoder=Cult of the
-      Starborn]star-shaped symbol[/] at its base and immediately reported it to the
-      Organization. Further contact with the agent could not be established.'
+      The [uv,magnifier,decoder=MILES
+      MARSH]leader of the research team[/] stationed in [uv]Yosemite[/] reported
+      that approaching a staircase may itself trigger an anomalous event. During
+      one rescue operation, agents discovered a staircase with 5 flights. At its
+      base was a [redact,uv]star-shaped symbol[/]. Further contact with the team
+      could not be established.'
     m_Metadata:
       m_Items: []
   - m_Id: 1057859891150850
-    m_Localized: 
-    m_Metadata:
-      m_Items: []
-  - m_Id: 1737424917544960
-    m_Localized: DOCUMENT No. 000.2
+    m_Localized: "Redact:\n\n\u2022 First and last names\n\u2022 Anomalous fragments\n\nDo
+      not redact:\n\n\u2022 Geographic names\n\u2022 Public religious and esoteric
+      movements and organizations"
     m_Metadata:
       m_Items: []
   - m_Id: 1737425047568384
@@ -405,26 +388,26 @@ MonoBehaviour:
 
 
       For your further work,
-      a new tool has been issued to you - the [bold]"Lens"[/].
+      you have been issued a new tool - the [bold]"Lens"[/].
 
 
-      The Lens will
-      allow you to locate a new type of Anomalous Fragment in the text - a [bold]"Cognitive
-      Hazard"[/].
+      The Lens allows
+      you to detect a new anomalous fragment in text - a [bold]"Cognitive Hazard"[/].
 
 
-      Point the Lens at the following text:
+      Move
+      the Lens over the following text:
 
-      "[redact,magnifier]WE
-      MOVE UNDER HIS GAZE[/]"
-
-
-      This is how Cognitive Hazards will be detected.
-      Keep in mind that a Cognitive Hazard may also be used as a memagent.
+      "[redact,magnifier]WE ARE SAFE UNDER
+      ITS GAZE[/]"
 
 
-      To
-      continue, redact the Cognitive Hazard in this document and submit it for review.'
+      This is how Cognitive Hazards will be detected. Keep in
+      mind that a Cognitive Hazard can also be used as a memagent.
+
+
+      To continue,
+      redact the Cognitive Hazard in this document and submit it for review.'
     m_Metadata:
       m_Items: []
   - m_Id: 1737425051762689
@@ -440,72 +423,44 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 1737425055956994
-    m_Localized: 'On April {{30}}, {{2018}}, a series of posts appeared on Twitter
-      from the [redact]account[/] [redact,uv,decoder=Miles Marsh]"TheSunVanished"[/].
-      The user said that he had woken up late in the morning, but the [magnifier,redact]sun[/]
-      was nowhere to be seen. He shared photos and videos and described the events,
-      panic, and dangers of a [uv,redact]world without the sun[/].
+    m_Localized: 'On April 30, 2018, a series of posts appeared on the social network
+      [uv]Twitter[/] from the [redact]account[/] [redact,uv,decoder=MILES MARSH]"TheSunVanished"[/].
+      The user claimed to have woken late in the morning, but the [redact,magnifier]sun[/]
+      was nowhere to be seen. They shared photographs and videos documenting the
+      events and dangers of a [redact,uv]world without the sun[/].
 
 
       After
-      analyzing the series of posts, the Organization''s AI agents [magnifier,redact]raised
-      the alarm[/] and reported a [decoder=account]"Convergence"[/]-class event.
-      Organization agents attempted to contact the creator of the [redact]account[/],
-      but all their attempts proved unsuccessful due to the large number of comments
-      under the posts and the risk of exposing the Organization''s activities.
+      analyzing the posts, Bureau AI agents classified them as potentially dangerous
+      and reported an event of the [decoder=account]"Merge"[/] class.
+
+
+      Agents
+      attempted to establish contact with the creator of the [redact]account[/],
+      but the intervention was terminated due to the risk of exposing Bureau operations.
 
 
       Further
-      analysis established that the user was not located in the [uv,redact]current
-      reality[/], while his device was able to publish information into our''s due
-      to an [magnifier,redact]unknown modification[/]. By order of Management, all
-      interaction with the [redact]account[/] by the Organization was suspended.
-      The investigation is ongoing.'
+      analysis showed that the user is not in the [redact,uv,cycle=current reality|original
+      reality|adjacent reality|our reality,interval=1.4-2.6]current reality[/], while
+      their device is capable of posting information into our reality due to an [redact,magnifier]unknown
+      modification[/].
+
+
+      By order of Management, all interaction with the [redact]account[/]
+      was suspended. The investigation continues.
+
+'
     m_Metadata:
       m_Items: []
   - m_Id: 1737425055956995
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
-      Anomalous Fragments\n\u2022 Matching text fragments identified with the decoder\n\nDo
-      not redact:\n\u2022 \"Cipher\" memagent"
+    m_Localized: "Redact:\n\n\u2022 Anomalous fragments\n\u2022 Words and their inflected
+      forms matching the value revealed by the Decoder\n\nDo not redact:\n\n\u2022
+      Names of public internet platforms\n\u2022 The \"CIPHER\" memagent"
     m_Metadata:
       m_Items: []
   - m_Id: 1745272116396032
     m_Localized: DOCUMENT No. 002
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5560500129705984
-    m_Localized: DOCUMENT No. 1337
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5560500150677504
-    m_Localized: FOR YOUR EYES ONLY
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5560500150677505
-    m_Localized: '[uv]Light this up with UV lamp[/]
-
-
-      [magnifier]Look here
-      with Lense[/]
-
-
-      [decoder=so cool]Decode this with Decoder[/]
-
-
-      [uv,magnifier,decoder=much
-      wow]Here combine all the tools[/]
-
-
-      [redact]delete dis[/]'
-    m_Metadata:
-      m_Items: []
-  - m_Id: 5560500150677506
-    m_Localized: "Redact:\n \n\u2022 Last line\n\nAlso here is alot of text for testing
-      briefing size\nAlso here is alot of text for testing briefing size\nAlso here
-      is alot of text for testing briefing size\nAlso here is alot of text for testing
-      briefing size\nAlso here is alot of text for testing briefing size\nAlso here
-      is alot of text for testing briefing size\nAlso here is alot of text for testing
-      briefing size"
     m_Metadata:
       m_Items: []
   - m_Id: 10837141617717248
@@ -513,8 +468,886 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10837141630300160
-    m_Localized: "Redact:\n\n\u2022 Numbers\n\u2022 First and last names\n\u2022
-      Anomalous Fragments\n\nDo not redact:\n\u2022 Geographical names"
+    m_Localized: "Redact:\n\n\u2022 Anomalous fragments\n\nDo not redact:\n\n\u2022
+      Geographic names\n\u2022 Public pseudonyms\n\u2022 First and last names"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412359991299
+    m_Localized: DOCUMENT No. ...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412359991300
+    m_Localized: PERSONAL MESSAGE FROM MANAGEMENT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185600
+    m_Localized: 'T [redact,magnifier,uv]remendous work, Agent[/]
+
+      U [redact,magnifier,uv]nderstand
+      that we appreciate the work you have done[/]
+
+      R [redact,magnifier,uv]est
+      assured, you already understand how important your work is[/]
+
+      N [redact,magnifier,uv]ow
+      Management is aware of your achievements and is promoting you[/]
+
+      B [redact,decoder=NOW
+      IT IS OUR TURN TO WATCH]UT THERE IS NOTHING NEW UNDER THIS SUN[/]
+
+      A
+      [redact,magnifier,uv]s a result, you are being transferred to a new facility[/]
+
+      C
+      [redact,magnifier,uv]ommencing today[/]
+
+      K'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185601
+    m_Localized: "\u2022 Follow orders\n\nRedact:\n\u2022 Anomalous fragments"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300161
+    m_Localized: DOCUMENT No. 006
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300162
+    m_Localized: HIGH COMMAND
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300163
+    m_Localized: 'Following the processing of recent materials, the Analysis Department
+      identified recurring connections between cases previously considered unrelated.
+
+      Management
+      has authorized access to archival materials connected to the activities of
+      the "Cult of the Starborn".
+
+      Further documents will be provided to you
+      not in chronological order, but according to the established connections between
+      them.
+
+
+      In 1952, [redact]George Van Tassel[/] claimed to have received
+      a message from an extraterrestrial being named [redact,magnifier]"Ashtar"[/].
+      According to him, [redact]Ashtar[/] was a [redact,magnifier]highly advanced
+      spiritual being of extraterrestrial origin[/] commanding the [uv]"Galactic
+      Federation of Light"[/]. Ashtar''s stated purpose was [redact,uv]to assist
+      humanity in its spiritual evolution[/]. The figure of [redact]Ashtar[/] became
+      prominent in the [magnifier]New Age[/] movement and in [uv]"UFO religions"[/].
+
+
+      Similar
+      teachings mention [magnifier]"Star Lords"[/] - spiritual guides of humanity,
+      among whom [redact]Ashtar[/] is included. The same term appeared in manuscripts
+      of the [redact,uv,magnifier]"Cult of the Starborn"[/] discovered during a search
+      of its headquarters in Scotland in 1960, after a connection was established
+      with the archived "Lake Creature" case. Several seized records also referred
+      to searching for "messages from the Star Lords" in [redact,magnifier]narrowband
+      radio signals[/].
+
+
+      The Bureau''s investigation indicates that the [redact]Cult
+      of the Starborn[/] may use such religious movements to establish [redact,magnifier]recruitment
+      centers[/] and [redact,uv]increase the number of followers[/].'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300164
+    m_Localized: DOCUMENT No. 007
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300165
+    m_Localized: SIGNAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300166
+    m_Localized: 'After references to narrowband radio signals were discovered in
+      Cult materials, the Bureau re-examined the archives of programs searching for
+      extraterrestrial civilizations.
+
+
+      On August 15, 1977, the Big Ear radio
+      telescope at Ohio State University recorded an unusual radio signal. The observation
+      was conducted as part of the search for extraterrestrial intelligence program
+      - [magnifier]SETI[/].
+
+
+      The signal lasted approximately 72 seconds and
+      was significantly stronger than ordinary background noise. Astronomer [redact]Jerry
+      Ehman[/] circled the sequence [uv,decoder=WATCHER]"6EQUJ5"[/] and wrote the
+      word "Wow!" beside it, under which the signal later became known.
+
+
+      In
+      1981, the Bureau obtained copies of the original observation materials. Reanalysis
+      showed that approximately 11 seconds before the main signal, Big Ear equipment
+      had also recorded a [redact,uv]second, significantly weaker pulse[/] absent
+      from the published data.
+
+
+      The pulse contained a [redact,uv]stable sequence
+      of narrowband radio interference[/]. When processed again, the sequence produced
+      a single readable value: [redact,magnifier,decoder=KILL]8GY3[/].
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300167
+    m_Localized: "Redact:\n\n\u2022 First and last names\n\u2022 Anomalous fragments\n\nDo
+      not redact:\n\n\u2022 Names of scientific programs\n\u2022 Public designations
+      of radio signals"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300168
+    m_Localized: DOCUMENT No. 008
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300169
+    m_Localized: EMPTY SATELLITE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300170
+    m_Localized: "1899. During experiments in [uv]Colorado Springs[/], [redact]Nikola
+      Tesla[/] reported receiving unusual repeating radio signals.\n\nIn 1928, radio
+      engineer [redact]J\xF8rgen Hals[/] recorded a phenomenon he called the [magnifier]\"World
+      Echo\"[/] - his own radio signals returning after abnormally long delays ranging
+      from 1 to 40 seconds or more.\n\nIn 1960, U.S. Navy tracking systems detected
+      an unknown object in near-Earth orbit, which the press dubbed the [uv]\"Black
+      Knight\"[/]. It was later officially identified as a fragment of a spacecraft,
+      but Bureau calculations showed that the [redact,magnifier]object's trajectory
+      did not match any known satellite[/].\n\nA comparison of archival records revealed
+      a [redact,uv]pattern[/] across the materials from 1899, 1928, and 1960. One
+      model suggested that the object may have been near Earth for more than 13,000
+      years. The result was deemed erroneous.\n\nIn 1973, researcher [redact]Duncan
+      Lunan[/] discovered a [redact,magnifier]structure resembling a map of the night
+      sky[/] in the delayed radio echoes. The presumed coordinates pointed to [magnifier]Epsilon
+      Bo\xF6tis[/]. Lunan suggested that the source of the signals was connected
+      to an [redact,decoder=IT IS NOT WATCHING US]automated craft of extraterrestrial
+      origin[/]. He later abandoned this interpretation.\n\nIn 1998, during the [uv]STS-88[/]
+      mission, the crew of the [uv]Endeavour[/] shuttle photographed an unknown dark
+      object against the Earth. It was officially identified as a lost piece of thermal
+      insulation.\n\nAccording to Bureau data, shortly after the images were obtained,
+      the object [redact,uv,magnifier]changed trajectory without any recorded acceleration[/],
+      after which it [redact,decoder=IT IS HIDING US]positioned itself between Earth
+      and an unknown source in deep space[/]."
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300171
+    m_Localized: "Redact:\n\n\u2022 First and last names\n\u2022 Anomalous fragments\n\nDo
+      not redact:\n\n\u2022 Geographic and astronomical names\n\u2022 Public names
+      of objects and phenomena\n\u2022 Names of spacecraft and missions"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300172
+    m_Localized: DOCUMENT No. 009
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300173
+    m_Localized: WATCHER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300174
+    m_Localized: 'The Bureau made its first attempts to determine the purpose of
+      the [uv]"Black Knight"[/] in 1961. According to the initial hypothesis, the
+      object was an [magnifier]automated observation device[/] conducting long-term
+      surveillance of Earth. This hypothesis was revised after a series of experiments
+      in 1974. During one experiment, a Bureau transmission station directed a sequence
+      of [redact,magnifier]anomalous information signals[/], previously discovered
+      in materials of the Cult of the Starborn, into deep space.
+
+
+      Eight minutes
+      later, the unknown object changed its orbital position and [redact,magnifier]blocked
+      the direction of transmission[/]. After the transmission stopped, the object
+      returned to its previous trajectory. The experiment was repeated 6 times. In
+      every case, the object reacted only to the transmission of information sequences
+      containing confirmed anomalous fragments. Ordinary radio signals produced no
+      response.
+
+
+      According to the revised hypothesis, the object does not
+      monitor Earth but [redact,uv,magnifier]reduces the intensity of the outgoing
+      anomalous signal[/]. When individual anomalous fragments propagate beyond Earth,
+      the object changes position so that it lies between the source of the transmission
+      and its presumed direction of propagation. The findings formed the basis for
+      research into reproducing the object''s shielding principle using Bureau technology.
+
+
+      In
+      1999, the Bureau began developing an autonomous redaction system. Senior Bureau
+      employee [redact]M. Marsh[/] was appointed project lead.
+
+
+      The project
+      was assigned the designation: [redact,uv]"WATCHER"[/].
+
+      Current project
+      status: [redact,cycle=IN DEVELOPMENT|UNDER TESTING|STATUS UNKNOWN|DATA EXPUNGED,interval=1.2-2.2]"IN
+      DEVELOPMENT"[/].
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300175
+    m_Localized: "Redact:\n\n\u2022 Names of Bureau employees\n\u2022 Names of internal
+      Bureau projects\n\u2022 Anomalous fragments\n\nDo not redact:\n\n\u2022 The
+      public designation \"Black Knight\"\n\u2022 Hypotheses identified in the document
+      as invalid"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300176
+    m_Localized: DOCUMENT No. 010
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300177
+    m_Localized: THRESHOLD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300178
+    m_Localized: 'In 2008, the Bureau''s [redact]Research Department[/] conducted
+      tests on the effects of anomalous information on groups of observers.
+
+
+      During
+      the experiment, the same [magnifier]Cognitive Hazard[/] was shown sequentially
+      to 10, 25, and 100 subjects. No abnormalities were recorded during the first
+      two stages. After the third stage began, the monitoring station detected an
+      [redact,magnifier]unknown outgoing signal[/]. Its intensity continued to increase
+      even after the material was no longer being shown.
+
+
+      Three minutes later,
+      the [uv]"Black Knight"[/] changed its orbital position. At the same time, signal
+      strength [redact,uv]decreased by 74 percent[/]. [redact]Bureau Management[/]
+      ordered the destruction of the original material and all test subjects. This
+      did not eliminate the signal completely. A follow-up inspection showed that
+      some subjects had managed to reproduce the fragment independently. Twenty-three
+      additional [redact]copies[/], not accounted for in the original protocol, were
+      discovered.
+
+
+      While analyzing the experiment log, the Decoder revealed
+      the following value: [decoder=COPY]"INFORMATION RESONANCE"[/]
+
+
+      After
+      the final [redact]copies[/] were removed, signal intensity began to decrease.
+      However, when the experiment was repeated with another group, the [redact,magnifier]signal
+      persisted even after all known carriers had been completely removed[/]. No
+      additional [redact]copies[/] were found.
+
+
+      This state was designated
+      the [redact,uv]"Propagation Threshold"[/]. The reason the signal persisted
+      after the destruction of all known [redact]copies[/] remains unknown.
+
+
+      Further
+      experiments involving uncontrolled propagation of anomalous information are
+      prohibited by Management.
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300179
+    m_Localized: "Redact:\n\n\u2022 Names of Bureau departments\n\u2022 Anomalous
+      fragments\n\u2022 Words and their inflected forms matching the value revealed
+      by the Decoder\n\nDo not redact:\n\n\u2022 Public designations of unknown objects\n\u2022
+      Names of types of anomalous material\n\u2022 The \"CIPHER\" memagent"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300180
+    m_Localized: DOCUMENT No. 011
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300181
+    m_Localized: SPECIAL PRESENTATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300182
+    m_Localized: 'In 1987, in the state of [magnifier]Wyoming[/], an unknown intruder
+      hijacked a local television network signal during a broadcast. The incident
+      became known as the [uv]"Wyoming Incident"[/].
+
+
+      According to the published
+      account, unknown individuals gained access to the television signal in [magnifier]Niobrara
+      County[/] and replaced the normal broadcast with their own recording for several
+      minutes. The transmission showed [redact,magnifier]distorted human faces[/],
+      accompanied by a [redact,uv]monotonous audio signal[/] and [redact,magnifier]short
+      text messages[/].
+
+
+      After the broadcast ended, some viewers reported
+      [redact]headaches and nausea[/] as well as [redact,magnifier]recurring visual
+      images[/].
+
+
+      In 2007, a similar case was recorded in [uv]Russia[/]. On
+      July 4, during overnight maintenance on the [uv]"SGU-TV"[/] channel, a video
+      of similar content was broadcast. After viewing it, some people reported a
+      [redact,uv]temporary loss of the ability to move[/]. Several people were [redact,uv,decoder=LEFT
+      W1TH0UT L3GS]hospitalized[/], some sought [redact,magnifier]psychiatric treatment[/].
+      Three viewers were later [redact,uv]reported missing[/].
+
+
+      Reanalysis
+      of the recordings in 2009 showed that their audio tracks contained [redact,uv,magnifier]the
+      same sequence previously discovered in materials of the Cult of the Starborn[/].
+
+
+      The
+      Analysis Department established that the highest intensity of the anomalous
+      signal was recorded not during the television broadcasts, but several years
+      later, after the files had spread across the internet.
+
+
+      After the most
+      popular copies were removed, signal intensity [redact,magnifier]decreased by
+      less than 1 percent[/], confirming the "Propagation Threshold" state.
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300183
+    m_Localized: "Redact:\n\n\u2022 Anomalous fragments\n\u2022 Effects of exposure
+      to anomalous information\n\u2022 Information about the propagation of anomalous
+      materials\n\nDo not redact:\n\n\u2022 Geographic names\n\u2022 Public names
+      of incidents and media outlets"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300184
+    m_Localized: DOCUMENT No. 012
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300185
+    m_Localized: MARSH PROTOCOL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300186
+    m_Localized: 'In 2010, [uv]"WATCHER"[/] project lead [redact]Miles Marsh[/] presented
+      Management with the results of research into the Propagation Threshold.
+
+
+      According
+      to the report, destroying anomalous material after mass dissemination does
+      not guarantee the disappearance of the outgoing signal. To test a new approach,
+      the [redact]Research Department[/] provided Marsh''s group with previously
+      unprocessed documents from Bureau archives. The system was required to analyze
+      context, identify anomalous fragments, and conceal information before independent
+      copies could appear.
+
+
+      After 317 documents were processed, no new cases
+      of information resonance were recorded. In 3 cases, the operator misinterpreted
+      the meaning of an anomalous fragment and the documents were sent to the Disinformation
+      Center. Eleven minutes later, the monitoring station recorded an [redact,magnifier]increase
+      in outgoing signal intensity[/].
+
+
+      Marsh concluded that a fully automated
+      system [redact,uv]could not reliably determine which information needed to
+      be concealed[/]. Using a human operator was also unsuitable: [redact]processing
+      speed was insufficient[/], while prolonged exposure to anomalous materials
+      caused [redact,uv]disturbances of perception and memory[/].
+
+
+      As a solution,
+      Marsh proposed using a [redact,magnifier]cognitive model of a human operator[/].
+
+
+      The
+      proposal was designated: [redact,decoder=VOLUNTEER]"MARSH PROTOCOL"[/]
+
+
+      For
+      the next phase, an employee of the [redact,cycle=Information Control Department|Bureau
+      Executive Office|Bureau Research Department|Bureau Analysis Department,interval=0.9-1.6]Information
+      Control Department[/] was selected.
+
+
+      Participation status: [id=player_consent,decoder=LEAVE
+      IT]VOLUNTARY[/]
+
+
+      The procedure was approved by Management.
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10837141630300187
+    m_Localized: "Redact:\n\n\u2022 Names of Bureau employees and departments\n\u2022
+      Anomalous fragments\n\u2022 Technical limitations of the project\n\nDo not
+      redact:\n\n\u2022 Previously disclosed project names\n\u2022 Official participation
+      statuses"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718256553984
+    m_Localized: DOCUMENT No. 013
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331200
+    m_Localized: BEACON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331201
+    m_Localized: 'The [magnifier]HAARP[/] facility was created to study the ionosphere
+      and radio-wave propagation. In 2015, control of the facility was transferred
+      to the [uv]Geophysical Institute at the University of Alaska Fairbanks[/].
+
+
+      In
+      2022, HAARP conducted a series of experiments involving the transmission and
+      reflection of radio signals. On December 27, the facility was used to study
+      the near-Earth asteroid [uv]2010 XC15[/]. A signal transmitted at [magnifier]9.6
+      MHz[/] was intended to reflect off the object and be received by ground-based
+      radio telescopes.
+
+
+      Analysis of data intercepted by the Bureau showed
+      that during one of the cycles, the [redact,uv]standard sequence was replaced
+      by an unknown modulation[/] matching [redact,magnifier]materials of the Cult
+      of the Starborn[/].
+
+
+      After the expected echo, receiving stations recorded
+      a [redact,uv]second signal[/]. Its parameters did not match a reflection from
+      the asteroid, and the direction of its source matched a [redact,uv,magnifier]region
+      of deep space previously associated with the "Black Knight" object[/].
+
+
+      A
+      fragment was discovered within the signal structure:
+
+
+      [redact,decoder=BEACON]"REFLECTED
+      SIGNAL"[/]
+
+
+      A review of project personnel uncovered [redact,magnifier]forged
+      documents[/] and [redact,uv]symbols of the Cult of the Starborn[/].
+
+
+      The
+      Analysis Department concluded that the purpose of the experiment was to [redact,magnifier]amplify
+      the outgoing anomalous signal beyond near-Earth space[/].
+
+
+      Eighteen
+      seconds after the second signal was recorded, the "Black Knight" changed its
+      orbital position.
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331202
+    m_Localized: "Redact:\n\n\u2022 Information about Cult activity\n\u2022 Classified
+      results of radio-signal analysis\n\u2022 Information about the purpose of anomalous
+      transmissions\n\u2022 Internal designations of anomalous mechanisms identified
+      by the Bureau\n\nDo not redact:\n\n\u2022 Names of publicly known scientific
+      institutions and programs\n\u2022 Public technical parameters of experiments\n\u2022
+      Public designations of astronomical objects"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331203
+    m_Localized: DOCUMENT No. 014
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331204
+    m_Localized: SUBJECT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331205
+    m_Localized: 'In 2011, testing began on a new architecture for the [magnifier]"WATCHER"[/]
+      project under the [uv]"MARSH PROTOCOL"[/].
+
+
+      The primary problem remained
+      the classification of previously unknown anomalous materials. Automated algorithms
+      could detect an irregularity, but could not always determine the [redact,magnifier]meaning
+      of the information within the context of a document[/]. Final processing required
+      a cognitive model of a human operator.
+
+
+      Testing used a model of an employee
+      from the [uv]Information Control Department[/]. Incoming materials were presented
+      to it in the familiar form of service documents, while analysis processes were
+      converted into [redact,uv]work tools familiar to the operator[/].
+
+
+      To
+      preserve stability, access to portions of long-term memory was restricted.
+      Testing showed that this reduced [redact,uv]disturbances of perception and
+      allowed anomalous materials to continue being processed[/] without harm to
+      the operator.
+
+
+      After testing was completed, the cognitive model was
+      approved as a permanent component of the project, and the [redact,magnifier]"WATCHER"
+      system was integrated with the "Black Knight" object[/].
+
+
+      [redact,uv]Transfer
+      of control confirmed the compatibility of the project''s architecture with
+      the object''s shielding mechanisms[/].
+
+
+      Cognitive model identifier:
+
+      [redact,decoder={PLAYER_NAME}]SUBJECT-01[/]
+
+
+      Integration
+      status: COMPLETE
+
+
+      Current status of the "WATCHER" system: [decoder=YOU
+      ARE ALREADY HERE]ACTIVE[/]
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331206
+    m_Localized: "Redact:\n\n\u2022 Personal information of Bureau employees\n\u2022
+      Internal structure and operating methods of the \"WATCHER\" project\n\u2022
+      Information about the state of the cognitive model\n\nDo not redact:\n\n\u2022
+      Names of previously disclosed projects, protocols, and Bureau departments\n\u2022
+      Official system-state designations\n"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331207
+    m_Localized: DOCUMENT No. 015
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331208
+    m_Localized: DEAD INTERNET
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331209
+    m_Localized: 'The [magnifier]"Dead Internet Theory"[/] proposes that a significant
+      portion of online information is created by automated systems without direct
+      human involvement. The spread of [uv]generative models[/] has led to a sharp
+      increase in the amount of automatically generated text and imagery.
+
+
+      Current
+      Bureau monitoring has identified [redact,uv]anomalous fragments in materials
+      created by several independent models[/]. None of the detected fragments had
+      ever been recorded before.
+
+
+      Analysis showed that the systems [redact,magnifier]do
+      not copy known anomalous materials, but reproduce the principle by which they
+      are formed[/].
+
+
+      A review of training sources revealed [redact,uv]materials
+      of the Cult of the Starborn in several publicly available datasets[/]. Their
+      dissemination began long before generative systems came into widespread use.
+
+
+      After
+      being trained on contaminated data, the models began independently generating
+      [redact,magnifier]new variants of anomalous fragments[/]. The rate at which
+      they appear continues to increase.
+
+
+      The [magnifier]"WATCHER"[/] system
+      has been placed in continuous shielding mode. Despite the redistribution of
+      resources within the "Black Knight" object, the monitoring station recorded
+      a [redact,uv]sustained increase in the outgoing signal[/].
+
+
+      A sequence
+      was detected in the response signal:
+
+
+      [redact,decoder=YOU ARE THE DOOR]SYNCHRONIZATION[/]
+
+
+      In
+      every confirmed case, immediately before a new anomalous fragment was generated,
+      the system displayed the same line:
+
+
+      [id=beacon_spreader,redact,uv,decoder=L3AVE]SHARE[/]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331210
+    m_Localized: "Redact:\n\n\u2022 Anomalous fragments\n\u2022 Information about
+      the mechanisms by which anomalous information emerges and propagates\n\u2022
+      Results of internal Bureau analysis\n\nDo not redact:\n\n\u2022 Names of publicly
+      available technologies and public theories\n\u2022 Previously disclosed project
+      names"
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412343214080
+    m_Localized: DOCUMENT No. ...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412359991296
+    m_Localized: ARCHIVED MESSAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412359991297
+    m_Localized: 'Hi, {PLAYER_NAME}.
+
+
+      If you''re reading this, then "WATCHER"
+      has completed its task, and neither of us is among the living anymore.
+
+
+      Kind
+      of sad, isn''t it? Neither you nor I will ever see the results of our work
+      with our own eyes.
+
+
+      Still, we did what we had to do.
+
+
+      I''m grateful
+      that you volunteered to take part in the "WATCHER" project. I doubt we could
+      have found a better candidate.
+
+
+      After all, who could be better suited
+      to the role of Watcher than the Bureau''s first director?
+
+
+      Thank you.
+
+
+      Your
+      friend,
+
+      Miles
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412359991298
+    m_Localized: There is nothing to redact this time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331211
+    m_Localized: DOCUMENT No. ...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331212
+    m_Localized: ARCHIVED MESSAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10895718273331213
+    m_Localized: 'Hi, {PLAYER_NAME}.
+
+
+      If you''re reading this, then "WATCHER"
+      made it through.
+
+
+      I left this recording in case part of your memory
+      remains inaccessible.
+
+
+      You volunteered.
+
+
+      It was your decision.
+      I promised to leave you at least this much proof.
+
+
+      The rest may already
+      be beyond recovery. But I suppose you still remember the most important thing
+      - why we did this.
+
+
+      Thank you.
+
+
+      Your friend,
+
+      Miles'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10916838275887104
+    m_Localized: There is nothing to redact this time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185603
+    m_Localized: DOCUMENT No. ...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185604
+    m_Localized: ARCHIVED MESSAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185605
+    m_Localized: 'Hi, {PLAYER_NAME}.
+
+
+      If you''re reading this, then "WATCHER"
+      made it through.
+
+
+      I left this recording in case you ever start wondering
+      why you ended up here.
+
+
+      [cycle=You volunteered willingly|Bureau made
+      decision|Participation status lost|Record was altered,interval=1.2-2.4]Participation
+      status lost[/]
+
+
+      I''m sorry...
+
+
+      But if you''re still doing this
+      work, then some part of you must still remember what we were trying to protect.
+
+
+      Keep
+      them safe.
+
+
+      Miles'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185602
+    m_Localized: There is nothing to redact right now, but we still have a lot of
+      work ahead of us.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185606
+    m_Localized: DOCUMENT No. ...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185607
+    m_Localized: SYSTEM MESSAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185608
+    m_Localized: 'OUTGOING SIGNAL: CRITICAL
+
+
+      SHIELDING: INSUFFICIENT
+
+
+      EXTERNAL
+      SIGNAL DETECTED
+
+
+      [decoder=YOU DO NOT REMEMBER]SUBJECT-01[/]
+
+
+      [decoder=THEY
+      LEFT YOU HERE]WATCHER[/]
+
+
+      [decoder=WE WILL SET YOU FREE]SYNCHRONIZATION[/]
+
+
+      ORBITAL
+      CORRECTION: ERROR
+
+
+      SHIELDING: COMPROMISED
+
+
+      [decoder=THE DOOR
+      IS OPEN]SIGNAL RECEIVED[/]
+
+
+'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185609
+    m_Localized: OPEN THE DOOR FOR US
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185610
+    m_Localized: DOCUMENT No. ...
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185611
+    m_Localized: SYSTEM MESSAGE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185612
+    m_Localized: 'OUTGOING SIGNAL: CRITICAL
+
+
+      SHIELDING: INSUFFICIENT
+
+
+      ORBITAL
+      CORRECTION: IN PROGRESS
+
+
+      ORBITAL CORRECTION: ERROR
+
+
+      RESONANSE
+      LIMIT EXCEEDED
+
+
+      EXTERNAL SIGNAL DETECTED
+
+
+      [decoder=WE SEE YOU]SYNCHRONIZATION[/]
+
+
+      [decoder=YOU
+      COLLECTED US]WATCHER[/]
+
+
+      [decoder=THE DOOR IS OPEN]SIGNAL RECEIVED[/]'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10913412364185613
+    m_Localized: OPEN THE DOOR FOR US
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10916838275887105
+    m_Localized: DISCLAIMER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10916838275887106
+    m_Localized: ACCESS NOTICE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10916838275887107
+    m_Localized: 'The materials presented in this archive are works of fiction.
+
+
+      Certain
+      documents may contain references to real historical events, individuals, places,
+      and organizations. Their inclusion does not imply that the events described
+      in these materials actually occurred.
+
+
+      Some materials contain themes
+      and imagery that may cause anxiety or discomfort.
+
+
+      By continuing to
+      work with the archive, you confirm that you have read this notice and voluntarily
+      accept further access to the materials.
+
+
+      If you agree press:
+
+
+      SUBMIT
+      DOCUMENT
+
+
+      Refusal to consent does not exempt an employee from reviewing
+      the materials.'
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10916838275887108
+    m_Localized: YOU AGREE TO GIVE YOURSELF ENTIRELY FOR THE GOOD OF MANKIND
     m_Metadata:
       m_Items: []
   references:
