@@ -27,50 +27,50 @@ MonoBehaviour:
       - type: 4
         value: 100
         fragmentId: 
-      - type: 8
+      - type: 9
         value: 0
         fragmentId: player_consent
-      - type: 7
+      - type: 8
         value: 0
         fragmentId: beacon_spreader
       nextDocumentId: DOC_016_VG
       endsCampaign: 0
     - debugName: N_FORGOTTEN
       conditions:
-      - type: 7
+      - type: 8
         value: 0
         fragmentId: player_consent
-      - type: 7
+      - type: 8
         value: 0
         fragmentId: beacon_spreader
       nextDocumentId: DOC_016_N
       endsCampaign: 0
     - debugName: C_CULT
       conditions:
-      - type: 7
+      - type: 8
         value: 0
         fragmentId: player_consent
-      - type: 8
+      - type: 9
         value: 0
         fragmentId: beacon_spreader
       nextDocumentId: DOC_016_C
       endsCampaign: 0
     - debugName: B_BEACON
       conditions:
-      - type: 8
+      - type: 9
         value: 0
         fragmentId: player_consent
-      - type: 8
+      - type: 9
         value: 0
         fragmentId: beacon_spreader
       nextDocumentId: DOC_016_B
       endsCampaign: 0
     - debugName: G_GOOD
       conditions:
-      - type: 8
+      - type: 9
         value: 0
         fragmentId: player_consent
-      - type: 7
+      - type: 8
         value: 0
         fragmentId: beacon_spreader
       nextDocumentId: DOC_016_G
