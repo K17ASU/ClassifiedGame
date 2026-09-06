@@ -20,7 +20,7 @@ MonoBehaviour:
       - type: 5
         value: 10
         fragmentId: 
-      nextDocumentId: DOC_016_VB
+      nextDocumentId: DOC_16_VB
       endsCampaign: 0
     - debugName: VG_WATCHER
       conditions:
@@ -81,7 +81,7 @@ MonoBehaviour:
     branches: []
     defaultNextDocumentId: 
     endCampaignIfNoBranchMatches: 1
-  - currentDocumentId: DOC_016_VB
+  - currentDocumentId: DOC_16_VB
     branches: []
     defaultNextDocumentId: 
     endCampaignIfNoBranchMatches: 1
