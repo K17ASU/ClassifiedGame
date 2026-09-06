@@ -6,11 +6,98 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05d7a5388b9f36f4aab44ca370e787c2, type: 3}
   m_Name: StoryGraph
   m_EditorClassIdentifier: Assembly-CSharp::StoryGraph
-  campaignPlayableDocumentCount: 0
-  nodes: []
+  campaignPlayableDocumentCount: 16
+  nodes:
+  - currentDocumentId: DOC_015
+    branches:
+    - debugName: VB_DEFEAT
+      conditions:
+      - type: 5
+        value: 10
+        fragmentId: 
+      nextDocumentId: DOC_016_VB
+      endsCampaign: 0
+    - debugName: VG_WATCHER
+      conditions:
+      - type: 4
+        value: 100
+        fragmentId: 
+      - type: 8
+        value: 0
+        fragmentId: player_consent
+      - type: 7
+        value: 0
+        fragmentId: beacon_spreader
+      nextDocumentId: DOC_016_VG
+      endsCampaign: 0
+    - debugName: N_FORGOTTEN
+      conditions:
+      - type: 7
+        value: 0
+        fragmentId: player_consent
+      - type: 7
+        value: 0
+        fragmentId: beacon_spreader
+      nextDocumentId: DOC_016_N
+      endsCampaign: 0
+    - debugName: C_CULT
+      conditions:
+      - type: 7
+        value: 0
+        fragmentId: player_consent
+      - type: 8
+        value: 0
+        fragmentId: beacon_spreader
+      nextDocumentId: DOC_016_C
+      endsCampaign: 0
+    - debugName: B_BEACON
+      conditions:
+      - type: 8
+        value: 0
+        fragmentId: player_consent
+      - type: 8
+        value: 0
+        fragmentId: beacon_spreader
+      nextDocumentId: DOC_016_B
+      endsCampaign: 0
+    - debugName: G_GOOD
+      conditions:
+      - type: 8
+        value: 0
+        fragmentId: player_consent
+      - type: 7
+        value: 0
+        fragmentId: beacon_spreader
+      nextDocumentId: DOC_016_G
+      endsCampaign: 0
+    defaultNextDocumentId: 
+    endCampaignIfNoBranchMatches: 1
+  - currentDocumentId: DOC_016_VG
+    branches: []
+    defaultNextDocumentId: 
+    endCampaignIfNoBranchMatches: 1
+  - currentDocumentId: DOC_016_VB
+    branches: []
+    defaultNextDocumentId: 
+    endCampaignIfNoBranchMatches: 1
+  - currentDocumentId: DOC_016_G
+    branches: []
+    defaultNextDocumentId: 
+    endCampaignIfNoBranchMatches: 1
+  - currentDocumentId: DOC_016_N
+    branches: []
+    defaultNextDocumentId: 
+    endCampaignIfNoBranchMatches: 1
+  - currentDocumentId: DOC_016_C
+    branches: []
+    defaultNextDocumentId: 
+    endCampaignIfNoBranchMatches: 1
+  - currentDocumentId: DOC_016_B
+    branches: []
+    defaultNextDocumentId: 
+    endCampaignIfNoBranchMatches: 1
